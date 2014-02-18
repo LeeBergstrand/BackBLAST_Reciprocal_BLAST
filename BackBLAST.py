@@ -16,7 +16,12 @@
 #----------------------------------------------------------------------------------------
 #===========================================================================================================
 #Imports:
-	
+import sys
+import csv
+import subprocess
+from Bio.Blast.Applications import NcbiblastxCommandline
+from Bio import SearchIO
+from Bio.Blast import NCBIXML
 #===========================================================================================================
 # Functions:
 
@@ -38,6 +43,20 @@ argsCheck() # Checks if the number of arguments are correct.
 queryFile = sys.argv[1]
 
 # File extension check
-if not inFile.endswith(".faa"):
+if not queryFile.endswith(".faa"):
 	print "[Warning] " + inFile + " may not be a amino acid fasta file!"
 	
+BLASTDBFile = sys.argv[2]
+
+print queryFile 
+print BLASTDBFile
+
+BLASTOut = subprocess.check_output(["blastp", "-db", BLASTDBFile, "-query", queryFile, "-evalue", "1e-40", "-num_threads", "16", "-outfmt", "10 qseqid sseqid pident evalue qcovhsp score"]) # Runs BLASTp and save output to a string. Blastp is set to output xml which can be parsed.
+
+BLASTCSVOut = BLASTOut.splitlines(True)
+
+BLASTreader = csv.reader(BLASTCSVOut)
+print BLASTreader.next()
+
+
+ 
