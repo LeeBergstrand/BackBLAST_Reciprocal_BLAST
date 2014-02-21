@@ -19,9 +19,6 @@
 import sys
 import csv
 import subprocess
-from Bio.Blast.Applications import NcbiblastxCommandline
-from Bio import SearchIO
-from Bio.Blast import NCBIXML
 #===========================================================================================================
 # Functions:
 
@@ -34,6 +31,9 @@ def argsCheck():
 		print "Usage: " + sys.argv[0] + " <queryGeneList.faa> <subject1.faa> ... <subjectN.faa>\n"
 		print "Examples:" + sys.argv[0] + " queryGeneList.faa ./*.faa"
 		exit(1) # Aborts program. (exit(1) indicates that an error occured)
+#-------------------------------------------------------------------------------------------------
+# 2: Flitres Blast output HSPs by some catagory. Returns 
+#def 		
 #===========================================================================================================
 # Main program code:
 
@@ -54,9 +54,13 @@ print BLASTDBFile
 BLASTOut = subprocess.check_output(["blastp", "-db", BLASTDBFile, "-query", queryFile, "-evalue", "1e-40", "-num_threads", "16", "-outfmt", "10 qseqid sseqid pident evalue qcovhsp score"]) # Runs BLASTp and save output to a string. Blastp is set to output xml which can be parsed.
 
 BLASTCSVOut = BLASTOut.splitlines(True)
+BLASTreader = csv.reader(BLASTCSVOut) 
 
-BLASTreader = csv.reader(BLASTCSVOut)
-print BLASTreader.next()
+BLASTCSVOutFiltred = []
 
+for HSP in BLASTreader:
+	if HSP[2] >= 30:
+		BLASTCSVOutFiltred.append(HSP) 
 
- 
+for x in BLASTCSVOutFiltred:
+	print x
