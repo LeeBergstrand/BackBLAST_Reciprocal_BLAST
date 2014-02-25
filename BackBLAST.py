@@ -95,7 +95,7 @@ def getQueryProteome(proteomesCSV, queryProtein):
 	return proteomeAccession
 #===========================================================================================================
 # Main program code:
-
+print time.time()
 # House keeping...
 argsCheck() # Checks if the number of arguments are correct.
 
@@ -131,7 +131,7 @@ BackBlastOutput = []
 print "Back-Blasting hits to query proteome..."
 # For each top Hit...
 for hit in BLASTOut:
-	print time.time()
+	#print time.time()
 	
 	subjectProtein = hit[1]
 	queryProtein = hit[0]
@@ -141,11 +141,11 @@ for hit in BLASTOut:
 	
 	# Opens query proteome and extracts fasta formated sequence of the query protien.
 	# This will be used as the query protien fasta will be used as a BLAST query.
-	print time.time()
+	#print time.time()
 	subjectProtienFASTA = subprocess.check_output(["grep", "-A", "1", subjectProtein, BLASTDBFile])
-	print time.time()
+	#print time.time()
 	BackBlastOut = runBLAST(subjectProtienFASTA, CurrentQueryProteome) #Backwards BLASTs from subject protien hit to query proteome.
-	print time.time()
+	#print time.time()
 	BackBlastOut = filtreBLASTCSV(BackBlastOut, 30) # Filtres BLAST results by PIdnet.
 	BackHits = getTopHits(BackBlastOut) # Gets top hits from the BackBlast.
 			
@@ -156,7 +156,7 @@ for hit in BLASTOut:
 			
 	if match == True:
 		BackBlastOutput.append(hit)
-	print time.time()
+	#print time.time()
 OutFile = BLASTDBFile.rstrip(".faa") + ".csv"
 
 # Attempts to write reciprocal BLAST output to file.
@@ -173,4 +173,5 @@ for row in BackBlastOutput:
 	writer.writerow(row)
 
 writeFile.close()
+print time.time()
 print "done"	
