@@ -21,6 +21,7 @@ import sys
 import csv
 import subprocess
 from Bio import SeqIO
+import time
 #===========================================================================================================
 # Functions:
 
@@ -130,6 +131,8 @@ BackBlastOutput = []
 print "Back-Blasting hits to query proteome..."
 # For each top Hit...
 for hit in BLASTOut:
+	print time.time()
+	
 	subjectProtein = hit[1]
 	queryProtein = hit[0]
 	
@@ -137,20 +140,15 @@ for hit in BLASTOut:
 	CurrentQueryProteome = getQueryProteome(QueryProteomes, queryProtein) + ".faa" 
 	
 	# Opens query proteome and extracts fasta formated sequence of the query protien.
-	# This will be used query protien fasta will be used as a BLAST query.
-	try:
-		handle = open(BLASTDBFile, "rU")
-		for record in SeqIO.parse(handle, "fasta") :
-		    if record.id == subjectProtein: 
-				subjectProtienFASTA = record.format("fasta") 
-		handle.close()
-	except IOError:
-		print "Failed to open " + BLASTDBFile
-		exit(1)
-	
+	# This will be used as the query protien fasta will be used as a BLAST query.
+	print time.time()
+	subjectProtienFASTA = subprocess.check_output(["grep", "-A", "1", subjectProtein, BLASTDBFile])
+	print time.time()
 	BackBlastOut = runBLAST(subjectProtienFASTA, CurrentQueryProteome) #Backwards BLASTs from subject protien hit to query proteome.
+	print time.time()
 	BackBlastOut = filtreBLASTCSV(BackBlastOut, 30) # Filtres BLAST results by PIdnet.
-	BackHits = getTopHits(BackBlastOut) # Gets top hits from the BackBlast.	
+	BackHits = getTopHits(BackBlastOut) # Gets top hits from the BackBlast.
+			
 	match = False # By default set match to false
 	for BackHit in BackHits:
 		if BackHit[1] == queryProtein:
@@ -158,8 +156,7 @@ for hit in BLASTOut:
 			
 	if match == True:
 		BackBlastOutput.append(hit)
-
-		
+	print time.time()
 OutFile = BLASTDBFile.rstrip(".faa") + ".csv"
 
 # Attempts to write reciprocal BLAST output to file.
