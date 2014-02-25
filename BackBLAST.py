@@ -3,7 +3,7 @@
 # Descript: A Bio-Python program that takes a list of query proteins and uses local BLASTp to search
 #           for highly similer proteins within a local blast database (usally a local db of a target 
 #           proteome). The program then BLASTps backward from the found subject protein to the proteome 
-#           for which the original query protein is in to confirm orthology. 
+#           for which the original query protein if found in order to confirm gene orthology. 
 #             
 # Requirements: - This program requires the Biopython module: http://biopython.org/wiki/Download
 #               - All operations are done with protien sequences.
@@ -20,7 +20,6 @@ import sys
 import csv
 import subprocess
 from Bio import SeqIO
-import cProfile
 #===========================================================================================================
 # Functions:
 
@@ -45,11 +44,10 @@ def runBLAST(query, BLASTDBFile):
 		blastp = subprocess.Popen(BlastArgs, shell=True, stdin=subprocess.PIPE,stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 		BLASTOut, err = blastp.communicate(query)
 	
-	# Else the string is a file name and should be put in the file argument.
+	# Else the string is a file name and should be submitted as a file argument.
 	else:
 		BLASTOut = subprocess.check_output(["blastp", "-db", BLASTDBFile, "-query", query, "-evalue", "1e-40", "-num_threads", "16", "-outfmt", "10 qseqid sseqid pident evalue qcovhsp score"]) # Runs BLASTp and save output to a string. Blastp is set to output xml which can be parsed.
 	return BLASTOut
-	
 #-------------------------------------------------------------------------------------------------
 # 3: Filters HSPs by Percent Identity...
 def filtreBLASTCSV(BLASTOut, minIdent):
@@ -69,7 +67,6 @@ def filtreBLASTCSV(BLASTOut, minIdent):
 			BLASTCSVOutFiltred.append(HSP) # Appends to output array.
 	
 	return BLASTCSVOutFiltred
-	
 #-------------------------------------------------------------------------------------------------
 # 4: Finds Top Scoring Hit For Each Query Protien In BLAST result... Could be more elegantly done...
 def getTopHits(BLASTCSVOut): 
@@ -150,10 +147,9 @@ for hit in BLASTOut:
 		print "Failed to open " + BLASTDBFile
 		exit(1)
 	
-	#Backwards BLASTs from subject protien hit to query genome.
-	BackBlastOut = runBLAST(subjectProtienFASTA, CurrentQueryGenome)
+	BackBlastOut = runBLAST(subjectProtienFASTA, CurrentQueryGenome) #Backwards BLASTs from subject protien hit to query genome.
 	BackBlastOut = filtreBLASTCSV(BackBlastOut, 30) # Filtres BLAST results by PIdnet.
-	BackHits = getTopHits(BackBlastOut) # Little bit sledge hammery since it goes through all of blast results. 										 # Only first couple of hits will be relevant. 
+	BackHits = getTopHits(BackBlastOut) # Gets top hits from the BackBlast.	
 	match = False # By default set match to false
 	for BackHit in BackHits:
 		if BackHit[1] == queryProtein:
@@ -165,7 +161,7 @@ for hit in BLASTOut:
 		
 OutFile = BLASTDBFile.rstrip(".faa") + ".csv"
 
-# Attempts to write reciprical BLAST output to file.
+# Attempts to write reciprocal BLAST output to file.
 try:
 	writeFile = open(OutFile, "w") 	
 	writer = csv.writer(writeFile)
