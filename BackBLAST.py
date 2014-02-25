@@ -93,6 +93,21 @@ def getQueryProteome(proteomesCSV, queryProtein):
 			proteomeAccession = row[0]
 			break # Should remove break as it is bad voodoo...
 	return proteomeAccession
+#----------------------------------------------------------------------
+# 5: Creates a python dictionary (hash table) that contains the the fasta for each protien in the proteome.
+def createProteomeHash(ProteomeFile):
+	ProteomeHash = dict() 
+	try:
+		handle = open(ProteomeFile, "rU")
+		proteome = SeqIO.parse(handle, "fasta")
+		for record in proteome:
+			ProteomeHash.update({ record.id : record.format("fasta") })
+		handle.close()
+	except IOError:
+		print "Failed to open " + ProteomeFile
+		exit(1)
+		
+	return ProteomeHash
 #===========================================================================================================
 # Main program code:
 print time.time()
@@ -127,25 +142,19 @@ except IOError:
 	exit(1)
 
 BackBlastOutput = []
+SubjectProteomeHash = createProteomeHash(BLASTDBFile) # Creates python dictionary for geneome.
 
 print "Back-Blasting hits to query proteome..."
 # For each top Hit...
 for hit in BLASTOut:
-	#print time.time()
-	
 	subjectProtein = hit[1]
 	queryProtein = hit[0]
 	
 	# Takes the csv list of query proteomes and a queryProtien and find what query proteome the query protien is part of.    
 	CurrentQueryProteome = getQueryProteome(QueryProteomes, queryProtein) + ".faa" 
-	
-	# Opens query proteome and extracts fasta formated sequence of the query protien.
-	# This will be used as the query protien fasta will be used as a BLAST query.
-	#print time.time()
-	subjectProtienFASTA = subprocess.check_output(["grep", "-A", "1", subjectProtein, BLASTDBFile])
-	#print time.time()
+	subjectProtienFASTA = SubjectProteomeHash.get(subjectProtein) # Extracts subjectProtien from python dictionary.
 	BackBlastOut = runBLAST(subjectProtienFASTA, CurrentQueryProteome) #Backwards BLASTs from subject protien hit to query proteome.
-	#print time.time()
+	
 	BackBlastOut = filtreBLASTCSV(BackBlastOut, 30) # Filtres BLAST results by PIdnet.
 	BackHits = getTopHits(BackBlastOut) # Gets top hits from the BackBlast.
 			
@@ -155,8 +164,8 @@ for hit in BLASTOut:
 			match = True
 			
 	if match == True:
-		BackBlastOutput.append(hit)
-	#print time.time()
+		BackBlastOutput.append(hit) 
+
 OutFile = BLASTDBFile.rstrip(".faa") + ".csv"
 
 # Attempts to write reciprocal BLAST output to file.
@@ -173,5 +182,5 @@ for row in BackBlastOutput:
 	writer.writerow(row)
 
 writeFile.close()
-print time.time()
 print "done"	
+print time.time()
