@@ -6,13 +6,14 @@
 #           for which the original query protein if found in order to confirm gene orthology. 
 #             
 # Requirements: - This program requires the Biopython module: http://biopython.org/wiki/Download
+#               - This script requires BLAST+ 2.2.9 or later.
 #               - All operations are done with protien sequences.
 #               - All query proteins should be from sequenced genomes in order to facilitate backwards BLAST. 
 #               - MakeBlastDB must be used to create BLASTp databases for both query and subject proteomes.
 #               - BLAST databases require the FASTA file they were made from to be in the same directory.
 #  
-# Usage: BackBLAST.py <queryGeneList.faa> <queryGenomes.csv> <subject1.faa> ... <subjectN.faa> 
-# Example: BackBLAST.py queryGeneList.faa queryGenomes.csv ./*.faa
+# Usage: BackBLAST.py <queryGeneList.faa> <queryProteomes.csv> <subject1.faa> 
+# Example: BackBLAST.py queryGeneList.faa queryProteomes.csv AUUJ00000000.faa
 #----------------------------------------------------------------------------------------
 #===========================================================================================================
 #Imports:
@@ -29,8 +30,8 @@ def argsCheck():
 		print "Orthologous Gene Finder"
 		print "By Lee Bergstrand\n"
 		print "Please refer to source code for documentation\n"
-		print "Usage: " + sys.argv[0] + " <queryGenomes.csv> <queryGeneList.faa> <subject1.faa> ... <subjectN.faa>\n"
-		print "Examples:" + sys.argv[0] + " queryGenomes.csv queryGeneList.faa ./*.faa"
+		print "Usage: " + sys.argv[0] + " <queryProteomes.csv> <queryGeneList.faa> <subject1.faa>\n"
+		print "Examples:" + sys.argv[0] + " queryProteomes.csv queryGeneList.faa AUUJ0000000.faa"
 		exit(1) # Aborts program. (exit(1) indicates that an error occured)
 #-------------------------------------------------------------------------------------------------
 # 2: Runs BLAST, can either be sent a fasta formatted string or a file ...
@@ -46,7 +47,7 @@ def runBLAST(query, BLASTDBFile):
 	
 	# Else the string is a file name and should be submitted as a file argument.
 	else:
-		BLASTOut = subprocess.check_output(["blastp", "-db", BLASTDBFile, "-query", query, "-evalue", "1e-40", "-num_threads", "16", "-outfmt", "10 qseqid sseqid pident evalue qcovhsp score"]) # Runs BLASTp and save output to a string. Blastp is set to output xml which can be parsed.
+		BLASTOut = subprocess.check_output(["blastp", "-db", BLASTDBFile, "-query", query, "-evalue", "1e-40", "-num_threads", "16", "-outfmt", "10 qseqid sseqid pident evalue qcovhsp score"]) # Runs BLASTp and save output to a string. Blastp is set to output csv which can be parsed.
 	return BLASTOut
 #-------------------------------------------------------------------------------------------------
 # 3: Filters HSPs by Percent Identity...
@@ -83,14 +84,14 @@ def getTopHits(BLASTCSVOut):
 
 	return topHits
 #-------------------------------------------------------------------------------------------------
-# 4: Returns Accession of genome for which the query protein is found
-def getQueryGenome(GenomesCSV, queryProtein):
+# 4: Returns Accession of proteome for which the query protein is found
+def getQueryProteome(proteomesCSV, queryProtein):
 	
-	for row in GenomesCSV:
+	for row in proteomesCSV:
 		if row[1].strip() == queryProtein.strip(): 
-			GenomeAccession = row[0]
+			proteomeAccession = row[0]
 			break # Should remove break as it is bad voodoo...
-	return GenomeAccession
+	return proteomeAccession
 #===========================================================================================================
 # Main program code:
 
@@ -98,44 +99,44 @@ def getQueryGenome(GenomesCSV, queryProtein):
 argsCheck() # Checks if the number of arguments are correct.
 
 queryFile = sys.argv[1]
-queryGenomesFile = sys.argv[2]
+queryProteomesFile = sys.argv[2]
 
 # File extension check
 if not queryFile.endswith(".faa"):
 	print "[Warning] " + queryFile + " may not be a amino acid fasta file!"
 # File extension check
-if not queryGenomesFile.endswith(".csv"):
-	print "[Warning] " + queryGenomesFile + " may not be a csv file!"
+if not queryProteomesFile.endswith(".csv"):
+	print "[Warning] " + queryProteomesFile + " may not be a csv file!"
 	
 BLASTDBFile = sys.argv[3]
 
-print "Forward Blasting to subject Genome..."
-BLASTOut = runBLAST(queryFile, BLASTDBFile) # Forward BLASTs from query protien to subject genome
+print "Forward Blasting to subject proteome..."
+BLASTOut = runBLAST(queryFile, BLASTDBFile) # Forward BLASTs from query protien to subject proteome
 BLASTOut = filtreBLASTCSV(BLASTOut, 30) # Filtres BLAST results by PIdnet.
 
-# Attemps to open csv contain a csv that links each query protien to its respective genome. 
+# Attemps to open csv contain a csv that links each query protien to its respective proteome. 
 try:
-	QueryGenomes = [] # Stores this CSV in memory for later use 
-	inFile = open(queryGenomesFile, "r")
+	QueryProteomes = [] # Stores this CSV in memory for later use 
+	inFile = open(queryProteomesFile, "r")
 	reader = csv.reader(inFile) # opens file with csv module which takes into account verying csv formats and parses correctly
 	for row in reader:
-		QueryGenomes.append(row)
+		QueryProteomes.append(row)
 except IOError:
-	print "Failed to open " + queryGenomesFile
+	print "Failed to open " + queryProteomesFile
 	exit(1)
 
 BackBlastOutput = []
 
-print "Back Blasting Hits to Query Genome..."
+print "Back-Blasting hits to query proteome..."
 # For each top Hit...
 for hit in BLASTOut:
 	subjectProtein = hit[1]
 	queryProtein = hit[0]
 	
-	# Takes the csv list of query genomes and a queryProtien and find what query genome the query protien is part of.    
-	CurrentQueryGenome = getQueryGenome(QueryGenomes, queryProtein) + ".faa" 
+	# Takes the csv list of query proteomes and a queryProtien and find what query proteome the query protien is part of.    
+	CurrentQueryProteome = getQueryProteome(QueryProteomes, queryProtein) + ".faa" 
 	
-	# Opens query genome and extracts fasta formated sequence of the query protien.
+	# Opens query proteome and extracts fasta formated sequence of the query protien.
 	# This will be used query protien fasta will be used as a BLAST query.
 	try:
 		handle = open(BLASTDBFile, "rU")
@@ -147,7 +148,7 @@ for hit in BLASTOut:
 		print "Failed to open " + BLASTDBFile
 		exit(1)
 	
-	BackBlastOut = runBLAST(subjectProtienFASTA, CurrentQueryGenome) #Backwards BLASTs from subject protien hit to query genome.
+	BackBlastOut = runBLAST(subjectProtienFASTA, CurrentQueryProteome) #Backwards BLASTs from subject protien hit to query proteome.
 	BackBlastOut = filtreBLASTCSV(BackBlastOut, 30) # Filtres BLAST results by PIdnet.
 	BackHits = getTopHits(BackBlastOut) # Gets top hits from the BackBlast.	
 	match = False # By default set match to false
