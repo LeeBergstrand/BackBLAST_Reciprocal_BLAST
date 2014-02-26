@@ -110,7 +110,6 @@ def createProteomeHash(ProteomeFile):
 	return ProteomeHash
 #===========================================================================================================
 # Main program code:
-print time.time()
 # House keeping...
 argsCheck() # Checks if the number of arguments are correct.
 
@@ -125,6 +124,8 @@ if not queryProteomesFile.endswith(".csv"):
 	print "[Warning] " + queryProteomesFile + " may not be a csv file!"
 	
 BLASTDBFile = sys.argv[3]
+
+print "Opening " + BLASTDBFile + "..."
 
 print "Forward Blasting to subject proteome..."
 BLASTOut = runBLAST(queryFile, BLASTDBFile) # Forward BLASTs from query protien to subject proteome
@@ -174,13 +175,10 @@ try:
 	writer = csv.writer(writeFile)
 	print ">> Output file created."
 	print ">> Writing Data..."
+	for row in BackBlastOutput:
+		writer.writerow(row)
+	writeFile.close()
 except IOError:
 	print "Failed to create " + outFile
 	exit(1)
-	
-for row in BackBlastOutput:
-	writer.writerow(row)
-
-writeFile.close()
 print "done"	
-print time.time()
