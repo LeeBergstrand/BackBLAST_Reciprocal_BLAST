@@ -133,7 +133,7 @@ BLASTOut = filtreBLASTCSV(BLASTOut, 30) # Filtres BLAST results by PIdnet.
 
 # Attemps to open csv contain a csv that links each query protien to its respective proteome. 
 try:
-	QueryProteomes = [] # Stores this CSV in memory for later use 
+	QueryProteomes = [] # Stores the CSV in memory for later use 
 	inFile = open(queryProteomesFile, "r")
 	reader = csv.reader(inFile) # opens file with csv module which takes into account verying csv formats and parses correctly
 	for row in reader:
@@ -154,7 +154,7 @@ for hit in BLASTOut:
 	# Takes the csv list of query proteomes and a queryProtien and find what query proteome the query protien is part of.    
 	CurrentQueryProteome = getQueryProteome(QueryProteomes, queryProtein) + ".faa" 
 	subjectProtienFASTA = SubjectProteomeHash.get(subjectProtein) # Extracts subjectProtien from python dictionary.
-	BackBlastOut = runBLAST(subjectProtienFASTA, CurrentQueryProteome) #Backwards BLASTs from subject protien hit to query proteome.
+	BackBlastOut = runBLAST(subjectProtienFASTA, CurrentQueryProteome) # Backwards BLASTs from subject protien hit to query proteome.
 	
 	BackBlastOut = filtreBLASTCSV(BackBlastOut, 30) # Filtres BLAST results by PIdnet.
 	BackHits = getTopHits(BackBlastOut) # Gets top hits from the BackBlast.
