@@ -16,12 +16,19 @@
 # Example: BackBLAST.py queryGeneList.faa queryProteomes.csv AUUJ00000000.faa
 #----------------------------------------------------------------------------------------
 #===========================================================================================================
-#Imports:
+#Imports & Setup:
 import sys
 import csv
 import subprocess
 from Bio import SeqIO
-import time
+from Graph import Vertex
+from Graph import Graph
+from multiprocessing import cpu_count
+
+processors = cpu_count() # Gets number of processor cores for BLAST.
+
+# Dev Imports:
+import time # For profiling purposes.
 #===========================================================================================================
 # Functions:
 
@@ -37,22 +44,13 @@ def argsCheck():
 #-------------------------------------------------------------------------------------------------
 # 2: Runs BLAST, can either be sent a fasta formatted string or a file ...
 def runBLAST(query, BLASTDBFile):
-	
-	query = query.strip()
-	
-	# If the string starts with > it is a fasta file and should be sent to blast via stdin.
-	if query.startswith(">"):
-		BlastArgs = "blastp -db "+ BLASTDBFile + " -num_threads 16 -outfmt \"10 qseqid sseqid pident evalue qcovhsp score\""
-		blastp = subprocess.Popen(BlastArgs, shell=True, stdin=subprocess.PIPE,stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-		BLASTOut, err = blastp.communicate(query)
-	
-	# Else the string is a file name and should be submitted as a file argument.
-	else:
-		BLASTOut = subprocess.check_output(["blastp", "-db", BLASTDBFile, "-query", query, "-evalue", "1e-40", "-num_threads", "16", "-outfmt", "10 qseqid sseqid pident evalue qcovhsp score"]) # Runs BLASTp and save output to a string. Blastp is set to output csv which can be parsed.
+	BLASTOut = subprocess.check_output(["blastp", "-db", BLASTDBFile, "-query", query, "-evalue", "1e-40", "-num_threads", str(processors), "-outfmt", "10 qseqid sseqid pident evalue qcovhsp score"]) # Runs BLASTp and save output to a string. Blastp is set to output csv which can be parsed.
 	return BLASTOut
 #-------------------------------------------------------------------------------------------------
 # 3: Filters HSPs by Percent Identity...
-def filtreBLASTCSV(BLASTOut, minIdent):
+def filtreBLASTCSV(BLASTOut):
+	
+	minIdent = 30
 	
 	BLASTCSVOut = BLASTOut.splitlines(True) # Converts raw BLAST csv output into list of csv rows.
 	BLASTreader = csv.reader(BLASTCSVOut) # Reads BLAST csv rows as a csv.
@@ -85,14 +83,19 @@ def getTopHits(BLASTCSVOut):
 
 	return topHits
 #-------------------------------------------------------------------------------------------------
-# 4: Returns Accession of proteome for which the query protein is found
-def getQueryProteome(proteomesCSV, queryProtein):
-	
-	for row in proteomesCSV:
-		if row[1].strip() == queryProtein.strip(): 
-			proteomeAccession = row[0]
-			break # Should remove break as it is bad voodoo...
-	return proteomeAccession
+# 4: Returns a list of accession of the proteomes for which the query proteins is are found.
+def GetQueryProteomeAccessions(queryProteomesFile):
+	# Reads sequence file list and stores it as a string object. Safely closes file.try:
+	try:	
+		with open(queryProteomesFile,"r") as newFile:
+			proteomeAccessions = newFile.read()
+			newFile.close()
+	except IOError:
+		print "Failed to open " + queryProteomesFile
+		exit(1)
+
+	QueryProteomeAccessions = proteomeAccessions.splitlines() # Splits string into a list. Each element is a single line from the string.	
+	return QueryProteomeAccessions
 #----------------------------------------------------------------------
 # 5: Creates a python dictionary (hash table) that contains the the fasta for each protien in the proteome.
 def createProteomeHash(ProteomeFile):
@@ -120,65 +123,60 @@ queryProteomesFile = sys.argv[2]
 if not queryFile.endswith(".faa"):
 	print "[Warning] " + queryFile + " may not be a amino acid fasta file!"
 # File extension check
-if not queryProteomesFile.endswith(".csv"):
-	print "[Warning] " + queryProteomesFile + " may not be a csv file!"
+if not queryProteomesFile.endswith(".txt"):
+	print "[Warning] " + queryProteomesFile + " may not be a txt file!"
 	
 BLASTDBFile = sys.argv[3]
-
 print "Opening " + BLASTDBFile + "..."
 
+BLASTGraph = Graph() # Creates graph to map BLAST hits.
+
 print "Forward Blasting to subject proteome..."
-BLASTOut = runBLAST(queryFile, BLASTDBFile) # Forward BLASTs from query protien to subject proteome
-BLASTOut = filtreBLASTCSV(BLASTOut, 30) # Filtres BLAST results by PIdnet.
+BLASTForward = runBLAST(queryFile, BLASTDBFile) # Forward BLASTs from query protiens to subject proteome
+BLASTForward = filtreBLASTCSV(BLASTForward) # Filtres BLAST results by PIdnet.
 
-# Attemps to open csv contain a csv that links each query protien to its respective proteome. 
-try:
-	QueryProteomes = [] # Stores the CSV in memory for later use 
-	inFile = open(queryProteomesFile, "r")
-	reader = csv.reader(inFile) # opens file with csv module which takes into account verying csv formats and parses correctly
-	for row in reader:
-		QueryProteomes.append(row)
-except IOError:
-	print "Failed to open " + queryProteomesFile
-	exit(1)
+SubjectProteomeHash = createProteomeHash(BLASTDBFile) # Creates python dictionary contianing every protien in the subject Proteome.
+BackBlastQueryFASTAs = []
 
-BackBlastOutput = []
-SubjectProteomeHash = createProteomeHash(BLASTDBFile) # Creates python dictionary for geneome.
-
-print "Back-Blasting hits to query proteome..."
+print "Creating Back-Blasting Query from found subject protiens..."
 # For each top Hit...
-for hit in BLASTOut:
+for hit in BLASTForward:
 	subjectProtein = hit[1]
 	queryProtein = hit[0]
-	
-	# Takes the csv list of query proteomes and a queryProtien and find what query proteome the query protien is part of.    
-	CurrentQueryProteome = getQueryProteome(QueryProteomes, queryProtein) + ".faa" 
 	subjectProtienFASTA = SubjectProteomeHash.get(subjectProtein) # Extracts subjectProtien from python dictionary.
-	BackBlastOut = runBLAST(subjectProtienFASTA, CurrentQueryProteome) # Backwards BLASTs from subject protien hit to query proteome.
+	subjectProtienFASTA.strip()
+	BackBlastQueryFASTAs.append(subjectProtienFASTA) # Addes to master protien list.
 	
-	BackBlastOut = filtreBLASTCSV(BackBlastOut, 30) # Filtres BLAST results by PIdnet.
-	BackHits = getTopHits(BackBlastOut) # Gets top hits from the BackBlast.
-			
-	match = False # By default set match to false
-	for BackHit in BackHits:
-		if BackHit[1] == queryProtein:
-			match = True
-			
-	if match == True:
-		BackBlastOutput.append(hit) 
+CompleteBackBlastQuery = "".join(BackBlastQueryFASTAs)
 
-OutFile = BLASTDBFile.rstrip(".faa") + ".csv"
-
-# Attempts to write reciprocal BLAST output to file.
 try:
-	writeFile = open(OutFile, "w") 	
-	writer = csv.writer(writeFile)
-	print ">> Output file created."
-	print ">> Writing Data..."
-	for row in BackBlastOutput:
-		writer.writerow(row)
+	writeFile = open("tempQuery.faa", "w") 
+	writeFile.write(CompleteBackBlastQuery) 
 	writeFile.close()
 except IOError:
-	print "Failed to create " + outFile
+	print "Failed to create " + "tempQuery.faa"
 	exit(1)
+
+#print CompleteBackBlastQuery
+print "Back-Blasting hits to query proteomes..."
+for proteome in GetQueryProteomeAccessions(queryProteomesFile):
+	proteomeFile = proteome + ".faa"
+	print runBLAST("tempQuery.faa", proteomeFile)
+
+
+print "Done"
+
+OutFile = BLASTDBFile.rstrip(".faa") + ".csv" 
+
+# Attempts to write reciprocal BLAST output to file.
+#try:
+#	writeFile = open(OutFile, "w") 	
+#	writer = csv.writer(writeFile)
+#	print ">> Output file created."
+#	print ">> Writing Data..."
+#	for row in BackBlastOutput:
+#		writer.writerow(row)
+#xcept IOError:
+#	print "Failed to create " + outFile
+#	exit(1)
 print "done"	
