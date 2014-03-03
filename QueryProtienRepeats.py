@@ -60,44 +60,39 @@ for row in reader:
 	BlastHits.append(row)
 readFile.close()
 
-numHits = len(BlastHits)
-finishedFiltering = False
+QueryCounter = {}
 
-print ">> The original number of hits is " + str(len(BlastHits)) + "."
+for hit in BlastHits:
+	QueryProtien = hit[0]
+	if QueryProtien in QueryCounter:
+		QueryCounter[QueryProtien] += 1
+	else:
+		QueryCounter.update({QueryProtien:1})
 
-while finishedFiltering == False:
-	numHits = len(BlastHits)
-	print ">> Filtering..."	
-	for subject in BlastHits:
-		subjectIndex = BlastHits.index(subject) # Get index of subject
-		if (subjectIndex) != (len(BlastHits) - 1): # If subject is not the last in the array. 
-			if BlastHits[subjectIndex][0] == BlastHits[subjectIndex + 1][0]: # If the subject points has hits with multiple querys...
-				if checkForBetterHits(subject,BlastHits) == True: # Check if the query has a better match with another gene.
-					del BlastHits[subjectIndex] # If so delete the original hit.
-	if numHits == len(BlastHits):
-		finishedFiltering = True
+for x in QueryCounter:
+	print x + ":", QueryCounter[x]
 												
-print ">> There is now " + str(len(BlastHits)) + " hits."
+#print ">> There is now " + str(len(BlastHits)) + " hits."
 
 # Opens CSV file for writing.
-try:
-	writeFile = open(outFile, "w") 	
-	writer = csv.writer(writeFile)
-	print ">> Output file created..."
-	print ">> Writing Data..."
-except IOError:
-	print "Failed to create " + outFile
-	exit(1)
+#try:
+#	writeFile = open(outFile, "w") 	
+#	writer = csv.writer(writeFile)
+#	print ">> Output file created..."
+#	print ">> Writing Data..."
+#except IOError:
+#	print "Failed to create " + outFile
+#	exit(1)
 
-try:
-	for row in BlastHits:
-		writer.writerow(row)
-	print ">> Finished Writing."
-	print ">> Closing..."		
-	writeFile.close()
+#try:
+#	for row in BlastHits:
+#		writer.writerow(row)
+#	print ">> Finished Writing."
+#	print ">> Closing..."		
+#	writeFile.close()
 
-except IOError:
-	print "Failed to write to " + outFile
-	exit(1)
-print ">> Done!"
+#except IOError:
+#	print "Failed to write to " + outFile
+#	exit(1)
+#print ">> Done!"
 		
