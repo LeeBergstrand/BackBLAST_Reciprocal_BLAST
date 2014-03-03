@@ -44,13 +44,13 @@ def argsCheck():
 #-------------------------------------------------------------------------------------------------
 # 2: Runs BLAST, can either be sent a fasta formatted string or a file ...
 def runBLAST(query, BLASTDBFile):
-	BLASTOut = subprocess.check_output(["blastp", "-db", BLASTDBFile, "-query", query, "-evalue", "1e-40", "-num_threads", str(processors), "-outfmt", "10 qseqid sseqid pident evalue qcovhsp score"]) # Runs BLASTp and save output to a string. Blastp is set to output csv which can be parsed.
+	BLASTOut = subprocess.check_output(["blastp", "-db", BLASTDBFile, "-query", query, "-evalue", "1e-30", "-num_threads", str(processors), "-outfmt", "10 qseqid sseqid pident evalue qcovhsp score"]) # Runs BLASTp and save output to a string. Blastp is set to output csv which can be parsed.
 	return BLASTOut
 #-------------------------------------------------------------------------------------------------
 # 3: Filters HSPs by Percent Identity...
 def filtreBLASTCSV(BLASTOut):
 	
-	minIdent = 30
+	minIdent = 25
 	
 	BLASTCSVOut = BLASTOut.splitlines(True) # Converts raw BLAST csv output into list of csv rows.
 	BLASTreader = csv.reader(BLASTCSVOut) # Reads BLAST csv rows as a csv.
@@ -131,14 +131,14 @@ print "Opening " + BLASTDBFile + "..."
 
 BLASTGraph = Graph() # Creates graph to map BLAST hits.
 
-print "Forward Blasting to subject proteome..."
+print ">> Forward Blasting to subject proteome..."
 BLASTForward = runBLAST(queryFile, BLASTDBFile) # Forward BLASTs from query protiens to subject proteome
 BLASTForward = filtreBLASTCSV(BLASTForward) # Filtres BLAST results by PIdnet.
 
 SubjectProteomeHash = createProteomeHash(BLASTDBFile) # Creates python dictionary contianing every protien in the subject Proteome.
 BackBlastQueryFASTAs = []
 
-print "Creating Back-Blasting Query from found subject protiens..."
+print ">> Creating Back-Blasting Query from found subject protiens..."
 # For each top Hit...
 for hit in BLASTForward:
 	subjectProtein = hit[1]
@@ -158,60 +158,46 @@ except IOError:
 	exit(1)
 
 BackBLASTResults = []
-print "Back-Blasting hits to query proteomes..."
+print ">> Back-Blasting hits to query proteomes..."
 for proteome in GetQueryProteomeAccessions(queryProteomesFile):
 	proteomeFile = proteome + ".faa"
 	BackBLASTResults.append(runBLAST("tempQuery.faa", proteomeFile))
 
 BLASTBackward = "".join(BackBLASTResults)
 BLASTBackward = filtreBLASTCSV(BLASTBackward) # Filtres BLAST results by PIdnet.
-
-print "Creating Graph..."
+	
+print ">> Creating Graph..."
 for hit in BLASTForward:
 	BLASTGraph.addEdge(hit[0],hit[1],hit[5])
 for hit in BLASTBackward:
 	BLASTGraph.addEdge(hit[0],hit[1],hit[5])
+	
+BackBlastOutput = list(BLASTForward)
 
+print ">> Checking if forward hit subjects have better reciprical hits than query."
 for hit in BLASTForward: 
-	print "=================================================================="
-	print "Forward Hit:", hit
 	queryProtien = BLASTGraph.getVertex(hit[0])
-	print "Query Protien:", queryProtien.id
 	subjectProtien = BLASTGraph.getVertex(hit[1])
-	print "Subject Protien:", subjectProtien.id
-	forwardHitScore = queryProtien.getWeight(subjectProtien)
-	print "Blast Score According to Graph:", forwardHitScore
-	print
-	print "Subject Protien Back-Hits:"
+	
 	topBackHitScore = 0
+	# Find the top score of the best reciprical BLAST hit.
 	for backHit in subjectProtien.getConnections():
-		backHitScore = subjectProtien.getWeight(backHit)
-		print "Back-Hit Protien:", backHit.id
-		print "Back-Hit Score:", backHitScore
+		backHitScore = subjectProtien.getWeight(backHit) # The edge weight between the subject and its reciprocal BLAST hit is the BLAST score.
 		if backHitScore >= topBackHitScore:
 			topBackHitScore = backHitScore
-		print "+++++++++++++++++++++++++++++++++++++++++++"
-	print "Top Back-Hit Score:", topBackHitScore
-	print "Forward-Hit Score:", forwardHitScore
+	
+	# Check if the query is the best reciprical BLAST hit for the subject.
 	deleteHit = False
 	if queryProtien in subjectProtien.getConnections():
-		print "The Query Protien is a back hit."
-		if forwardHitScore >= topBackHitScore:
-			print "Query Protien is best hit!"
-		else:
-			print "Query Protien is not best hit :("
-			deleteHit = True
+		BackHitToQueryScore = subjectProtien.getWeight(queryProtien) # The edge weight between the subject and the query is the reciprocal BLAST score.
+		if BackHitToQueryScore < topBackHitScore: 
+			deleteHit = True  # If the query is not the best reciprocal BLAST hit simply delete it from the BackBlastOutput.
 	else:
-		print "The Query Protien is not a back hit."
-		deleteHit = True
-	print "We should delete the hit.", deleteHit
+		deleteHit = True # If the query is not a reciprocal BLAST hit simply delete it from the BackBlastOutput.
 	
 	if deleteHit == True:
-		del BLASTForward[BLASTForward.index(hit)]
-		print "Deleting the hit!"
-print "Done"
-
-BackBlastOutput = BLASTForward
+		del BackBlastOutput[BackBlastOutput.index(hit)] # Delete the forward BLAST hit from BackBlastOutput.
+print ">> Done"
 
 OutFile = BLASTDBFile.rstrip(".faa") + ".csv" 
 
