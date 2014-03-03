@@ -68,21 +68,6 @@ def filtreBLASTCSV(BLASTOut):
 	
 	return BLASTCSVOutFiltred
 #-------------------------------------------------------------------------------------------------
-# 4: Finds Top Scoring Hit For Each Query Protien In BLAST result... Could be more elegantly done...
-def getTopHits(BLASTCSVOut): 
-	
-	topHits = []
-	topHits.append(BLASTCSVOut[0])	
-	currentQuery = BLASTCSVOut[0]
-	
-	# If ties occur include these tied in the top hit list. (Ties should have the same score)
-	for x in range(1, len(BLASTCSVOut)):
-		if BLASTCSVOut[x][5] == currentQuery[5]:			topHits.append(BLASTCSVOut[x])
-		else:
-			break # Break out of loop if hit has lower score than top hit. # Should remove break as it is bad voodoo...
-
-	return topHits
-#-------------------------------------------------------------------------------------------------
 # 4: Returns a list of accession of the proteomes for which the query proteins is are found.
 def GetQueryProteomeAccessions(queryProteomesFile):
 	# Reads sequence file list and stores it as a string object. Safely closes file.try:
