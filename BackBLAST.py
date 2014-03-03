@@ -157,26 +157,73 @@ except IOError:
 	print "Failed to create " + "tempQuery.faa"
 	exit(1)
 
-#print CompleteBackBlastQuery
+BackBLASTResults = []
 print "Back-Blasting hits to query proteomes..."
 for proteome in GetQueryProteomeAccessions(queryProteomesFile):
 	proteomeFile = proteome + ".faa"
-	print runBLAST("tempQuery.faa", proteomeFile)
+	BackBLASTResults.append(runBLAST("tempQuery.faa", proteomeFile))
 
+BLASTBackward = "".join(BackBLASTResults)
+BLASTBackward = filtreBLASTCSV(BLASTBackward) # Filtres BLAST results by PIdnet.
 
+print "Creating Graph..."
+for hit in BLASTForward:
+	BLASTGraph.addEdge(hit[0],hit[1],hit[5])
+for hit in BLASTBackward:
+	BLASTGraph.addEdge(hit[0],hit[1],hit[5])
+
+for hit in BLASTForward: 
+	print "=================================================================="
+	print "Forward Hit:", hit
+	queryProtien = BLASTGraph.getVertex(hit[0])
+	print "Query Protien:", queryProtien.id
+	subjectProtien = BLASTGraph.getVertex(hit[1])
+	print "Subject Protien:", subjectProtien.id
+	forwardHitScore = queryProtien.getWeight(subjectProtien)
+	print "Blast Score According to Graph:", forwardHitScore
+	print
+	print "Subject Protien Back-Hits:"
+	topBackHitScore = 0
+	for backHit in subjectProtien.getConnections():
+		backHitScore = subjectProtien.getWeight(backHit)
+		print "Back-Hit Protien:", backHit.id
+		print "Back-Hit Score:", backHitScore
+		if backHitScore >= topBackHitScore:
+			topBackHitScore = backHitScore
+		print "+++++++++++++++++++++++++++++++++++++++++++"
+	print "Top Back-Hit Score:", topBackHitScore
+	print "Forward-Hit Score:", forwardHitScore
+	deleteHit = False
+	if queryProtien in subjectProtien.getConnections():
+		print "The Query Protien is a back hit."
+		if forwardHitScore >= topBackHitScore:
+			print "Query Protien is best hit!"
+		else:
+			print "Query Protien is not best hit :("
+			deleteHit = True
+	else:
+		print "The Query Protien is not a back hit."
+		deleteHit = True
+	print "We should delete the hit.", deleteHit
+	
+	if deleteHit == True:
+		del BLASTForward[BLASTForward.index(hit)]
+		print "Deleting the hit!"
 print "Done"
+
+BackBlastOutput = BLASTForward
 
 OutFile = BLASTDBFile.rstrip(".faa") + ".csv" 
 
-# Attempts to write reciprocal BLAST output to file.
-#try:
-#	writeFile = open(OutFile, "w") 	
-#	writer = csv.writer(writeFile)
-#	print ">> Output file created."
-#	print ">> Writing Data..."
-#	for row in BackBlastOutput:
-#		writer.writerow(row)
-#xcept IOError:
-#	print "Failed to create " + outFile
-#	exit(1)
+#Attempts to write reciprocal BLAST output to file.
+try:
+	writeFile = open(OutFile, "w") 	
+	writer = csv.writer(writeFile)
+	print ">> Output file created."
+	print ">> Writing Data..."
+	for row in BackBlastOutput:
+		writer.writerow(row)
+except IOError:
+	print "Failed to create " + outFile
+	exit(1)
 print "done"	
