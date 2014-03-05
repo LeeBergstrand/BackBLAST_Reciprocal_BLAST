@@ -120,6 +120,11 @@ print ">> Forward Blasting to subject proteome..."
 BLASTForward = runBLAST(queryFile, BLASTDBFile) # Forward BLASTs from query protiens to subject proteome
 BLASTForward = filtreBLASTCSV(BLASTForward) # Filtres BLAST results by PIdnet.
 
+if len(BLASTForward) == 0:
+	print ">> No Forward hits in subject proteome were found."
+	print ">> Exiting."
+	exit(1) # Aborts program. (exit(1) indicates that an error occured)
+
 SubjectProteomeHash = createProteomeHash(BLASTDBFile) # Creates python dictionary contianing every protien in the subject Proteome.
 BackBlastQueryFASTAs = []
 
@@ -150,7 +155,7 @@ for proteome in GetQueryProteomeAccessions(queryProteomesFile):
 
 BLASTBackward = "".join(BackBLASTResults)
 BLASTBackward = filtreBLASTCSV(BLASTBackward) # Filtres BLAST results by PIdnet.
-	
+
 print ">> Creating Graph..."
 for hit in BLASTForward:
 	BLASTGraph.addEdge(hit[0],hit[1],hit[5])
@@ -159,7 +164,7 @@ for hit in BLASTBackward:
 	
 BackBlastOutput = list(BLASTForward)
 
-print ">> Checking if forward hit subjects have better reciprical hits than query."
+print ">> Checking if forward hit subjects have better reciprocal hits than query."
 for hit in BLASTForward: 
 	queryProtien = BLASTGraph.getVertex(hit[0])
 	subjectProtien = BLASTGraph.getVertex(hit[1])
