@@ -34,3 +34,10 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+# R/RStudio
+.Rhistory
+.RData
+
+# OSX
+.DS_Store
