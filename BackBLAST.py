@@ -2,15 +2,15 @@
 # Created by: Lee Bergstrand
 # Descript: A Bio-Python program that takes a list of query proteins and uses local BLASTp to search
 #           for highly similer proteins within a local blast database (usally a local db of a target 
-#           proteome). The program then BLASTps backward from the found subject protein to the proteome 
-#           for which the original query protein if found in order to confirm gene orthology. 
+#           proteome). The program then BLASTps backward from the found subject proteins to the proteome 
+#           for which the original query protein is found in order to confirm gene orthology. 
 #             
 # Requirements: - This program requires the Biopython module: http://biopython.org/wiki/Download
 #               - This script requires BLAST+ 2.2.9 or later.
 #               - All operations are done with protien sequences.
 #               - All query proteins should be from sequenced genomes in order to facilitate backwards BLAST. 
 #               - MakeBlastDB must be used to create BLASTp databases for both query and subject proteomes.
-#               - BLAST databases require the FASTA file they were made from to be in the same directory.
+#               - BLAST databases require the FASTA file they were made from be in the same directory.
 #  
 # Usage: BackBLAST.py <queryGeneList.faa> <queryProteomes.csv> <subject1.faa> 
 # Example: BackBLAST.py queryGeneList.faa queryProteomes.csv AUUJ00000000.faa
@@ -44,7 +44,8 @@ def argsCheck():
 #-------------------------------------------------------------------------------------------------
 # 2: Runs BLAST, can either be sent a fasta formatted string or a file ...
 def runBLAST(query, BLASTDBFile):
-	BLASTOut = subprocess.check_output(["blastp", "-db", BLASTDBFile, "-query", query, "-evalue", "1e-30", "-num_threads", str(processors), "-outfmt", "10 qseqid sseqid pident evalue qcovhsp score"]) # Runs BLASTp and save output to a string. Blastp is set to output csv which can be parsed.
+	# Runs BLASTp and saves the output to a string. Blastp is set to output a csv which can be parsed by Pythons CSV module.
+	BLASTOut = subprocess.check_output(["blastp", "-db", BLASTDBFile, "-query", query, "-evalue", "1e-30", "-num_threads", str(processors), "-outfmt", "10 qseqid sseqid pident evalue qcovhsp score"]) 
 	return BLASTOut
 #-------------------------------------------------------------------------------------------------
 # 3: Filters HSPs by Percent Identity...
