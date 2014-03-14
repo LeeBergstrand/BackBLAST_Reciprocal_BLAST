@@ -33,8 +33,8 @@ import time # For profiling purposes.
 # Functions:
 
 # 1: Checks if in proper number of arguments are passed gives instructions on proper use.
-def argsCheck():
-	if len(sys.argv) < 4:
+def argsCheck(argsCount):
+	if len(sys.argv) < argsCount:
 		print "Orthologous Gene Finder"
 		print "By Lee Bergstrand\n"
 		print "Please refer to source code for documentation\n"
@@ -100,7 +100,7 @@ def createProteomeHash(ProteomeFile):
 #===========================================================================================================
 # Main program code:
 # House keeping...
-argsCheck() # Checks if the number of arguments are correct.
+argsCheck(4) # Checks if the number of arguments are correct.
 
 queryFile = sys.argv[1]
 queryProteomesFile = sys.argv[2]
