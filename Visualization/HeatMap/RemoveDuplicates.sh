@@ -1,5 +1,5 @@
 #!/bin/bash
-# A simple script for cleans duplicate sequences  batch creation of blast databases from a directory with fasta files.
+# A simple script that removes multiple hits from BackBlast results.
 
 for fasta;
 do
