@@ -1,43 +1,35 @@
 #!/usr/bin/env Rscript 
 # Created by: Lee Bergstrand & Erick Cardenas Poire 
-# Descript: Converts BLAST results BackBlast into a heatmap.  
+# Descript: Converts BLAST TotalBLASTResultss from BackBlast into a heatmap.  
 #             
 # Requirements: - reshape2 and RColorBrewer modules
 #----------------------------------------------------------------------------------------
 
-# Set working directory. 
+# Sets the working directory. 
 setwd("/Users/lee/Dropbox/R & D/Repositories/BackBLAST-Gene-Cluster-Finder/Visualization/HeatMap/TestData")
 
 # Gets a list files from the working directory.
-alist = list.files(path = getwd(), all.files = FALSE, pattern = "\\.csv$") 
+fileList = list.files(path = getwd(), all.files = FALSE, pattern = "\\.csv$") 
 
-result = matrix(data = 0, nrow = 0,ncol = 7)
-colnames(result) = c("V1","V2","V3","V4","V5","V6","filename")
-dim(result)
+TotalBLASTResults = matrix(data = 0, nrow = 0, ncol = 7)
 
-counter = 1
-counter=2
-while (counter <= length(alist)){
-  set_name = gsub("( )", "", paste(alist[counter]))
-  data = read.csv(set_name,header=FALSE,stringsAsFactors=TRUE)
-  filename = matrix(data = alist[counter], nrow = nrow(data), ncol = 1)
-  data2  = cbind(data, filename)
-  result = rbind(result,data2)
-  #print(filename)
-  counter = counter + 1
+fileCounter = 1
+while (fileCounter <= length(fileList)){
+  BackBLASTResults = read.csv(fileList[fileCounter], header = FALSE, stringsAsFactors = TRUE) # Inport data from csv file from BackBLAST.py
+  SubjectAccession = sub(".csv$", "", fileList[fileCounter]) # Remove .csv suffix from csv filename. This should be the subject organism accession.
+  SubjectAccessionColumn = matrix(data = SubjectAccession, nrow = nrow(BackBLASTResults), ncol = 1) # Makes a column that contains only the organism accession as data.
+  BackBLASTResults  = cbind(BackBLASTResults, SubjectAccessionColumn) # Concatenates SubjectAccessionColumn to the BackBLAST results.
+  TotalBLASTResults = rbind(TotalBLASTResults, BackBLASTResults) # Concatenates the current csv files BLAST results to the total BLAST results.
+  fileCounter = fileCounter + 1
 }
+
+colnames(TotalBLASTResults) = c("QuerySeqID", "SubjectSeqID", "PercentIdent", "Evalue", "QueryCoverage", "Bitscore", "TargetOrganism")
 
 library(reshape2)
 library(RColorBrewer)
 
 #check this function help to see what to do when multiple values occur
-mymatrix = acast(result, V1~filename, value.var="V3")
+HeatmapMatrix = acast(TotalBLASTResults, QuerySeqID ~ TargetOrganism, value.var = "PercentIdent") # Converts TotalBLASTResults to wide format data matrix.
+HeatmapMatrix[is.na(HeatmapMatrix)] = 0 # Replaces NA values with zero for heatmap function.
 
-head(mymatrix)
-mymatrix[is.na(mymatrix)] <- 0
-head(mymatrix)
-
-heatmap(mymatrix, col = brewer.pal(8,"Blues"),
-        breaks=c(0,30,40,50,60,70,80,90,100),
-
-        , Rowv = NA) #, #Colv = NA
+heatmap(HeatmapMatrix, col = brewer.pal(8,"Blues"), breaks = c(0,30,40,50,60,70,80,90,100), Rowv = NA, Colv = NA)
