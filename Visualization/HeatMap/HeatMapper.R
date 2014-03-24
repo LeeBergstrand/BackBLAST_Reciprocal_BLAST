@@ -6,7 +6,7 @@
 #----------------------------------------------------------------------------------------
 
 # Set working directory. 
-setwd("/Users/lee/Dropbox/Repositories/BackBLAST_Reciprocal_BLAST/Visualization/HeatMap/TestData")
+setwd("/Users/lee/Dropbox/R & D/Repositories/BackBLAST-Gene-Cluster-Finder/Visualization/HeatMap/TestData")
 
 # Gets a list files from the working directory.
 alist = list.files(path = getwd(), all.files = FALSE, pattern = "\\.csv$") 
