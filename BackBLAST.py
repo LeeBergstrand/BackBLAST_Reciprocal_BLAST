@@ -45,7 +45,7 @@ def argsCheck(argsCount):
 # 2: Runs BLAST, can either be sent a fasta formatted string or a file ...
 def runBLAST(query, BLASTDBFile):
 	# Runs BLASTp and saves the output to a string. Blastp is set to output a csv which can be parsed by Pythons CSV module.
-	BLASTOut = subprocess.check_output(["blastp", "-db", BLASTDBFile, "-query", query, "-evalue", "1e-30", "-num_threads", str(processors), "-outfmt", "10 qseqid sseqid pident evalue qcovhsp score"]) 
+	BLASTOut = subprocess.check_output(["blastp", "-db", BLASTDBFile, "-query", query, "-evalue", "1e-30", "-num_threads", str(processors), "-outfmt", "10 qseqid sseqid pident evalue qcovhsp bitscore"]) 
 	return BLASTOut
 #-------------------------------------------------------------------------------------------------
 # 3: Filters HSPs by Percent Identity...
