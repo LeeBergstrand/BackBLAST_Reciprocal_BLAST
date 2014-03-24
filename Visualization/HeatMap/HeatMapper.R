@@ -4,7 +4,7 @@
 #             
 # Requirements: - reshape2 and RColorBrewer modules
 #----------------------------------------------------------------------------------------
-
+options(warn = 2) 
 # Sets the working directory. 
 setwd("/Users/lee/Dropbox/R & D/Repositories/BackBLAST-Gene-Cluster-Finder/Visualization/HeatMap/TestData")
 
@@ -19,10 +19,12 @@ while (fileCounter <= length(fileList)){
   SubjectAccession = sub(".csv$", "", fileList[fileCounter]) # Remove .csv suffix from csv filename. This should be the subject organism accession.
   SubjectAccessionColumn = matrix(data = SubjectAccession, nrow = nrow(BackBLASTResults), ncol = 1) # Makes a column that contains only the organism accession as data.
   BackBLASTResults  = cbind(BackBLASTResults, SubjectAccessionColumn) # Concatenates SubjectAccessionColumn to the BackBLAST results.
+  BackBLASTResults[[2]] = as.character(BackBLASTResults[[2]]) # Some SubjectSeqIDs in BackBLAST results are purly numeric (example from JGI id numbers). 
+                                                              # This throws a warning when you attempt to append this numeric column in BackBLASTResults 
+                                                              # to a character column in TotalBLASTResults. The code left typecasts this coloumn to character.
   TotalBLASTResults = rbind(TotalBLASTResults, BackBLASTResults) # Concatenates the current csv files BLAST results to the total BLAST results.
   fileCounter = fileCounter + 1
 }
-
 colnames(TotalBLASTResults) = c("QuerySeqID", "SubjectSeqID", "PercentIdent", "Evalue", "QueryCoverage", "Bitscore", "TargetOrganism")
 
 library(reshape2)
