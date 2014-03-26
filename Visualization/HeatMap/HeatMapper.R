@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript 
-# Created by: Lee Bergstrand
+# Created by: Lee Bergstrand & Erick Cardenas Poire 
 # Descript: Converts BLAST TotalBLASTResultss from BackBlast into a heatmap.  
 #             
 # Requirements: - reshape2 and RColorBrewer modules
@@ -56,4 +56,6 @@ cladePosition = cladePosition[order(cladePosition$cladeOrder),]
 newOrder = match(cladePosition$cladeName, colnames(HeatmapMatrix))
 OrderedHeatmapMatrix = HeatmapMatrix[,newOrder]
 
-heatmap(OrderedHeatmapMatrix, col = brewer.pal(8,"Greens"), breaks = c(0,30,40,50,60,70,80,90,100), Rowv = NA, Colv = dendrogram)
+OrderedHeatmapMatrix = OrderedHeatmapMatrix[order(rownames(OrderedHeatmapMatrix)), ] # Reorders rows by gene name.
+
+heatmap(OrderedHeatmapMatrix, col = brewer.pal(9,"Greens"), Rowv = NA, Colv = dendrogram)
