@@ -1,9 +1,11 @@
 plotTreeData<-function(treeFile,matrixFile=NULL,infoFile=NULL,locFile=NULL,outputPDF=NULL,outputPNG=NULL,w,h,matrix.colours=rev(gray(seq(0,1,0.1))),matrix.legend=F,tip.labels=F,offset=0,tip.colour.cex=0.5,legend=T,legend.pos="bottomleft",ancestral.reconstruction=F,boundaries=c(0.5,0.75),cluster=F,locColours=NULL,lwd=1.5,axis=T,axisPos=3,edge.color="black") {
+
 require(ape)
+
 # ladderize tree and extract tip order
 t<-read.tree(treeFile)
 tl<-ladderize(t)
-tips<-tl$edge[,2]
+tips<-tl$edge[,2] # tl[edge,2]
 tip.order<-tips[tips<=length(tl$tip.label)]
 tip.label.order<-tl$tip.label[tip.order]
 
