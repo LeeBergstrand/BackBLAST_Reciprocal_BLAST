@@ -12,8 +12,8 @@
 #               - MakeBlastDB must be used to create BLASTp databases for both query and subject proteomes.
 #               - BLAST databases require the FASTA file they were made from be in the same directory.
 #  
-# Usage: BackBLAST.py <queryGeneList.faa> <queryProteomes.csv> <subject1.faa> 
-# Example: BackBLAST.py queryGeneList.faa queryProteomes.csv AUUJ00000000.faa
+# Usage: BackBLAST.py <queryGeneList.faa> <queryProteomes.txt> <subject1.faa> 
+# Example: BackBLAST.py queryGeneList.faa queryProteomes.txt AUUJ00000000.faa
 #----------------------------------------------------------------------------------------
 #===========================================================================================================
 #Imports & Setup:
@@ -38,8 +38,8 @@ def argsCheck(argsCount):
 		print "Orthologous Gene Finder"
 		print "By Lee Bergstrand\n"
 		print "Please refer to source code for documentation\n"
-		print "Usage: " + sys.argv[0] + " <queryProteomes.csv> <queryGeneList.faa> <subject1.faa>\n"
-		print "Examples:" + sys.argv[0] + " queryProteomes.csv queryGeneList.faa AUUJ0000000.faa"
+		print "Usage: " + sys.argv[0] + " <queryGeneList.faa> <queryProteomes.txt> <subject1.faa>\n"
+		print "Examples:" + sys.argv[0] + " queryGeneList.faa <queryProteomes.txt> AUUJ0000000.faa"
 		exit(1) # Aborts program. (exit(1) indicates that an error occured)
 #-------------------------------------------------------------------------------------------------
 # 2: Runs BLAST, can either be sent a fasta formatted string or a file ...
