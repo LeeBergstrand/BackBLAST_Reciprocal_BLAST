@@ -11,7 +11,7 @@ import sys
 #========================================================================================
 
 # If in proper number of arguments are passed gives instructions on proper use.
-if len(sys.argv) < 2 or len(sys.argv) > 2:
+if len(sys.argv) < 3 or len(sys.argv) > 3:
 	print "Filtres Blast Hits"
 	print "By Lee Bergstrand\n"
 	print "Filtres Blast Hits to ...\n"
@@ -21,22 +21,23 @@ if len(sys.argv) < 2 or len(sys.argv) > 2:
 
 # Stores stores argument data.
 print ">> Opening CSV Blast Result file..."
-inFile  = sys.argv[1]
-outFile = inFile + ".out"
+#ClusterBoundries
+BLASTResults = sys.argv[1]
+outFile = BLASTResults + ".out"
 
 # File extension check
-if not inFile.endswith(".csv"):
-	print "[Warning] " + inFile + " may not be a CSV file!"
+if not BLASTResults.endswith(".csv"):
+	print "[Warning] " + BLASTResults + " may not be a CSV file!"
 else:
 	print ">> Good file extention."	
 	
 # Opens CSV file for reading.
 try:
-	readFile = open(inFile, "r")
+	readFile = open(BLASTResults, "r")
 	reader  = csv.reader(readFile) # opens file with csv module which takes into account verying csv formats and parses correctly
 	print ">> Good CSV file."
 except IOError:
-	print "Failed to open " + inFile
+	print "Failed to open " + BLASTResults
 	exit(1)
 
 BlastHits = []

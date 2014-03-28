@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript 
-# Created by: Lee Bergstrand & Erick Cardenas Poire 
+# Created by: Lee Bergstrand 
 # Descript: Converts BLAST TotalBLASTResultss from BackBlast into a heatmap.  
 #             
 # Requirements: - reshape2 and RColorBrewer modules
@@ -7,6 +7,7 @@
 library(reshape2)
 library(RColorBrewer)
 library(ape)
+library(gplots)
 
 # Sets the working directory. 
 setwd("/Users/lee/Dropbox/RandD/Repositories/BackBLAST-Gene-Cluster-Finder/Visualization/HeatMap/TestData")
@@ -58,4 +59,5 @@ OrderedHeatmapMatrix = HeatmapMatrix[,newOrder]
 
 OrderedHeatmapMatrix = OrderedHeatmapMatrix[order(rownames(OrderedHeatmapMatrix)), ] # Reorders rows by gene name.
 
-heatmap(OrderedHeatmapMatrix, col = brewer.pal(9,"Greens"), Rowv = NA, Colv = dendrogram)
+heatmap.2(OrderedHeatmapMatrix, Rowv = NA, Colv = dendrogram, dendrogram = "column", col = brewer.pal(9,"Greens"), 
+          trace="none", xlab = "Genome", ylab = "Steroid Degrading Gene", density.info = "none")
