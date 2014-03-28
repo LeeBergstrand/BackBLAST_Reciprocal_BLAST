@@ -58,7 +58,7 @@ try:
 	handle = open(geneList, "rU")
 	SeqRecords = SeqIO.parse(handle, "fasta")
 	for record in SeqRecords:
-		FakeResults.append(record.id + ",qseqid,sseqid,0,evalue,qcovhsp,bitscore") # qseqid sseqid pident evalue qcovhsp bitscore
+		FakeResults.append(record.id + ",sseqid,0,evalue,qcovhsp,bitscore") # qseqid sseqid pident evalue qcovhsp bitscore
 	handle.close()
 except IOError:
 	print "Failed to open " + inFile + " or " + outFile

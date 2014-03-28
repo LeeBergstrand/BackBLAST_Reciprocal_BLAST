@@ -10,8 +10,8 @@ library(ape)
 library(gplots)
 
 # Sets the working directory. 
-setwd("/Users/lee/Dropbox/RandD/Repositories/BackBLAST-Gene-Cluster-Finder/Visualization/HeatMap/TestData")
-tree = read.tree("/Users/lee/Dropbox/RandD/Repositories/BackBLAST-Gene-Cluster-Finder/Visualization/HeatMap/SteriodBacteria16SAligned2.nwk")
+setwd("/Users/lee/Dropbox/RandD/Repositories/BackBLAST-Gene-Cluster-Finder/Visualization/HeatMap/TestData/SteroidDegridationResults/FinalResults/")
+tree = read.tree("/Users/lee/Dropbox/RandD/Repositories/BackBLAST-Gene-Cluster-Finder/Visualization/HeatMap/TestData/Tree/SteroidTree.nwk")
 
 # Gets a list files from the working directory.
 fileList = list.files(path = getwd(), all.files = FALSE, pattern = "\\.csv$") 
@@ -60,4 +60,4 @@ OrderedHeatmapMatrix = HeatmapMatrix[,newOrder]
 OrderedHeatmapMatrix = OrderedHeatmapMatrix[order(rownames(OrderedHeatmapMatrix)), ] # Reorders rows by gene name.
 
 heatmap.2(OrderedHeatmapMatrix, Rowv = NA, Colv = dendrogram, dendrogram = "column", col = brewer.pal(9,"Greens"), 
-          trace="none", xlab = "Genome", ylab = "Steroid Degrading Gene", density.info = "none")
+          trace="none", xlab = "Genome", ylab = "Steroid Degrading Gene")
