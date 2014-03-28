@@ -4,8 +4,8 @@
 #
 # Requirements: - This script requires the Biopython module: http://biopython.org/wiki/Download
 #     
-# Usage: getGenbankSeqs.py <sequences.fna> 
-# Example: getGenbankSeqs.py mySeqs.fna
+# Usage: getGenbankSeqs.py <sequences.txt> <geneList.fna>
+# Example: getGenbankSeqs.py mySeqs.txt geneList.fna
 #----------------------------------------------------------------------------------------
 #===========================================================================================================
 #Imports:
@@ -20,8 +20,8 @@ def argsCheck(numArgs):
 	if len(sys.argv) < numArgs or len(sys.argv) > numArgs:
 		print "Takes a nucleotide FASTA file and returns the exact same FASTA file with a reverse complemented sequence."
 		print "By Lee Bergstrand\n"
-		print "Usage: " + sys.argv[0] + " <sequences.fna>"
-		print "Examples: " + sys.argv[0] + " mySeq.fna\n"
+		print "Usage: " + sys.argv[0] + " <sequences.fna> <geneList.fna>"
+		print "Examples: " + sys.argv[0] + " mySeq.fna geneList.fna\n"
 		exit(1) # Aborts program. (exit(1) indicates that an error occurred)
 #===========================================================================================================
 # Main program code:
@@ -69,7 +69,7 @@ FakeResultsOut = "\n".join(FakeResults)
 print ">> Writing Fake Results..."
 
 for x in filesToReplaceList:
-	replacementFileName = x
+	replacementFileName = x + ".csv"
 	
 	try:
 		writeFile = open(replacementFileName, "w")
