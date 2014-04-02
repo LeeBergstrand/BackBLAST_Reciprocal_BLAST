@@ -115,6 +115,8 @@ if not queryProteomesFile.endswith(".txt"):
 BLASTDBFile = sys.argv[3]
 print "Opening " + BLASTDBFile + "..."
 
+OutFile = BLASTDBFile.rstrip(".faa") + ".csv" 
+
 BLASTGraph = Graph() # Creates graph to map BLAST hits.
 
 print ">> Forward Blasting to subject proteome..."
@@ -123,8 +125,15 @@ BLASTForward = filtreBLASTCSV(BLASTForward) # Filtres BLAST results by PIdnet.
 
 if len(BLASTForward) == 0:
 	print ">> No Forward hits in subject proteome were found."
+	# Writes empty file for easier data processing.
+	try:
+		writeFile = open(OutFile, "w") 	
+		writer = csv.writer(writeFile)
+	except IOError:
+		print ">> Failed to create " + outFile
+		exit(1)
 	print ">> Exiting."
-	exit(1) # Aborts program. (exit(1) indicates that an error occured)
+	exit(0) # Aborts program. (exit(0) indicates that no error occured)
 
 SubjectProteomeHash = createProteomeHash(BLASTDBFile) # Creates python dictionary contianing every protien in the subject Proteome.
 BackBlastQueryFASTAs = []
@@ -190,8 +199,6 @@ for hit in BLASTForward:
 		del BackBlastOutput[BackBlastOutput.index(hit)] # Delete the forward BLAST hit from BackBlastOutput.
 print ">> Done"
 
-OutFile = BLASTDBFile.rstrip(".faa") + ".csv" 
-
 #Attempts to write reciprocal BLAST output to file.
 try:
 	writeFile = open(OutFile, "w") 	
@@ -201,6 +208,6 @@ try:
 	for row in BackBlastOutput:
 		writer.writerow(row)
 except IOError:
-	print "Failed to create " + outFile
+	print ">> Failed to create " + outFile
 	exit(1)
-print "done"	
+print ">> done"	
