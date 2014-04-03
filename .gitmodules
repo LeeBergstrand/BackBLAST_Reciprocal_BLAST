@@ -1,0 +1,3 @@
+[submodule "Visualization/Phylotree"]
+	path = Visualization/Phylotree
+	url = https://leebergstrand@github.com/LeeBergstrand/Phylogenetic-Tree-Building.git
