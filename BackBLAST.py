@@ -39,7 +39,7 @@ def argsCheck(argsCount):
 		print "By Lee Bergstrand\n"
 		print "Please refer to source code for documentation\n"
 		print "Usage: " + sys.argv[0] + " <queryGeneList.faa> <queryProteomes.txt> <subject1.faa>\n"
-		print "Examples:" + sys.argv[0] + " queryGeneList.faa <queryProteomes.txt> AUUJ0000000.faa"
+		print "Examples:" + sys.argv[0] + " queryGeneList.faa queryProteomes.txt AUUJ0000000.faa"
 		exit(1) # Aborts program. (exit(1) indicates that an error occured)
 #-------------------------------------------------------------------------------------------------
 # 2: Runs BLAST, can either be sent a fasta formatted string or a file ...
