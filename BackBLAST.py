@@ -9,8 +9,9 @@
 #               - This script requires BLAST+ 2.2.9 or later.
 #               - All operations are done with protien sequences.
 #               - All query proteins should be from sequenced genomes in order to facilitate backwards BLAST. 
-#               - MakeBlastDB must be used to create BLASTp databases for both query and subject proteomes.
-#               - BLAST databases require the FASTA file they were made from be in the same directory.
+#               - MakeAABlastDB must be used to create BLASTp databases for both query and subject proteomes.
+#               - BLAST databases require that the FASTA file that they were created from remain in the same 
+#		  directory as the BLAST database files. 
 #  
 # Usage: BackBLAST.py <queryGeneList.faa> <queryProteomes.txt> <subject1.faa> 
 # Example: BackBLAST.py queryGeneList.faa queryProteomes.txt AUUJ00000000.faa
