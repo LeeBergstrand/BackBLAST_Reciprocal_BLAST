@@ -41,3 +41,11 @@ nosetests.xml
 
 # OSX
 .DS_Store
+
+# NCBI BLAST
+*.faa.phr
+*.faa.pin
+*.faa.pog
+*.faa.psd
+*.faa.psi
+*.faa.psq
