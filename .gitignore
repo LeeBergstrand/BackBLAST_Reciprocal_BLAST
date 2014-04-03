@@ -43,9 +43,15 @@ nosetests.xml
 .DS_Store
 
 # NCBI BLAST
-*.faa.phr
-*.faa.pin
-*.faa.pog
-*.faa.psd
-*.faa.psi
-*.faa.psq
+# *.phr
+# *.pin
+# *.pog
+# *.psd
+# *.psi
+# *.psq
+# *.nhr
+# *.nin
+# *.nog
+# *.nsd
+# *.nsi
+# *.nsq
