@@ -12,8 +12,8 @@
 #               - MakeAABlastDB must be used to create BLASTn databases for both query and subject proteomes.
 #               - BLAST databases require that the FASTA file they were made from remain in the same directory.
 #  
-# Usage: BackBLAST.py <queryGeneList.faa> <queryProteomes.txt> <subject1.faa> 
-# Example: BackBLAST.py queryGeneList.faa queryProteomes.txt AUUJ00000000.faa
+# Usage: BackBLAST.py <queryGeneList.faa> <queryBLASTDB.faa> <subjectBLASTDB.faa> 
+# Example: BackBLAST.py queryGeneList.faa AL123456.3.faa AUUJ00000000.faa
 #----------------------------------------------------------------------------------------
 #===========================================================================================================
 #Imports & Setup:
@@ -38,8 +38,8 @@ def argsCheck(argsCount):
 		print "Orthologous Gene Finder"
 		print "By Lee Bergstrand\n"
 		print "Please refer to source code for documentation\n"
-		print "Usage: " + sys.argv[0] + " <queryGeneList.faa> <queryProteomes.txt> <subject1.faa>\n"
-		print "Examples:" + sys.argv[0] + " queryGeneList.faa queryProteomes.txt AUUJ0000000.faa"
+		print "Usage: " + sys.argv[0] + " <queryGeneList.faa> <queryBLASTDB.faa> <subjectBLASTDB.faa> \n"
+		print "Examples:" + sys.argv[0] + " queryGeneList.faa AL123456.3.faa AUUJ00000000.faa"
 		exit(1) # Aborts program. (exit(1) indicates that an error occured)
 #-------------------------------------------------------------------------------------------------
 # 2: Runs BLAST, can either be sent a fasta formatted string or a file ...
@@ -56,8 +56,8 @@ def filtreBLASTCSV(BLASTOut):
 	BLASTCSVOut = BLASTOut.splitlines(True) # Converts raw BLAST csv output into list of csv rows.
 	BLASTreader = csv.reader(BLASTCSVOut) # Reads BLAST csv rows as a csv.
 
-	BLASTCSVOutFiltred = [] # Note should simply delete unwanted HSPs from curent list rather than making new list. 
-					        # Rather than making a new one.
+	BLASTCSVOutFiltred = [] # Note should simply delete unwanted HSPs from curent list rather than making new list.
+							# Rather than making a new one.
 	for HSP in BLASTreader:
 		if HSP[2] >= minIdent: # Filtres by minimum ident.
 			# Converts each HSP parameter that should be a number to a number.
@@ -69,20 +69,6 @@ def filtreBLASTCSV(BLASTOut):
 	
 	return BLASTCSVOutFiltred
 #-------------------------------------------------------------------------------------------------
-# 4: Returns a list of accession of the proteomes for which the query proteins is are found.
-def GetQueryProteomeAccessions(queryProteomesFile):
-	# Reads sequence file list and stores it as a string object. Safely closes file.try:
-	try:	
-		with open(queryProteomesFile,"r") as newFile:
-			proteomeAccessions = newFile.read()
-			newFile.close()
-	except IOError:
-		print "Failed to open " + queryProteomesFile
-		exit(1)
-
-	QueryProteomeAccessions = proteomeAccessions.splitlines() # Splits string into a list. Each element is a single line from the string.	
-	return QueryProteomeAccessions
-#----------------------------------------------------------------------
 # 5: Creates a python dictionary (hash table) that contains the the fasta for each protien in the proteome.
 def createProteomeHash(ProteomeFile):
 	ProteomeHash = dict() 
@@ -102,18 +88,19 @@ def createProteomeHash(ProteomeFile):
 # House keeping...
 argsCheck(4) # Checks if the number of arguments are correct.
 
-queryFile = sys.argv[1]
-queryProteomesFile = sys.argv[2]
+queryFile   = sys.argv[1]
+queryDBFile = sys.argv[2]
+BLASTDBFile = sys.argv[3]
 
-# File extension check
+print "Opening " + BLASTDBFile + "..."
+
+# File extension checks
 if not queryFile.endswith(".faa"):
 	print "[Warning] " + queryFile + " may not be a amino acid fasta file!"
-# File extension check
-if not queryProteomesFile.endswith(".txt"):
-	print "[Warning] " + queryProteomesFile + " may not be a txt file!"
-	
-BLASTDBFile = sys.argv[3]
-print "Opening " + BLASTDBFile + "..."
+if not queryDBFile.endswith(".faa"):
+	print "[Warning] " + queryDBFile + " may not be a amino acid fasta file!"
+if not BLASTDBFile.endswith(".faa"):
+	print "[Warning] " + BLASTDBFile + " may not be a amino acid fasta file!"
 
 OutFile = BLASTDBFile.rstrip(".faa") + ".csv" 
 
@@ -145,25 +132,22 @@ for hit in BLASTForward:
 	queryProtein = hit[0]
 	subjectProtienFASTA = SubjectProteomeHash.get(subjectProtein) # Extracts subjectProtien from python dictionary.
 	subjectProtienFASTA.strip()
-	BackBlastQueryFASTAs.append(subjectProtienFASTA) # Addes to master protien list.
+	BackBlastQueryFASTAs.append(subjectProtienFASTA) # Addes current subject to overall protien list.
 	
 CompleteBackBlastQuery = "".join(BackBlastQueryFASTAs)
 
+# Attempt to write a temporary fasta file for the reverse BLAST to use. 
 try:
 	writeFile = open("tempQuery.faa", "w") 
 	writeFile.write(CompleteBackBlastQuery) 
 	writeFile.close()
 except IOError:
-	print "Failed to create " + "tempQuery.faa"
+	print "Failed to create tempQuery.faa"
 	exit(1)
 
-BackBLASTResults = []
-print ">> Back-Blasting hits to query proteomes..."
-for proteome in GetQueryProteomeAccessions(queryProteomesFile):
-	proteomeFile = proteome + ".faa"
-	BackBLASTResults.append(runBLAST("tempQuery.faa", proteomeFile))
-
-BLASTBackward = "".join(BackBLASTResults)
+print ">> Blasting backwards from subject genome to query genome."
+# Run backwards BLAST towards query proteome.
+BLASTBackward = runBLAST("tempQuery.faa", queryDBFile)
 BLASTBackward = filtreBLASTCSV(BLASTBackward) # Filtres BLAST results by PIdnet.
 
 print ">> Creating Graph..."
@@ -197,7 +181,6 @@ for hit in BLASTForward:
 	
 	if deleteHit == True:
 		del BackBlastOutput[BackBlastOutput.index(hit)] # Delete the forward BLAST hit from BackBlastOutput.
-print ">> Done"
 
 #Attempts to write reciprocal BLAST output to file.
 try:
@@ -210,4 +193,4 @@ try:
 except IOError:
 	print ">> Failed to create " + outFile
 	exit(1)
-print ">> done"	
+print ">> Done"	
