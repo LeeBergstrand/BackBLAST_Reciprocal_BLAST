@@ -119,7 +119,7 @@ if len(BLASTForward) == 0:
 	except IOError:
 		print ">> Failed to create " + outFile
 		exit(1)
-	print ">> Exiting."
+	print ">> Exiting.\n"
 	exit(0) # Aborts program. (exit(0) indicates that no error occured)
 
 SubjectProteomeHash = createProteomeHash(BLASTDBFile) # Creates python dictionary contianing every protien in the subject Proteome.
