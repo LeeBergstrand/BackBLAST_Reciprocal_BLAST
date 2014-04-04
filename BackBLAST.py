@@ -193,4 +193,4 @@ try:
 except IOError:
 	print ">> Failed to create " + outFile
 	exit(1)
-print ">> Done"	
+print ">> Done\n"	
