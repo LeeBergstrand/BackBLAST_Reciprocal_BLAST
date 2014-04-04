@@ -1,9 +1,9 @@
 #!/usr/bin/env python 
 # Created by: Lee Bergstrand
-# Descript: A Bio-Python program that takes a list of query proteins and uses local BLASTp to search
-#           for highly similer proteins within a local blast database (usally a local db of a target 
-#           proteome). The program then BLASTps backward from the found subject proteins to the proteome 
-#           for which the original query protein is found in order to confirm gene orthology. 
+# Descript: A Biopython program that takes a list of query proteins and uses local BLASTp to search 
+#	    for highly similer proteins within a local blast database (usally a local db of a target 
+#	    proteome). The program then BLASTps backwards from the found subject proteins to the query 
+#	    proteome to confirm gene orthology.
 #             
 # Requirements: - This program requires the Biopython module: http://biopython.org/wiki/Download
 #               - This script requires BLAST+ 2.2.9 or later.
