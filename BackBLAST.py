@@ -26,7 +26,6 @@ from Graph import Graph
 from multiprocessing import cpu_count
 
 processors = cpu_count() # Gets number of processor cores for BLAST.
-
 # Dev Imports:
 import time # For profiling purposes.
 #===========================================================================================================
@@ -38,8 +37,8 @@ def argsCheck(argsCount):
 		print "Orthologous Gene Finder"
 		print "By Lee Bergstrand\n"
 		print "Please refer to source code for documentation\n"
-		print "Usage: " + sys.argv[0] + " <queryGeneList.faa> <queryProteomes.txt> <subject1.faa>\n"
-		print "Examples:" + sys.argv[0] + " queryGeneList.faa queryProteomes.txt AUUJ0000000.faa"
+		print "Usage: " + sys.argv[0] + " <queryGeneList.faa> <queryBLASTDB.faa> <subjectBLASTDB.faa> \n"
+		print "Examples:" + sys.argv[0] + " queryGeneList.faa AL123456.3.faa AUUJ00000000.faa"
 		exit(1) # Aborts program. (exit(1) indicates that an error occured)
 #-------------------------------------------------------------------------------------------------
 # 2: Runs BLAST, can either be sent a fasta formatted string or a file ...
@@ -56,8 +55,8 @@ def filtreBLASTCSV(BLASTOut):
 	BLASTCSVOut = BLASTOut.splitlines(True) # Converts raw BLAST csv output into list of csv rows.
 	BLASTreader = csv.reader(BLASTCSVOut) # Reads BLAST csv rows as a csv.
 
-	BLASTCSVOutFiltred = [] # Note should simply delete unwanted HSPs from curent list rather than making new list. 
-					        # Rather than making a new one.
+	BLASTCSVOutFiltred = [] # Note should simply delete unwanted HSPs from curent list rather than making new list.
+							# Rather than making a new one.
 	for HSP in BLASTreader:
 		if HSP[2] >= minIdent: # Filtres by minimum ident.
 			# Converts each HSP parameter that should be a number to a number.
