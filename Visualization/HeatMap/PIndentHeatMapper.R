@@ -10,7 +10,7 @@ library(ape)
 library(gplots)
 
 # Sets the working directory. 
-setwd("/Users/lee/Dropbox/RandD/Repositories/BackBLAST-Gene-Cluster-Finder/Visualization/HeatMap/TestData/SteroidDegridationResults/FinalResults/")
+setwd("/Users/lee/Dropbox/RandD/Repositories/BackBLAST-Gene-Cluster-Finder/Visualization/HeatMap/TestData/SecondRun/FinalResults/")
 tree = read.tree("/Users/lee/Dropbox/RandD/Repositories/BackBLAST-Gene-Cluster-Finder/Visualization/HeatMap/TestData/Tree/SteroidTree.nwk")
 
 # Gets a list files from the working directory.
@@ -61,7 +61,7 @@ OrderedHeatmapMatrix = OrderedHeatmapMatrix[order(rownames(OrderedHeatmapMatrix)
 
 ColourPal = brewer.pal(9,"YlGn") # Gets Colour Palete from R colour brewer.
 ColourPal[1] = "#F4F5F6" # Swaps lowest colour for off white.
-
+ColourPal = append(ColourPal, "#00311d")
 heatmap.2(OrderedHeatmapMatrix, Rowv = NA, Colv = dendrogram, dendrogram = "column", col = ColourPal, 
-          trace="none", xlab = "Genome", ylab = "Steroid Degrading Gene", breaks = c(0,23,34,40,50,57,65,78,89,100),
+          trace="none", xlab = "Genome", ylab = "Steroid Degrading Gene", breaks = c(0,20,30,40,50,60,65,70,80,90,100),
           margins = c(10,9))
