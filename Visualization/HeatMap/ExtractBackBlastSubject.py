@@ -2,8 +2,8 @@
 # Created by: Lee Bergstrand 
 # Descript: A simple script that extracts the subject BLAST hits for a given subject protien from the csv results from BackBLAST.py.
 #
-# Usage: CSVmod.py <myInputList.txt> <myInputBLASTCSV.csv>
-# Example: CSVmod.py myInputList.txt myInputBLASTCSV.csv 
+# Usage: ExtractBackBlastSubject.py <myInputList.txt> <myInputBLASTCSV.csv>
+# Example: ExtractBackBlastSubject.py myInputList.txt myInputBLASTCSV.csv 
 #----------------------------------------------------------------------------------------
 
 import csv
@@ -12,7 +12,7 @@ import re
 
 # If in proper number of arguments are passed gives instructions on proper use.
 if len(sys.argv) < 3 or len(sys.argv) > 3:
-	print "CSV Modifier"
+	print "BLAST Subject Extractor"
 	print "By Lee Bergstrand\n"
 	print "A simple script that extracts the subject BLAST hits for a given subject protien from the csv results from BackBLAST.py.\n"
 	print "Usage: " + sys.argv[0] + "<myInputList.txt> <myInputBLASTCSV.csv>"
@@ -62,7 +62,9 @@ for row in BLASTreader:
 		if float(row[2]) >= 30:
 			if row[1] not in accessionsToAdd:
 				accessionsToAdd.append(row[1] + "\n")
-	
+
+print accessionsToAdd
+'''	
 try:
 	print ">> Output file created."
 	print ">> Writing Data..."
@@ -71,4 +73,4 @@ try:
 	writeFile.close()
 except IOError:
 	print "Failed to create " + outListFile
-	exit(1)
+	exit(1)''
