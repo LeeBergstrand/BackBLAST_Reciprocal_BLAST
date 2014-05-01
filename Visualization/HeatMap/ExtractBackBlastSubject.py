@@ -60,11 +60,9 @@ accessionsToAdd = []
 for row in BLASTreader:
 	if row[0] in seqList:
 		if float(row[2]) >= 30:
-			if row[1] not in accessionsToAdd:
+			if (row[1] + "\n") not in accessionsToAdd:
 				accessionsToAdd.append(row[1] + "\n")
-
-print accessionsToAdd
-'''	
+				
 try:
 	print ">> Output file created."
 	print ">> Writing Data..."
@@ -73,4 +71,4 @@ try:
 	writeFile.close()
 except IOError:
 	print "Failed to create " + outListFile
-	exit(1)''
+	exit(1)
