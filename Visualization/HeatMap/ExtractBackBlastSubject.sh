@@ -1,5 +1,5 @@
 #!/bin/bash
-# A simple script that removes multiple hits from BackBlast results.
+# A simple script that extracts BLAST hit subjects for a certain set of query accessions from from BackBlast results.
 
 for file;
 do
