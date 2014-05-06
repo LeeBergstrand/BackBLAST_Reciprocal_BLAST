@@ -8,10 +8,9 @@
 
 import csv
 import sys
-import re
 
 # If in proper number of arguments are passed gives instructions on proper use.
-if len(sys.argv) < 3 or len(sys.argv) > 3:
+if len(sys.argv) < 2 or len(sys.argv) > 2:
 	print "BLAST Subject Extractor"
 	print "By Lee Bergstrand\n"
 	print "A simple script that extracts the subject BLAST hits for a given subject protien from the csv results from BackBLAST.py.\n"
