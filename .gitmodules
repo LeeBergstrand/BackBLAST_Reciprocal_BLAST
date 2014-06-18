@@ -1,3 +1,6 @@
 [submodule "PhylogeneticTreeBuilding"]
 	path = PhylogeneticTreeBuilding
 	url = https://leebergstrand@github.com/LeeBergstrand/Phylogenetic-Tree-Building.git
+[submodule "PhyloTree"]
+	path = PhyloTree
+	url = https://leebergstrand@github.com/LeeBergstrand/Phylogenetic-Tree-Building.git
