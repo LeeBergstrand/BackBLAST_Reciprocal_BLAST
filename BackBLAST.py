@@ -89,25 +89,25 @@ def createProteomeHash(ProteomeFile):
 argsCheck(4) # Checks if the number of arguments are correct.
 
 queryFile   = sys.argv[1]
-queryDBFile = sys.argv[2]
-BLASTDBFile = sys.argv[3]
+queryBLASTDBFile = sys.argv[2]
+subjectBLASTDBFile = sys.argv[3]
 
-print "Opening " + BLASTDBFile + "..."
+print "Opening " + subjectBLASTDBFile + "..."
 
 # File extension checks
 if not queryFile.endswith(".faa"):
 	print "[Warning] " + queryFile + " may not be a amino acid fasta file!"
-if not queryDBFile.endswith(".faa"):
-	print "[Warning] " + queryDBFile + " may not be a amino acid fasta file!"
-if not BLASTDBFile.endswith(".faa"):
-	print "[Warning] " + BLASTDBFile + " may not be a amino acid fasta file!"
+if not queryBLASTDBFile.endswith(".faa"):
+	print "[Warning] " + queryBLASTDBFile + " may not be a amino acid fasta file!"
+if not subjectBLASTDBFile.endswith(".faa"):
+	print "[Warning] " + subjectBLASTDBFile + " may not be a amino acid fasta file!"
 
-OutFile = BLASTDBFile.rstrip(".faa") + ".csv" 
+OutFile = subjectBLASTDBFile.rstrip(".faa") + ".csv" 
 
 BLASTGraph = Graph() # Creates graph to map BLAST hits.
 
 print ">> Forward Blasting to subject proteome..."
-BLASTForward = runBLAST(queryFile, BLASTDBFile) # Forward BLASTs from query protiens to subject proteome
+BLASTForward = runBLAST(queryFile, subjectBLASTDBFile) # Forward BLASTs from query protiens to subject proteome
 BLASTForward = filtreBLASTCSV(BLASTForward) # Filtres BLAST results by PIdnet.
 
 if len(BLASTForward) == 0:
@@ -122,7 +122,7 @@ if len(BLASTForward) == 0:
 	print ">> Exiting.\n\n"
 	sys.exit(0) # Aborts program. (exit(0) indicates that no error occured)
 
-SubjectProteomeHash = createProteomeHash(BLASTDBFile) # Creates python dictionary contianing every protien in the subject Proteome.
+SubjectProteomeHash = createProteomeHash(subjectBLASTDBFile) # Creates python dictionary contianing every protien in the subject Proteome.
 BackBlastQueryFASTAs = []
 
 print ">> Creating Back-Blasting Query from found subject protiens..."
@@ -147,7 +147,7 @@ except IOError:
 
 print ">> Blasting backwards from subject genome to query genome."
 # Run backwards BLAST towards query proteome.
-BLASTBackward = runBLAST("tempQuery.faa", queryDBFile)
+BLASTBackward = runBLAST("tempQuery.faa", queryBLASTDBFile)
 BLASTBackward = filtreBLASTCSV(BLASTBackward) # Filtres BLAST results by PIdnet.
 
 print ">> Creating Graph..."
