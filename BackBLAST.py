@@ -40,7 +40,7 @@ def argsCheck(argsCount):
 		print "Please refer to source code for documentation\n"
 		print "Usage: " + sys.argv[0] + " <queryGeneList.faa> <queryBLASTDB.faa> <subjectBLASTDB.faa> \n"
 		print "Examples:" + sys.argv[0] + " queryGeneList.faa AL123456.3.faa AUUJ00000000.faa"
-		exit(1) # Aborts program. (exit(1) indicates that an error occured)
+		sys.exit(1) # Aborts program. (exit(1) indicates that an error occured)
 #-------------------------------------------------------------------------------------------------
 # 2: Runs BLAST, can either be sent a fasta formatted string or a file ...
 def runBLAST(query, BLASTDBFile):
@@ -80,7 +80,7 @@ def createProteomeHash(ProteomeFile):
 		handle.close()
 	except IOError:
 		print "Failed to open " + ProteomeFile
-		exit(1)
+		sys.exit(1)
 		
 	return ProteomeHash
 #===========================================================================================================
@@ -118,9 +118,9 @@ if len(BLASTForward) == 0:
 		writer = csv.writer(writeFile)
 	except IOError:
 		print ">> Failed to create " + outFile
-		exit(1)
+		sys.exit(1)
 	print ">> Exiting.\n\n"
-	exit(0) # Aborts program. (exit(0) indicates that no error occured)
+	sys.exit(0) # Aborts program. (exit(0) indicates that no error occured)
 
 SubjectProteomeHash = createProteomeHash(BLASTDBFile) # Creates python dictionary contianing every protien in the subject Proteome.
 BackBlastQueryFASTAs = []
@@ -143,7 +143,7 @@ try:
 	writeFile.close()
 except IOError:
 	print "Failed to create tempQuery.faa"
-	exit(1)
+	sys.exit(1)
 
 print ">> Blasting backwards from subject genome to query genome."
 # Run backwards BLAST towards query proteome.
@@ -192,5 +192,5 @@ try:
 		writer.writerow(row)
 except IOError:
 	print ">> Failed to create " + outFile
-	exit(1)
+	sys.exit(1)
 print ">> Done\n"	
