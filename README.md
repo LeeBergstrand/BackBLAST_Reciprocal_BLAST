@@ -1,7 +1,7 @@
 BackBLAST_Reciprocal_BLAST
 ==========================
 
-This repository contains a toolkit for finding and visualizing BLAST hits for gene clusters within multiple bacterial genomes. It also contains a reciprocal BLAST program for filtering down BLAST results to only best bidirectional hits.
+This repository contains a reciprocal BLAST program for filtering down BLAST results to only best bidirectional hits. It also contains a toolkit for finding and visualizing BLAST hits for gene clusters within multiple bacterial genomes.
 
 - **BackBLAST.py** - A script that uses NCBI BLAST to search for gene clusters within a within a bacterial genome genome. Non-orthalagous genes are filtred out by identifying and extracting only Bidirectional BLAST Hits using a graph-based algorithm. The algorithm is illustrated below:
 
