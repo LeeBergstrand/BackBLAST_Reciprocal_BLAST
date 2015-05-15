@@ -59,3 +59,4 @@ nosetests.xml
 # BackBLAST
 tempQuery.faa
 BackLog*.txt
+.idea
