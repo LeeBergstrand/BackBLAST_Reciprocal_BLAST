@@ -10,7 +10,7 @@ library(ape)
 library(gplots)
 
 # Sets the working directory. 
-setwd("/Users/lee/Data/SecondBDHAnalysis/InDraft/Results/Filtered")
+setwd("/Users/lee/Dropbox/RandD/Repositories/BackBLAST_Reciprocal_BLAST/TestData/Old_Run/Filtered")
 
 # Gets a list files from the working directory.
 fileList = list.files(path = getwd(), all.files = FALSE, pattern = "\\.csv$") 
@@ -40,5 +40,5 @@ HeatmapMatrix = HeatmapMatrix[order(rownames(HeatmapMatrix)), ] # Reorders rows 
 ColourPal = brewer.pal(9,"YlGn") # Gets Colour Palete from R colour brewer.
 ColourPal[1] = "#F4F5F6" # Swaps lowest colour for off white.
 ColourPal = append(ColourPal, "#00311d")
-heatmap.2(HeatmapMatrix, Rowv = NA, col = ColourPal, 
+heatmap.2(HeatmapMatrix, Rowv=FALSE, Colv=FALSE, col = ColourPal, 
           trace="none", xlab = "Genome", ylab = "Steroid Degrading Gene", margins = c(10,9))

@@ -1,13 +1,13 @@
 #!/usr/bin/env python 
 # Created by: Lee Bergstrand
 # Description: A Biopython program that takes a list of query proteins and uses local BLASTp to search
-#	    for highly similar proteins within a local blast database (usually a local db of a target
-#	    proteome). The program then BLASTps backwards from the found subject proteins to the query 
-#	    proteome to confirm gene orthology.
+#              for highly similar proteins within a local blast database (usually a local db of a target
+#              proteome). The program then BLASTps backwards from the found subject proteins to the query
+#              proteome to confirm gene orthology.
 #             
 # Requirements: - This program requires the Biopython module: http://biopython.org/wiki/Download
 #               - This script requires BLAST+ 2.2.9 or later.
-#               - All operations are done with protien sequences.
+#               - All operations are done with protein sequences.
 #               - All query proteins should be from sequenced genomes in order to facilitate backwards BLAST. 
 #               - MakeAABlastDB must be used to create BLASTn databases for both query and subject proteomes.
 #               - BLAST databases require that the FASTA file they were made from remain in the same directory.
@@ -20,6 +20,7 @@
 import sys
 import csv
 import subprocess
+import tempfile
 from Bio import SeqIO
 from Graph import Graph
 from multiprocessing import cpu_count
@@ -41,10 +42,10 @@ def argsCheck(argsCount):
 
 
 # -------------------------------------------------------------------------------------------------
-# 2: Runs BLAST, can either be sent a fasta formatted string or a file ...
+# 2: Runs BLAST, can either be sent a FASTA formatted string or a file ...
 def runBLAST(query, BLASTDBFile):
 	# Runs BLASTp and saves the output to a string.
-	# Blastp is set to output a csv which can be parsed by Pythons CSV module.
+	# BLASTp is set to output a csv which can be parsed by Pythons CSV module.
 	BLASTOut = subprocess.check_output(
 		["blastp", "-db", BLASTDBFile, "-query", query, "-evalue", "1e-25", "-num_threads", str(processors), "-outfmt",
 		 "10 qseqid sseqid pident evalue qcovhsp bitscore"])
@@ -57,7 +58,7 @@ def filterBLASTCSV(BLASTOut):
 	minIdent = 25
 
 	BLASTCSVOut = BLASTOut.splitlines(True)  # Converts raw BLAST csv output into list of csv rows.
-	BLASTreader = csv.reader(BLASTCSVOut)  # Reads BLAST csv rows as a csv.
+	BLASTreader = csv.reader(BLASTCSVOut)    # Reads BLAST csv rows as a csv.
 
 	BLASTCSVOutFiltred = []  # Note should simply delete unwanted HSPs from current list rather than making new list.
 	# Rather than making a new one.
@@ -74,7 +75,7 @@ def filterBLASTCSV(BLASTOut):
 
 
 # -------------------------------------------------------------------------------------------------
-# 5: Creates a python dictionary (hash table) that contains the the fasta for each protein in the proteome.
+# 5: Creates a python dictionary (hash table) that contains the the FASTA for each protein in the proteome.
 def createProteomeHash(ProteomeFile):
 	ProteomeHash = dict()
 	try:
@@ -89,6 +90,7 @@ def createProteomeHash(ProteomeFile):
 
 	return ProteomeHash
 
+
 # ===========================================================================================================
 # Main program code:
 # House keeping...
@@ -102,11 +104,11 @@ print("Opening " + subjectBLASTDBFile + "...")
 
 # File extension checks
 if not queryFile.endswith(".faa"):
-	print("[Warning] " + queryFile + " may not be a amino acid fasta file!")
+	print("[Warning] " + queryFile + " may not be a amino acid FASTA file!")
 if not queryBLASTDBFile.endswith(".faa"):
-	print("[Warning] " + queryBLASTDBFile + " may not be a amino acid fasta file!")
+	print("[Warning] " + queryBLASTDBFile + " may not be a amino acid FASTA file!")
 if not subjectBLASTDBFile.endswith(".faa"):
-	print("[Warning] " + subjectBLASTDBFile + " may not be a amino acid fasta file!")
+	print("[Warning] " + subjectBLASTDBFile + " may not be a amino acid FASTA file!")
 
 OutFile = subjectBLASTDBFile.rstrip(".faa") + ".csv"
 
@@ -134,6 +136,9 @@ BackBlastQueryFASTAs = []
 
 print(">> Creating Back-Blasting Query from found subject proteins...")
 # For each top Hit...
+
+print(BLASTForward)
+
 for hit in BLASTForward:
 	subjectProtein = hit[1]
 	queryProtein = hit[0]
@@ -143,7 +148,7 @@ for hit in BLASTForward:
 
 CompleteBackBlastQuery = "".join(BackBlastQueryFASTAs)
 
-# Attempt to write a temporary fasta file for the reverse BLAST to use. 
+# Attempt to write a temporary FASTA file for the reverse BLAST to use.
 try:
 	writeFile = open("tempQuery.faa", "w")
 	writeFile.write(CompleteBackBlastQuery)
