@@ -10,8 +10,8 @@ library(ape)
 library(gplots)
 
 # Sets the working directory. 
-setwd("/Users/lee/Data/SecondBDHAnalysis/Proteobacteria/Results/New/Filtered/")
-tree = read.tree("/Users/lee/Data/SecondBDHAnalysis/Proteobacteria/16SRRNA/New/PhyloTree/Bootstrap/Proteo16STree.nwk")
+setwd("/Users/lee/Google Drive/Mohn_Lab_Steroid_Research/SecondBDBHAnalysis/Proteobacteria/OldResults/14-09-18/Filtered")
+tree = read.tree("/Users/lee/Google Drive/Mohn_Lab_Steroid_Research/SecondBDBHAnalysis/Proteobacteria/16SRRNA/New/PhyloTree/Old14-08-19/Bootstrap/Proteo16STree.nwk")
 
 # Gets a list files from the working directory.
 fileList = list.files(path = getwd(), all.files = FALSE, pattern = "\\.csv$") 
