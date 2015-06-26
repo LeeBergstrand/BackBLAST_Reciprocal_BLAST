@@ -137,8 +137,6 @@ BackBlastQueryFASTAs = []
 print(">> Creating Back-Blasting Query from found subject proteins...")
 # For each top Hit...
 
-print(BLASTForward)
-
 for hit in BLASTForward:
 	subjectProtein = hit[1]
 	queryProtein = hit[0]
