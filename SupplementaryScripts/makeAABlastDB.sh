@@ -3,8 +3,8 @@
 
 for fasta;
 do
-	echo Makeing blast database for $fasta
-	makeblastdb -in $fasta -input_type fasta -dbtype prot -parse_seqids;
+	echo Makeing blast database for ${fasta}
+	makeblastdb -in ${fasta} -input_type fasta -dbtype prot -parse_seqids;
 done
 echo All databases created.
 exit 0

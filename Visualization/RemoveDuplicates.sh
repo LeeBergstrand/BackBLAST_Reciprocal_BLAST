@@ -3,8 +3,8 @@
 
 for fasta;
 do
-	echo Removing duplicate hits from on $fasta
-	sort -k 1,1 -t , -u $fasta > "$fasta.out"
+	echo Removing duplicate hits from on ${fasta}
+	sort -k 1,1 -t , -u ${fasta} > "$fasta.out"
 done
 echo Done.
 exit 0
