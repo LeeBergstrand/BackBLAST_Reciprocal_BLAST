@@ -16,15 +16,15 @@
 # Example: BackBLAST.py queryGeneList.faa AL123456.3.faa AUUJ00000000.faa
 # ----------------------------------------------------------------------------------------
 # ===========================================================================================================
+
 # Imports & Setup:
 import csv
-import subprocess
 import sys
-from multiprocessing import cpu_count
+import subprocess
 
 from Bio import SeqIO
-
 from Graph import Graph
+from multiprocessing import cpu_count
 
 processors = cpu_count()  # Gets number of processor cores for BLAST.
 

@@ -5,9 +5,9 @@
 # Usage: BackBLASTStats.py <input.csv>
 # Example: BackBLASTStats.py AUUJ0000000000.csv
 # ----------------------------------------------------------------------------------------
-# Imports 
-import csv
 
+# Imports
+import csv
 import sys
 
 # ========================================================================================

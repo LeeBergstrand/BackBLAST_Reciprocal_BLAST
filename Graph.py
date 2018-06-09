@@ -1,6 +1,6 @@
 #!/usr/bin/env python 
 # From: http://interactivepython.org/courselib/static/pythonds/Graphs/graphintro.html#graphs
-# Description: Lite Weight Script For Creating Graph Objects.
+# Description: Light Weight Script For Creating Graph Objects.
 # ----------------------------------------------------------------------------------------
 
 
@@ -47,9 +47,9 @@ class Graph:
 
     def addEdge(self, f, t, cost=0):
         if f not in self.vertList:
-            nv = self.addVertex(f)
+            self.addVertex(f)
         if t not in self.vertList:
-            nv = self.addVertex(t)
+            self.addVertex(t)
         self.vertList[f].addNeighbor(self.vertList[t], cost)
 
     def getVertices(self):

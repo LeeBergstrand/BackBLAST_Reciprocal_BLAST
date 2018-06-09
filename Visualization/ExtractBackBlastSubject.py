@@ -8,7 +8,6 @@
 # ----------------------------------------------------------------------------------------
 
 import csv
-
 import sys
 
 # If in proper number of arguments are passed gives instructions on proper use.
