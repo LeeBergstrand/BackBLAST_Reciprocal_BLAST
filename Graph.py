@@ -1,4 +1,6 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
+
+# ----------------------------------------------------------------------------------------
 # From: http://interactivepython.org/courselib/static/pythonds/Graphs/graphintro.html#graphs
 # Description: Light Weight Script For Creating Graph Objects.
 # ----------------------------------------------------------------------------------------

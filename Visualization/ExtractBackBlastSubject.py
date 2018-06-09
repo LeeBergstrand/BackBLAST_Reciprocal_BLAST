@@ -1,4 +1,6 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
+
+# ----------------------------------------------------------------------------------------
 # Created by: Lee Bergstrand 
 # Description: A simple script that extracts the subject BLAST hits for
 #              a given subject protein from the csv results from BackBLAST.py.
@@ -7,6 +9,7 @@
 # Example: ExtractBackBlastSubject.py myInputList.txt myInputBLASTCSV.csv 
 # ----------------------------------------------------------------------------------------
 
+# Imports
 import csv
 import sys
 

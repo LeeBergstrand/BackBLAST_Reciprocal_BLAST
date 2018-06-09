@@ -1,4 +1,6 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
+
+# ----------------------------------------------------------------------------------------
 # Created by: Lee Bergstrand 
 # Description: Counts up BLAST hits per subject.
 #

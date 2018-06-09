@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # A simple script that removes multiple hits from BackBlast results.
 
 for fasta;

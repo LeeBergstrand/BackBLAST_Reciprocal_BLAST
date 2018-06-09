@@ -1,4 +1,6 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
+
+# ----------------------------------------------------------------------------------------
 # Created by: Lee Bergstrand
 # Description: A Biopython program that takes a list of query proteins and uses local BLASTp to search
 #              for highly similar proteins within a local blast database (usually a local db of a target
@@ -19,12 +21,13 @@
 
 # Imports & Setup:
 import csv
-import sys
 import subprocess
+import sys
+from multiprocessing import cpu_count
 
 from Bio import SeqIO
+
 from Graph import Graph
-from multiprocessing import cpu_count
 
 processors = cpu_count()  # Gets number of processor cores for BLAST.
 

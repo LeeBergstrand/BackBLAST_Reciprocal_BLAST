@@ -1,4 +1,6 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
+
+# ----------------------------------------------------------------------------------------
 # Created by: Lee Bergstrand 
 # Description: A simple program that takes a FASTA file protein list and makes a csv of fake BLAST results.
 #
@@ -10,7 +12,6 @@
 # ===========================================================================================================
 
 # Imports:
-
 import sys
 
 from Bio import SeqIO

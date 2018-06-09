@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # A simple script for the batch creation of blast databases from a directory with fasta files.
 
 for fasta;

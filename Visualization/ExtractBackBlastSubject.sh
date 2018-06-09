@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # A simple script that extracts BLAST hit subjects for a certain set of query accessions from from BackBlast results.
 
 for file;
