@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# A simple script for the batch creation of blast databases from a directory with fasta files.
+# A simple script for the batch running BLAST on a directory of files.
 
 for fasta;
 do
@@ -8,4 +8,3 @@ do
 done
 echo All files BLASTed.
 exit 0
-

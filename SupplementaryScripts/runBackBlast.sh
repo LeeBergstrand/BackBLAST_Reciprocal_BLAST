@@ -11,4 +11,3 @@ do
 done
 echo All files BLASTed.
 exit 0
-
