@@ -23,14 +23,9 @@
 import csv
 import subprocess
 import sys
-from multiprocessing import cpu_count
 
 from Bio import SeqIO
-
 from Graph import Graph
-
-processors = cpu_count()  # Gets number of processor cores for BLAST.
-
 
 # ===========================================================================================================
 # Functions:
@@ -51,9 +46,8 @@ def argsCheck(argsCount):
 def runBLAST(query, BLASTDBFile):
     # Runs BLASTp and saves the output to a string.
     # BLASTp is set to output a csv which can be parsed by Pythons CSV module.
-    BLASTOut = subprocess.check_output(
-        ["blastp", "-db", BLASTDBFile, "-query", query, "-evalue", "1e-25", "-num_threads", str(processors), "-outfmt",
-         "10 qseqid sseqid pident evalue qcovhsp bitscore"])
+    BLASTOut = subprocess.check_output(["blastp", "-subject", BLASTDBFile, "-query", query, "-evalue", "1e-25",
+                                        "-outfmt", "10 qseqid sseqid pident evalue qcovhsp bitscore"])
     return BLASTOut
 
 
