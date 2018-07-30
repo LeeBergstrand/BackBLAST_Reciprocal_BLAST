@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 
-# ----------------------------------------------------------------------------------------
-# Created by: Lee Bergstrand 
-# Description: A simple program that takes a FASTA file protein list and makes a csv of fake BLAST results.
+# -----------------------------------------------------------------------------------------------------------
+# Created by: Lee Bergstrand
+# Description: A simple program that takes a FASTA file query and makes a csv of blank BLAST results.
 #
 # Requirements: - This script requires the Biopython module: http://biopython.org/wiki/Download
 #     
-# Usage: getGenbankSeqs.py <sequences.txt> <geneList.fna>
-# Example: getGenbankSeqs.py mySeqs.txt geneList.fna
-# ----------------------------------------------------------------------------------------
+# Usage: CreateBlankResults.py <sequence_files.txt> <query.faa>
+# Example: CreateBlankResults.py sequences_files_to_replace.txt query_proteins.faa
+# -----------------------------------------------------------------------------------------------------------
 # ===========================================================================================================
 
 # Imports:
@@ -26,8 +26,8 @@ def argsCheck(numArgs):
         print(
             "Takes a nucleotide FASTA file and returns the exact same FASTA file with a reverse complemented sequence.")
         print("By Lee Bergstrand\n")
-        print("Usage: " + sys.argv[0] + " <sequences.txt> <geneList.fna>")
-        print("Examples: " + sys.argv[0] + " mySeq.txt geneList.fna\n")
+        print("Usage: " + sys.argv[0] + "  <sequence_files.txt> <query.faa>")
+        print("Examples: " + sys.argv[0] + " sequences_files_to_replace.txt query_proteins.faa\n")
         exit(1)  # Aborts program. (exit(1) indicates that an error occurred)
 
 
@@ -50,7 +50,7 @@ if not filesToReplace.endswith(".txt"):
 if not geneList.endswith(".faa"):
     print("[Warning] " + geneList + " may not be a FASTA file!")
 
-# Reads sequence file list and stores it as a string object. Safely closes file.try:
+# Reads sequence file list and stores it as a string.
 try:
     with open(filesToReplace, "rU") as newFile:
         filesToReplace = newFile.read()
