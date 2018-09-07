@@ -1,0 +1,7 @@
+channels:
+  - r
+  - defaults
+dependencies:
+  - python=3.7
+  - r # TODO
+  - r-dplyr # TODO

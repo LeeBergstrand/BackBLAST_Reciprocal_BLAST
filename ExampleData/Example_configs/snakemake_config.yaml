@@ -1,0 +1,23 @@
+# Config file for running the BackBLAST pipeline
+
+## Execution settings
+# Total threads to be used for all processes
+threads: 4
+# Max. memory, in Gigabytes
+memory: 8
+
+
+## Input files
+# Tab-separated file containing the predicted proteomes (from genomes) for BLAST - see ExampleData/Example_configs/genome_ORFs.tsv
+genome_ORFs_tsv: /path/to/genome_ORFs.tsv
+# Tab-separated file containing the reference genes for BLAST - see ExampleData/Example_configs/gene_targets.tsv
+gene_targets_tsv: /path/to/gene_targets.tsv
+# Newick file of phylogenetic tree for the input genomes. Should already be in the orientation that you want it to be plotted in
+phylogenetic_tree_newick: /path/to/phylogenetic_tree.nwk
+
+
+## BLAST settings
+# Only hits with e-value below this number will be kept
+e_value_cutoff: 1e-6
+# Only hits with percent amino acid identity above this number will be kept
+minimum_percent_identity: 25
