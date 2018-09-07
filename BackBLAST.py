@@ -29,6 +29,8 @@ DEFAULT_MINIMUM_IDENTITY_CUTOFF = 25
 
 def get_blast_hight_scoreing_pairs(query_gene_cluster_path, subject_proteome_file, e_value_cutoff, minimum_identity):
     """
+    Runs BLASTp on the given query and subject FASTA files and returns collects high scoring pairs.
+
 
     :param query_gene_cluster_path: The path to the query FASTA file.
     :param subject_proteome_file:  The path to the subject FASTA file.
