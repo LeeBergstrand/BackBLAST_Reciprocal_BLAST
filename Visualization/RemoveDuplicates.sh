@@ -12,6 +12,9 @@ if [ $# == 0 ]; then
     exit 1
 fi
 
+# Print stack trace to log (STDERR)
+set -x
+
 # Get input from user
 input=$1
 
