@@ -1,4 +1,4 @@
-configfile: "config.yaml"
+configfile: "config.yaml" # TODO - specify this during running the script instead of hard-coding
 
 # Specify the minimum snakemake version allowable
 min_version("5.0")
@@ -10,25 +10,26 @@ rule all:
     input:
         "report.html"
 
-rule run_reciprocal_blast
+rule run_first_blast
     input:
-        genomes = config.get("genome_ORFs_tsv")
-        genes = config.get("gene_targets_tsv")
+        lambda wildcards: config["subjects"][wildcards.subject]
     output:
-        "reciprocal_blast/reciprocal_blast_results.tsv"
+        "blast_1/{subject}.tsv"
     conda:
         "envs/reciprocal_blast.yaml"
     log:
-        "logs/reciprocal_blast.log"
+        "logs/blast_1/{subject}.log"
     benchmark:
-        "benchmarks/reciprocal_blast.benchmark.txt"
+        "benchmarks/{subject}.blast_1.benchmark.txt"
     threads:
         config.get("threads", 1)
     params:
+        query_genes=config.get("query_genes")
+        query_genome_orfs=config.get("query_genome_orfs")
         eval = config.get("e_value_cutoff", 0.000001)
         pident = config.get("minimum_percent_identity", 25)
     shell:
-        # TODO - fix this. I just threw in a template command for now, but the required inputs don't even match those that I defined above! I have the command as I'd see it ideally as the second line below, with the real command above.
-        "BackBLAST.py <queryGeneList.faa> <queryBLASTDB.faa> <subjectBLASTDB.faa> > {output} 2> {log}"
-        "BackBLAST.py --genes {input.genes} --orfs {input.genomes} --eval {params.eval} --pident {params.pident} --threads {threads} > {output} 2> {log}"
+        # TODO - make sure the flags match the real flags.
+        "BackBLAST.py --query_genes {params.query_genes} --query_orfs {params.query_genome_orfs} --subject {input} "
+            "--eval {params.eval} --pident {params.pident} --threads {threads} > {output} 2> {log}"
 
