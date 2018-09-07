@@ -33,7 +33,7 @@ def get_blast_hight_scoreing_pairs(query_gene_cluster_path, subject_proteome_fil
 
 
     :param query_gene_cluster_path: The path to the query FASTA file.
-    :param subject_proteome_file:  The path to the subject FASTA file.
+    :param subject_proteome_file: The path to the subject FASTA file.
     :param e_value_cutoff: The e-value cutoff for BLASTp.
     :param minimum_identity: The minimum sequence identity that each HSP should have.
     :return: The blast output as a list of lists representing HSPs and their parameters.
