@@ -15,7 +15,7 @@ rule run_reciprocal_blast
     input:
         lambda wildcards: config["subjects"][wildcards.subject]
     output:
-        "reciprocal_blast/{subject}.tsv"
+        "reciprocal_blast/{subject}.csv"
     conda:
         "envs/reciprocal_blast.yaml"
     log:
@@ -30,26 +30,33 @@ rule run_reciprocal_blast
         pident = config.get("minimum_percent_identity", 25)
     shell:
         # TODO - make sure the flags match the real flags.
-        "BackBLAST.py --query_genes {params.query_genes} --query_orfs {params.query_genome_orfs} --subject {input} "
+        "BackBLAST.py --gene_cluster {params.query_genes} --query_proteome {params.query_genome_orfs} --subject_proteome {input} "
             "--eval {params.eval} --pident {params.pident} --threads {threads} > {output} 2> {log}"
 
-# Removes duplicate BLAST hits for each subject??
+# Removes duplicate BLAST hits for each BLAST table
 rule remove_duplicates
     input:
-        "reciprocal_blast/{subject}.tsv"
+        "reciprocal_blast/{subject}.csv"
     output:
-        "remove_duplicates/{subject}.tsv"
-    conda:
-        "envs/reciprocal_blast.yaml"
+        "remove_duplicates/{subject}.csv"
     log:
         "logs/remove_duplicates/{subject}.log"
     benchmark:
         "benchmarks/{subject}.remove_duplicates.benchmark.txt"
-    threads:
-        config.get("threads", 1)
-    params:
-        query_genes = config.get("query_genes")
-        query_genome_orfs = config.get("query_genome_orfs")
+    threads: 1
     shell:
     # TODO - make sure the flags match the real structure.
     "Visualization/RemoveDuplicates.sh {input} > {output} 2> {log}"
+
+# TODO - this is only run on SOME outputs, correct? How to construct an IF statement here?
+rule create_blank_results
+    input:
+        "remove_duplicates/{subject}.csv"
+    output:
+        ""
+    conda:
+        "envs/reciprocal_blast.yaml"
+    params:
+        query_genes = config.get("query_genes")
+    shell:
+        "CreateBlankResults.py {input} {params.query_genes}"
