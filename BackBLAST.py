@@ -25,7 +25,9 @@ import subprocess
 import sys
 
 from Bio import SeqIO
+
 from Graph import Graph
+
 
 # ===========================================================================================================
 # Functions:
@@ -43,12 +45,23 @@ def argsCheck(argsCount):
 
 # -------------------------------------------------------------------------------------------------
 # 2: Runs BLAST, can either be sent a FASTA formatted string or a file ...
-def runBLAST(query, BLASTDBFile):
-    # Runs BLASTp and saves the output to a string.
-    # BLASTp is set to output a csv which can be parsed by Pythons CSV module.
-    BLASTOut = subprocess.check_output(["blastp", "-subject", BLASTDBFile, "-query", query, "-evalue", "1e-25",
-                                        "-outfmt", "10 qseqid sseqid pident evalue qcovhsp bitscore"])
-    return BLASTOut
+def run_blastp(query_file_path, subject_file_path, e_value_cutoff=1e-25):
+    """
+    Runs BLASTp on the given query and subject FASTA files.
+
+    :param query_file_path: The amino acid query FASTA file.
+    :param subject_file_path: The amino acid BLAST database location (amino acid FASTA file at this location)
+    :param e_value_cutoff: The e-value cutoff for BLASTp (Default = 1e-25).
+    :return:    A csv formatted BLASTp output (query_sequence_id, subject_sequence_id, percent_identity, e-value,
+                query coverage, bitscore)
+    """
+    blast_out = subprocess.check_output(
+        ["blastp", "-query", query_file_path, "-subject", subject_file_path, "-evalue", str(e_value_cutoff),
+         "-outfmt", "10 qseqid sseqid pident evalue qcovhsp bitscore"])
+
+    # Decodes BLASTp output to UTF-8 (In Py3 check_output returns raw bytes)
+    blast_out = blast_out.decode().replace(' ', '')
+    return blast_out
 
 
 # -------------------------------------------------------------------------------------------------
@@ -114,7 +127,7 @@ OutFile = subjectBLASTDBFile.rstrip(".faa") + ".csv"
 BLASTGraph = Graph()  # Creates graph to map BLAST hits.
 
 print(">> Forward Blasting to subject proteome...")
-BLASTForward = runBLAST(queryFile, subjectBLASTDBFile)  # Forward BLASTs from query proteins to subject proteome
+BLASTForward = run_blastp(queryFile, subjectBLASTDBFile)  # Forward BLASTs from query proteins to subject proteome
 BLASTForward = filterBLASTCSV(BLASTForward)  # Filters BLAST results by percent identity.
 
 if len(BLASTForward) == 0:
@@ -156,7 +169,7 @@ except IOError:
 
 print(">> Blasting backwards from subject genome to query genome.")
 # Run backwards BLAST towards query proteome.
-BLASTBackward = runBLAST("tempQuery.faa", queryBLASTDBFile)
+BLASTBackward = run_blastp("tempQuery.faa", queryBLASTDBFile)
 BLASTBackward = filterBLASTCSV(BLASTBackward)  # Filters BLAST results by percent identity.
 
 print(">> Creating Graph...")
