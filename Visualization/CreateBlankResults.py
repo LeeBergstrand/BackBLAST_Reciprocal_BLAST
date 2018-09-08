@@ -8,13 +8,18 @@
 #     
 # Usage: CreateBlankResults.py <sequence_files.txt> <query.faa>
 # Example: CreateBlankResults.py sequences_files_to_replace.txt query_proteins.faa
+# TODO - replace the original with the NEW below.
+# NEW! Example: CreateBlankResults.py blast_output_file.csv query_proteins.faa > new_blast_output_file.csv
+#       Will make a blank file if the input blast file is blank, and will otherwise return the original file.
 # -----------------------------------------------------------------------------------------------------------
 # ===========================================================================================================
 
 # Imports:
 import sys
+import os
 
 from Bio import SeqIO
+from shutil import copyfile
 
 
 # ===========================================================================================================
@@ -32,10 +37,19 @@ def argsCheck(numArgs):
 
 
 # ===========================================================================================================
-# Main program code:
+# Functions:
 
-# House keeping...
-argsCheck(3)  # Checks if the number of arguments are correct.
+def check_if_input_CSV_is_empty(input_csv):
+    # Returns True is the CSV is empty and False if not
+
+    if os.stat(input_csv).st_size == 0:
+        return True
+    elif os.stat(input_csv).st_size > 0:
+        return False
+    else
+        print("ERROR: the input file appears to neither be empty nor non-empty. Exiting...")
+        exit(1)
+
 
 # Stores file one for input checking.
 print(">> Opening FASTA file...")
@@ -90,3 +104,21 @@ for x in filesToReplaceList:
         exit(1)
 
 print(">> Done.")
+
+def main(args):
+    # ===========================================================================================================
+    # Main program code:
+
+    # House keeping...
+    argsCheck(3)  # Checks if the number of arguments are correct.
+
+    # TODO - make input_csv and output_csv variables (global? Then capitalize)
+
+    # If the CSV file is not empty, then just keep the file as is.
+    if check_if_input_CSV_is_empty(input_csv) == False:
+        copyfile(input_csv, output_csv)
+
+    # If it is empty, then make a fake file.
+    elif check_if_input_CSV_is_empty(input_csv) == True:
+        #
+
