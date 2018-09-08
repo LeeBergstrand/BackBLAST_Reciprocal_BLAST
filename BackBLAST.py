@@ -27,7 +27,7 @@ DEFAULT_E_VALUE_CUTOFF = 1e-25
 DEFAULT_MINIMUM_IDENTITY_CUTOFF = 25
 
 
-def get_blast_hight_scoreing_pairs(query_gene_cluster_path, subject_proteome_file, e_value_cutoff, minimum_identity):
+def get_blast_hight_scoring_pairs(query_gene_cluster_path, subject_proteome_file, e_value_cutoff, minimum_identity):
     """
     Runs BLASTp on the given query and subject FASTA files and returns collects high scoring pairs.
 
@@ -202,7 +202,7 @@ def main(args):
 
     print(">> Forward Blasting to subject proteome...")
     # Forward BLASTs from query proteins to subject proteome and filters BLAST results by percent identity.
-    forward_blast_high_scoring_pairs = get_blast_hight_scoreing_pairs(query_gene_cluster_path=query_gene_cluster_path,
+    forward_blast_high_scoring_pairs = get_blast_hight_scoring_pairs(query_gene_cluster_path=query_gene_cluster_path,
                                                                       subject_proteome_file=subject_proteome_file,
                                                                       e_value_cutoff=input_e_value_cutoff,
                                                                       minimum_identity=input_min_ident_cutoff)
@@ -242,7 +242,7 @@ def main(args):
 
     print(">> Blasting backwards from subject genome to query genome.")
     # Run backwards BLAST towards query proteome and filters BLAST results by percent identity.
-    reverse_blast_high_scoring_pairs = get_blast_hight_scoreing_pairs(query_gene_cluster_path="tempQuery.faa",
+    reverse_blast_high_scoring_pairs = get_blast_hight_scoring_pairs(query_gene_cluster_path="tempQuery.faa",
                                                                       subject_proteome_file=query_proteome_path,
                                                                       e_value_cutoff=input_e_value_cutoff,
                                                                       minimum_identity=input_min_ident_cutoff)
