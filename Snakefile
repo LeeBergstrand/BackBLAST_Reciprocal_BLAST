@@ -53,10 +53,11 @@ rule create_blank_results
     input:
         "remove_duplicates/{subject}.csv"
     output:
-        ""
+        "fix_blank_results/{subject}.csv"
     conda:
         "envs/reciprocal_blast.yaml"
     params:
         query_genes = config.get("query_genes")
     shell:
-        "CreateBlankResults.py {input} {params.query_genes}"
+    # TODO - original script needs 'output'!
+        "CreateBlankResults.py {input} {output} {params.query_genes}"
