@@ -25,16 +25,18 @@ from shutil import copyfile
 # ===========================================================================================================
 # Functions:
 
-# 1: Checks if in proper number of arguments are passed gives instructions on proper use.
+# 1: Checks if the proper number of arguments are passed gives instructions on proper use.
 def argsCheck(numArgs):
     if len(sys.argv) < numArgs or len(sys.argv) > numArgs:
         print(
             "Takes a nucleotide FASTA file and returns the exact same FASTA file with a reverse complemented sequence.")
         print("By Lee Bergstrand\n")
-        print("Usage: " + sys.argv[0] + "  <sequence_files.txt> <query.faa>")
-        print("Examples: " + sys.argv[0] + " sequences_files_to_replace.txt query_proteins.faa\n")
+        print("Usage: " + sys.argv[0] + "  <blast_output_file.csv> <query_proteins.faa> > <new_blast_output_file.csv>")
         exit(1)  # Aborts program. (exit(1) indicates that an error occurred)
 
+# Get user-provided variables
+blast_output_file = sys.argv[1]
+query_proteins = sys.argv[2]
 
 # ===========================================================================================================
 # Functions:
@@ -53,24 +55,25 @@ def check_if_input_CSV_is_empty(input_csv):
 
 # Stores file one for input checking.
 print(">> Opening FASTA file...")
-filesToReplace = sys.argv[1]
-geneList = sys.argv[2]
 
-# File extension check
-if not filesToReplace.endswith(".txt"):
-    print("[Warning] " + geneList + " may not be a text file!")
 
-# File extension check
-if not geneList.endswith(".faa"):
-    print("[Warning] " + geneList + " may not be a FASTA file!")
+def file_extension_check(input_filename):
+    # Throws a warning if file extension does not appear to be appropriate
 
-# Reads sequence file list and stores it as a string.
+    if not blast_output_file.endswith(".csv"):
+        print("[Warning] " + blast_output_file + " may not be a CSV file!")
+
+    if not query_proteins.endswith(".faa"):
+        print("[Warning] " + query_proteins + " may not be an amino acid FASTA file!")
+
+# Reads BLAST output file and stores it as a string.
+# TODO - should not be a string
 try:
-    with open(filesToReplace, "rU") as newFile:
-        filesToReplace = newFile.read()
+    with open(blast_output_file, "rU") as newFile:
+        blast_output_file = newFile.read()
         newFile.close()
 except IOError:
-    print("Failed to open " + filesToReplace)
+    print("Failed to open " + blast_output_file)
     exit(1)
 
 # Splits string into a list. Each element is a single line from the string.
@@ -78,14 +81,14 @@ filesToReplaceList = filesToReplace.splitlines()
 
 FakeResults = []
 try:
-    handle = open(geneList, "rU")
+    handle = open(query_proteins, "rU")
     SeqRecords = SeqIO.parse(handle, "fasta")
     for record in SeqRecords:
         FakeResults.append(
             record.id + ",sseqid,0,evalue,qcovhsp,bitscore")  # qseqid sseqid pident evalue qcovhsp bitscore
     handle.close()
 except IOError:
-    print("Failed to open " + filesToReplace + " or " + geneList)
+    print("Failed to open " + blast_output_file + " or " + query_proteins)
     exit(1)
 
 FakeResultsOut = "\n".join(FakeResults)
@@ -120,5 +123,7 @@ def main(args):
 
     # If it is empty, then make a fake file.
     elif check_if_input_CSV_is_empty(input_csv) == True:
-        #
+        # TODO - keep moving the above code into functions and then get it into this block. Then add proper argument parser below...
+        # Doesn't have to be pretty.
+        
 
