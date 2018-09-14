@@ -48,7 +48,8 @@ rule remove_duplicates
     # TODO - make sure the flags match the real structure.
     "Visualization/RemoveDuplicates.sh {input} > {output} 2> {log}"
 
-# TODO - this is only run on SOME outputs, correct? How to construct an IF statement here?
+
+# If BLAST CSV is empty, creates a blank BLAST table
 rule create_blank_results
     input:
         "remove_duplicates/{subject}.csv"
@@ -56,8 +57,11 @@ rule create_blank_results
         "fix_blank_results/{subject}.csv"
     conda:
         "envs/reciprocal_blast.yaml"
+    log:
+        "logs/create_blank_results/{subject}.log"
+    benchmark:
+        "benchmarks/{subject}.create_blank_results.txt"
     params:
-        query_genes = config.get("query_genes")
+        query_genes=config.get("query_genes")
     shell:
-    # TODO - original script needs 'output'!
-        "CreateBlankResults.py {input} {output} {params.query_genes}"
+        "Visualization/CreateBlankResults.py {input} {params.query_genes} {output}"
