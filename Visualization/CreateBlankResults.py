@@ -85,7 +85,7 @@ def generate_blank_results(query_proteins):
         fasta_entries = SeqIO.parse(handle, "fasta")
         for entry in fasta_entries:
             blank_results_list.append(
-                entry.id + ",sseqid,0,evalue,qcovhsp,bitscore")  # qseqid sseqid pident evalue qcovhsp bitscore
+                entry.id + ",NA,NA,NA,NA,NA")  # qseqid sseqid pident evalue qcovhsp bitscore
         handle.close()
 
     except IOError:
