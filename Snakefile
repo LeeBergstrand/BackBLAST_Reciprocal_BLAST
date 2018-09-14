@@ -6,9 +6,11 @@ min_version("5.0")
 shell.executable("/bin/bash")
 shell.prefix("set -o pipefail; ")
 
+
 rule all:
     input:
-        "report.html"
+        "generate_heatmap/BackBLAST_heatmap.pdf"
+
 
 # Runs reciprocal BLAST for each subject genome against the target genes in the query genome
 rule run_reciprocal_blast
@@ -32,6 +34,7 @@ rule run_reciprocal_blast
         # TODO - make sure the flags match the real flags.
         "BackBLAST.py --gene_cluster {params.query_genes} --query_proteome {params.query_genome_orfs} --subject_proteome {input} "
             "--eval {params.eval} --pident {params.pident} --threads {threads} > {output} 2> {log}"
+
 
 # Removes duplicate BLAST hits for each BLAST table
 rule remove_duplicates
@@ -64,4 +67,39 @@ rule create_blank_results
     params:
         query_genes=config.get("query_genes")
     shell:
-        "Visualization/CreateBlankResults.py {input} {params.query_genes} {output}"
+        "Visualization/CreateBlankResults.py {input} {params.query_genes} {output} 2> {log}"
+
+
+# Combine the BLAST tables into a single table, and add a column for sample ID
+rule combine_blast_tables
+    input:
+        tables=expand("fix_blank_results/{subject}.csv", samples=SAMPLES)
+    output:
+        "combine_blast_tables/blast_tables_combined.csv"
+    conda:
+        "envs/R_viz.yaml"
+    log:
+        "logs/combine_blast_tables/combine_blast_tables.log"
+    benchmark:
+        "benchmarks/combine_blast_tables.txt"
+    shell:
+        "Visualization/CombineBlastTables.R {tables} {output} 2> {log}"
+
+
+# Generate the final heatmap
+rule generate_heatmap
+    input:
+        "combine_blast_tables/blast_tables_combined.csv"
+    output:
+        "generate_heatmap/BackBLAST_heatmap.pdf"
+    conda:
+        "envs/R_viz/yaml"
+    log:
+        "logs/generate_heatmap/generate_heatmap.log"
+    benchmark:
+        "benchmarks/generate_heatmap.txt"
+    params:
+        tree_file=config.get("phylogenetic_tree_newick")
+        gene_naming=config.get("gene_naming_tsv")
+    shell:
+        "generate_BackBLAST_heatmap.R -i {input} -o {output} -t {params.tree_file} -g {params.gene_naming} 2> {log}"
