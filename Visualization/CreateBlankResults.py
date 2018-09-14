@@ -96,9 +96,6 @@ def write_blank_results(blank_results, new_blast_file):
 
 
 def main(args):
-    # ===========================================================================================================
-    # Main program code:
-
     # House keeping...
     argsCheck(3)  # Checks if the number of arguments are correct.
 
@@ -132,3 +129,4 @@ def main(args):
         print("Something went wrong. Exiting...")
         exit(1)
 
+main(sys.argv)
