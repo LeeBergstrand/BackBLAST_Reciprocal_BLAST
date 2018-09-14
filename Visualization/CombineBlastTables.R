@@ -72,8 +72,11 @@ load_individual_table <- function(table_filename, header_names) {
   data_table <- read.table(table_filename, header = FALSE, sep = ",", stringsAsFactors = FALSE, comment.char = "")
   colnames(data_table) <- header_names
   
-  # Remove CSV ending
+  # Remove CSV ending and folder path. Set to subject_name.
   table_filename_base <- gsub(pattern = ".csv$", replacement = "", x = table_filename)
+  table_filename_base <- strsplit(table_filename_base, split = "/")[[1]]
+  table_filename_base <- table_filename_base[length(table_filename_base)]
+  subject_name <- table_filename_base
   
   # Add new columns to table
   # TODO - consider also adding query_name
@@ -101,10 +104,10 @@ main <- function() {
   
   # Load all tables
   cat(paste(ts(), "Loading BLAST tables\n", sep = ""))
-  blast_tables <- lapply(input_tables, function(x) { load_individual_table(x, header_names) })
+  blast_tables <- lapply(input_filenames, function(x) { load_individual_table(x, header_names) })
   
   cat(paste(ts(), "Combining BLAST tables\n", sep = ""))
-  output_table <- dplyr::bin_rows(blast_tables)
+  output_table <- dplyr::bind_rows(blast_tables)
   
   cat(paste(ts(), "Writing combining BLAST table to file (no headers, for convention)\n", sep = ""))
   write.table(output_table, file = output_filename, sep = ",", row.names = FALSE, col.names = FALSE)
