@@ -107,7 +107,8 @@ parse_command_line_input <- function() {
                   in place of the qseqid from NCBI, which may not be very human-readable.
 
                   The gene naming table must meet the following criteria:
-                    - First column: 'qseqid' - the EXACT ID of ALL of the unique query proteins in the BLAST table
+                    - First column: 'qseqid' - the EXACT ID of ALL of the unique query proteins in the BLAST table must be included.
+                          You can include additional qseqid's here if you'd like, they just won't be used.
                     - Second column: 'gene_name' - a corresponding name of your choice (e.g., rpoB, dsrA, and so on)
                   
                   The order of the rows in this table will dictate the order of the genes in the heatmap.
