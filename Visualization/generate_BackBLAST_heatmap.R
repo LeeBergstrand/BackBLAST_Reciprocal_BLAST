@@ -261,8 +261,10 @@ make_tree_plot <- function(phylo_tree, bootstrap_label_data) {
   
   tree_plot <- ggtree(phylo_tree, size = 1.5, colour = "black", ladderize = TRUE) +
     # Align tips to far right
-    # TODO - remove names but keep line
-    # geom_tiplab(align = TRUE, linetype = "dotted", size = 2) +
+    # TODO - make the size a function of total plot size? Or is fixed okay? But need to get it to match the heatmap font on the x-axis
+    # TODO - make the offset a function of total plot size
+    # TODO - ideally, make italic
+    geom_tiplab(align = TRUE, linetype = "dotted", size = 4, offset = 0.1) +
     
     # Add the bootstrap labels from the external file
     # TODO - fine-tune the 'nudge' value so that it works more generically
@@ -270,10 +272,11 @@ make_tree_plot <- function(phylo_tree, bootstrap_label_data) {
     
     # Manually tune the y-axis boundaries to match the heatmap: https://stackoverflow.com/a/18718196 (accessed Sept. 15, 2018)
     # TODO - change this to be a function of the number of entries
-    scale_y_discrete(expand = c(0,0.6))
+    scale_y_discrete(expand = c(0,0.6)) +
   
-    ## Unused for now
-    # xlim(NA, 1.5)
+    ## Manually set the righthand cutoff for the tree
+    # TODO - change this to be a function of the length of text
+    xlim_tree(1.8)
     # xlim etc.: https://guangchuangyu.github.io/2016/10/xlim_tree-set-x-axis-limits-for-only-tree-panel/ (accessed Sept 15, 2018)
   
   return(tree_plot)
@@ -475,6 +478,7 @@ plot_blast_heatmap <- function(blast_table) {
           panel.border = element_rect(colour = "black", size = 1),
           axis.text = element_text(size = 10, colour = "black"), 
           axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+          axis.text.y = element_blank(),
           axis.ticks = element_line(size = 0.5), axis.line = element_line(colour = "black", size = 0.5),
           legend.text = element_text(size = 10, colour = "black"), legend.title = element_blank(),
           legend.key = element_blank(), legend.key.size = unit(4.5, "mm")) +
