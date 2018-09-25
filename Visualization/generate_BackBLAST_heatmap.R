@@ -13,16 +13,16 @@ if (RUN_COMMAND_LINE == FALSE) {
   # See proper descriptions of variables under parse_command_line_input
   
   # Required inputs
-  setwd("/home/jmtsuji/Research_General/PhD/04b_Metagenome_resequencing_F2015/10_ATLAS_re_analysis/06_reciprocal_BLAST/vs3/riboprotein_tree")
+  setwd("/home/jmtsuji/Research_General/Bioinformatics/02_git/BackBLAST_Reciprocal_BLAST/test/")
   input_phylogenetic_tree_filepath <- "GSB_riboproteins_tree_vs3.treefile"
-  input_blast_table_filename <- "GSB_pathway_vs7_e40_best_hits.tsv"
-  output_pdf_name <- "test4.pdf"
+  input_blast_table_filename <- "GSB_pathway_vs7_e40_best_hits_MOD3.csv"
+  output_pdf_name <- "test.pdf"
   
   # Optional inputs (set to 'NA' to ignore)
   tree_metadata_filename <- NA
   tree_decorator_colname <- NA
   gene_naming_table_filename <- NA
-  bootstrap_cutoff <- 80
+  bootstrap_cutoff <- NA
   root_name <- NA #"Ignavibacterium_album_JCM_16511_NC_017464.1" # Optional; set to NA if you want to use the tree as-is.
     
   # To add...
@@ -203,9 +203,9 @@ reroot_tree <- function(phylo_tree, root_name) {
 }
 
 
-# Function: extracts tree label (bootstrap) data and applies bootstrap cutoff
+# Function: extracts tree label (bootstrap) data and applies bootstrap cutoff if desired
 # Input: 'phylo_tree' - ggtree-format tree; 'bootstrap_cutoff' - numeric vector (length 1) with minimum bootstrap cutoff in %
-# Return: extracted tree data as a data frame with labels adjusted to only contain bootstraps (numeric) above bootstrap cutoff for branches.
+# Return: extracted tree data as a data frame with labels adjusted to only contain bootstraps (numeric) (optionally) above bootstrap cutoff for branches.
         # To be mapped onto the main tree during plotting.
 generate_bootstrap_labels <- function(phylo_tree, bootstrap_cutoff) {
   # For adding bootstrap labels like this, see https://guangchuangyu.github.io/software/ggtree/faq/ (accessed Sept 14, 2018)
@@ -215,10 +215,16 @@ generate_bootstrap_labels <- function(phylo_tree, bootstrap_cutoff) {
   bootstrap_label_data <- ggtree(phylo_tree)$data
   
   # Set the labels to numeric (instead of character; will make non character go 'NA', like perhaps tip labels)
-  bootstrap_label_data$label <- as.numeric(label_data$label)
+  bootstrap_label_data$label <- as.numeric(bootstrap_label_data$label)
   
-  # Filter out tip labels and 'NA' labels. Set bootstrap cutoff for remaining labels
-  bootstrap_label_data <- dplyr::filter(label_data, is.na(label) == FALSE & isTip == FALSE & label >= bootstrap_cutoff)
+  # Filter out tip labels and 'NA' labels
+  bootstrap_label_data <- dplyr::filter(bootstrap_label_data, is.na(label) == FALSE & isTip == FALSE)
+  
+  # Set bootstrap cutoff if desired
+  if ( is.na(bootstrap_cutoff) == FALSE ) {
+    message(ts(), "Applying bootstrap display cutoff of ", bootstrap_cutoff)
+    bootstrap_label_data <- dplyr::filter(bootstrap_label_data, label >= bootstrap_cutoff)
+  }
   
   # Return whole tree data frame (helps for mapping the labels onto the existing tree later)
   return(bootstrap_label_data)
@@ -252,10 +258,10 @@ choose_discrete_colour_scale <- function(number_of_entries, data_type) {
 # Return: ggtree plot
 make_tree_plot <- function(phylo_tree, bootstrap_label_data) {
   
-  tree_plot <- ggtree(tree, size = 1.5, colour = "black", ladderize = TRUE) +
+  tree_plot <- ggtree(phylo_tree, size = 1.5, colour = "black", ladderize = TRUE) +
     # Align tips to far right
     # TODO - remove names but keep line
-    geom_tiplab(align = TRUE, linetype = "dotted", size = 2) +
+    # geom_tiplab(align = TRUE, linetype = "dotted", size = 2) +
     
     # Add the bootstrap labels from the external file
     # TODO - fine-tune the 'nudge' value so that it works more generically
@@ -347,13 +353,9 @@ load_and_plot_phylogenetic_tree <- function(input_phylogenetic_tree_filepath, ro
   }
   
   # Set cutoff for bootstraps externally, to be overlaid onto the tree figure later
-  if (is.na(bootstrap_cutoff) == FALSE) {
-    message(ts(), "Applying bootstrap display cutoff of ", bootstrap_cutoff)
-    bootstrap_label_data <- generate_bootstrap_labels(phylo_tree, bootstrap_cutoff)
-  } else {
-    # Just use the unmanipulated tree data to overlay onto tree figure later
-    bootstrap_label_data <- ggtree(phylo_tree)$data
-  }
+  # No cutoff is applied if bootstrap_cutoff is set to 'NA'
+  message(ts(), "Generating bootstrap labels")
+  bootstrap_label_data <- generate_bootstrap_labels(phylo_tree, bootstrap_cutoff)
   
   # Generate tree plot
   message(ts(), "Generating ggtree plot")
@@ -369,7 +371,7 @@ load_and_plot_phylogenetic_tree <- function(input_phylogenetic_tree_filepath, ro
     if ( colnames(metadata)[1] != "subject_name" ) {
       stop(ts(), "First column of the tree metadata file must be 'subject_name'; yours is '", colnames(metadata)[1], "'. Exiting...")
     }
-    if ( identical(sort(metadata$subject_name), 
+    if ( identical(sort(unique(metadata$subject_name)), 
                    sort(dplyr::filter(ggtree(phylo_tree)$data, isTip == TRUE)$label)) == FALSE ) {
       stop(ts(), "Entries in 'subject_name' of the provided metadata file do not exactly match the tip labels on the tree. Exiting...")
     }
@@ -415,7 +417,7 @@ read_blast_table <- function(input_blast_table_filename) {
 # Return: blast_table (data frame) with subject_name as an ordered factor
 order_blast_table_subjects <- function(blast_table, tip_order) {
   # Check that the tip_order labels match the blast table's subject_name labels
-  if ( identical(sort(tip_order), sort(blast_table$subject_name)) == FALSE) {
+  if ( identical(sort(tip_order), sort(unique(blast_table$subject_name))) == FALSE) {
     stop(ts(), "Tree tip labels do not perfectly match the subject_name entries in the BLAST table. Exiting...")
   }
   
