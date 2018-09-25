@@ -178,7 +178,6 @@ ts <- function() {
 # Function: re-roots tree to terminal node name matching 'root_name'
 # Input: 'phylo_tree' - ggtree-format tree; 'root_name' - character vector (length 1) with exact name of the to-be root
 # Return: ggtree-format re-rooted tree
-# TODO - currently DOES NOT WORK
 reroot_tree <- function(phylo_tree, root_name) {
   
   # Extract the data from the tree in tabular format
@@ -198,7 +197,7 @@ reroot_tree <- function(phylo_tree, root_name) {
   }
   
   # Re-root
-  tree_rooted <- reroot(phylo_tree, root_node_num)
+  tree_rooted <- suppressMessages(reroot(phylo_tree, root_node_num))
   
   return(tree_rooted)
 }
@@ -358,7 +357,7 @@ load_and_plot_phylogenetic_tree <- function(input_phylogenetic_tree_filepath, ro
   # Optionally re-root tree
   if (is.na(root_name) == FALSE) {
     message(ts(), "Re-rooting tree to '", root_name, "'")
-    phylo_tree <- reroot_tree(phylo_tree)
+    phylo_tree <- reroot_tree(phylo_tree, root_name)
   }
   
   # Set cutoff for bootstraps externally, to be overlaid onto the tree figure later
