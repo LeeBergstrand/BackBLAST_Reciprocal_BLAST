@@ -131,7 +131,7 @@ parse_command_line_input <- function() {
     # If neither are present, then good - set as 'NA' and move on
     opt$tree_metadata_filename <- NA
     opt$tree_decorator_colname <- NA
-  } else if ( (is.null(opt$tree_metadata_filename) | (is.null(opt$tree_metadata_filename))) == TRUE ) {
+  } else if ( (is.null(opt$tree_metadata_filename) | (is.null(opt$tree_decorator_colname))) == TRUE ) {
     # If just one is set, then throw an error
     stop("One of 'tree_metadata_filename' and 'tree_decorator_colname' was set, but not the other. If one is set, both are needed. Exiting...")
   } else {
@@ -270,6 +270,10 @@ make_tree_plot <- function(phylo_tree, bootstrap_label_data) {
     # TODO - fine-tune the 'nudge' value so that it works more generically
     geom_text(data = bootstrap_label_data, aes(label = label), nudge_x = -0.035, nudge_y = 0.35, size = 3) +
     
+    # Add scale bar
+    # TODO - set y based on tree topography?
+    geom_treescale(x = 0, y = 8, linesize = 1, fontsize = 3, offset = 0.5) +
+    
     # Manually tune the y-axis boundaries to match the heatmap: https://stackoverflow.com/a/18718196 (accessed Sept. 15, 2018)
     # TODO - change this to be a function of the number of entries
     scale_y_discrete(expand = c(0,0.6)) +
@@ -381,7 +385,7 @@ load_and_plot_phylogenetic_tree <- function(input_phylogenetic_tree_filepath, ro
     }
     
     message(ts(), "Decorating ggtree plot with metadata column '", tree_decorator_colname, "'")
-    phylo_tree_fig <- decorate_tree_plot(phylo_tree_fig)
+    phylo_tree_fig <- decorate_tree_plot(phylo_tree_fig, metadata, tree_decorator_colname)
   }
   
   # Make list to return to user
