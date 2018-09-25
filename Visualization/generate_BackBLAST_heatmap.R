@@ -453,11 +453,13 @@ overlay_gene_naming <- function(blast_table, gene_naming_table_filename) {
          ". However, you provided something else: ",  glue::glue_collapse(colnames(gene_naming_table)[1:2], sep = ", "), ". Exiting...")
   }
   
-  # Check that the query seq IDs in the gene table perfectly match those provided as queries for BLAST
+  # Check that the query seq IDs in the gene table include those provided as queries for BLAST (can contain extra - that's fine)
   gene_table_queries <- sort(gene_naming_table$qseqid)
   blast_table_queries <- sort(unique(blast_table$qseqid))
-  if ( identical(gene_table_queries, blast_table_queries) == FALSE ) {
-    stop(ts(), "Query sequence IDs do not perfectly match between BLAST table and gene naming table provided. Exiting...")
+  if ( length(unique(blast_table_queries %in% gene_table_queries)) > 1 ) {
+    stop(ts(), "Query sequence IDs from the BLAST table are not contained in the gene naming table provided. Exiting...")
+  } else if ( unique(blast_table_queries %in% gene_table_queries) == FALSE ) {
+    stop(ts(), "None of the query sequence IDs from the BLAST table match the gene naming table provided. Exiting...")
   }
   
   # Change qseqid to gene_name and order according to the gene_naming_table
