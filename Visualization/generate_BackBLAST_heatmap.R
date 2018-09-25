@@ -216,6 +216,7 @@ generate_bootstrap_labels <- function(phylo_tree, bootstrap_cutoff) {
   
   # Set the labels to numeric (instead of character; will make non character go 'NA', like perhaps tip labels)
   bootstrap_label_data$label <- as.numeric(bootstrap_label_data$label)
+  # TODO - make this more elegant to avoid warning
   
   # Filter out tip labels and 'NA' labels
   bootstrap_label_data <- dplyr::filter(bootstrap_label_data, is.na(label) == FALSE & isTip == FALSE)
