@@ -21,6 +21,7 @@ if (RUN_COMMAND_LINE == FALSE) {
   # Optional inputs (set to 'NA' to ignore)
   tree_metadata_filename <- NA
   tree_decorator_colname <- NA
+  map_genome_names <- NA
   gene_naming_table_filename <- NA
   bootstrap_cutoff <- NA
   root_name <- NA #"Ignavibacterium_album_JCM_16511_NC_017464.1" # Optional; set to NA if you want to use the tree as-is.
@@ -52,6 +53,7 @@ parse_command_line_input <- function() {
                      'output_filepath', 'o', 1, "character",
                      'tree_metadata_filename', 'm', 2, "character",
                      'tree_decorator_colname', 'd', 2, "character",
+                     'genome_plotting_names', 'n', 2, "logical",
                      'gene_naming_table_filename', 'g', 2, "character",
                      'bootstrap_cutoff', 'b', 2, "character",
                      'root_name', 'r', 2, "character",
@@ -78,7 +80,9 @@ parse_command_line_input <- function() {
               Optional inputs:
                 --tree_metadata_filename      Filepath for TSV-format metadata file for the phylogenetic tree. Details below.
                 --tree_decorator_colname      Column name from the metadata to map onto the tree as fill colours.
-                                                Required if --tree_metadata_filename is set. Details below.
+                                                Requires that --tree_metadata_filename is set. Details below.
+                --genome_plotting_names       Set this flag to include a vector of genome names to plot in the tree_metadata_filename
+                                                called 'plotting_name'. Details below.
                 --gene_naming_table_filename  Filepath for TSV-format table linking query gene IDs in the BLAST table to proper
                                                 gene names. Details below.
                 --bootstrap_cutoff            A percentage at or above which to display the bootstrap values on the tree (e.g., 80)
@@ -90,17 +94,20 @@ parse_command_line_input <- function() {
                   'subject_name' column. Otherwise, the script will fail.
 
               Tree metadata:
-                  You can provide a tree_metadata table and tree_decorator_colname to optionally overlay information onto the 
-                  phylogenetic tree about characteristics of the organisms whose genomes you are plotting. The information is
-                  currently displayed as fill colours on the tips of the tree, but we might expand this in the future.
-
-                  To use this feature, your tree metadata file must meet the following criteria:
-                    - First column: 'subject_name' - should include the EXACT names of ALL genomes in the tree
-                    - Next column(s): can be called whatever you want, e.g., 'GC_content', or 'metabolism', or 'pathogenicity'.
-                        Fill with meaningful data to you.
+                  You can optionally provide a tree_metadata table to overlay additional information onto the phylogenetic tree.
                   
-                  The tree_decorator_colname must EXACTLY match the name of ONE of the additional columns above. That info will
-                  then be plotted on the tree. Enjoy!
+                  The first column of this TSV (tab-separated) table MUST be called 'subject_name' and include the EXACT names
+                  of all genomes in the phylogenetic tree. You can then optionally include the following:
+
+                  1. genome_plotting_names: add a column called 'plotting_name' to include the names of the organisms that you 
+                      want to appear on the final plot. You can use spaces, most special characters, and so on.
+
+                  2. tree_decorator_colname: you can overlay characteristics of the organisms/genomes as fill colours on the tips
+                      of the tree. Add a column to the metadata table with any name you'd like, e.g., 'GC_content', 
+                      'predicted_metabolism', 'pathogenicity', and so on. Fill with meaningful data to you. Then, specify the
+                      'tree_decorator_colname' to EXACTLY match the name of ONE of the additional columns. That info will then
+                      be plotted on the tree. Enjoy! (We might expand this in the future to allow for font colours and so on to 
+                      be varied.)
 
               Gene naming for BLAST table:
                   You can provide a gene_naming_table to provide custom names and ordering for query genes in your BLAST search, 
@@ -127,17 +134,24 @@ parse_command_line_input <- function() {
     stop("Output filepath required (-o). Try -h for help message.")
   }
   
-  # Check if both tree_metadata_filename and tree_decorator_colname were provided, as needed
-  if ( is.null(opt$tree_metadata_filename) && is.null(opt$tree_decorator_colname) ) {
-    # If neither are present, then good - set as 'NA' and move on
+  # Check on the tree_metadata_filename and tree_decorator_colname were provided, as needed
+  if ( is.null(opt$tree_metadata_filename) ) {
+    # Annul everything
+    # TODO - throw a warning if some of the other flags were set
     opt$tree_metadata_filename <- NA
     opt$tree_decorator_colname <- NA
-  } else if ( (is.null(opt$tree_metadata_filename) | (is.null(opt$tree_decorator_colname))) == TRUE ) {
-    # If just one is set, then throw an error
-    stop("One of 'tree_metadata_filename' and 'tree_decorator_colname' was set, but not the other. If one is set, both are needed. Exiting...")
-  } else {
-    # The only alternative is that both are set, which is fine. Nothing to do here.
-    # TODO - how to phrase this 'if' statement more concisely?
+    opt$genome_plotting_names <- NA
+  } else if ( is.null(opt$tree_metadata_filename) == FALSE && is.null(opt$genome_plotting_names) == FALSE
+              && is.null(opt$tree_decorator_colname) == FALSE ) {
+    # All are present
+    opt$genome_plotting_names <- TRUE
+  } else if ( is.null(opt$tree_metadata_filename) == FALSE && is.null(opt$genome_plotting_names) == FALSE ) {
+    # tree_decorator_colname must not be set
+    opt$tree_decorator_colname <- NA
+    opt$genome_plotting_names <- TRUE
+  } else if ( is.null(opt$tree_metadata_filename) == FALSE && is.null(opt$tree_decorator_colname) == FALSE ) {
+    # genome_plotting_names must not be set
+    opt$genome_plotting_names <- NA
   }
   
   # Set defaults
@@ -157,6 +171,7 @@ parse_command_line_input <- function() {
   output_pdf_name <<- opt$output_filepath
   tree_metadata_filename <<- opt$tree_metadata_filename
   tree_decorator_colname <<- opt$tree_decorator_colname
+  map_genome_names <<- opt$genome_plotting_names
   gene_naming_table_filename <<- opt$gene_naming_table_filename
   bootstrap_cutoff <<- opt$bootstrap_cutoff
   root_name <<- opt$root_name
@@ -288,6 +303,28 @@ make_tree_plot <- function(phylo_tree, bootstrap_label_data) {
 }
 
 
+# Function: loads tree metadata file and checks for errors
+# Inputs: 'tree_metadata_filename'
+# Return: tree metadata (data frame)
+load_tree_metadata <- function(tree_metadata_filename) {
+  
+  # Load metadata to decorate the tree
+  message(ts(), "Loading tree metadata")
+  metadata <- read.table(tree_metadata_filename, sep = "\t", header = TRUE, stringsAsFactors = FALSE)
+  
+  # Check first column of metadata matches expected
+  if ( colnames(metadata)[1] != "subject_name" ) {
+    stop(ts(), "First column of the tree metadata file must be 'subject_name'; yours is '", colnames(metadata)[1], "'. Exiting...")
+  }
+  if ( identical(sort(unique(metadata$subject_name)), 
+                 sort(dplyr::filter(ggtree(phylo_tree)$data, isTip == TRUE)$label)) == FALSE ) {
+    stop(ts(), "Entries in 'subject_name' of the provided metadata file do not exactly match the tip labels on the tree. Exiting...")
+  }
+  
+  return(metadata)
+}
+
+
 # Function: decorates an existing ggtree plot with custom fill/colour based on user-supplied metadata
 # Inputs: 'tree_plot' - ggtree plot; '
           # 'metadata' - data frame of user-supplied information with row names matching the tree's tip labels;
@@ -365,25 +402,38 @@ load_and_plot_phylogenetic_tree <- function(input_phylogenetic_tree_filepath, ro
   message(ts(), "Generating bootstrap labels")
   bootstrap_label_data <- generate_bootstrap_labels(phylo_tree, bootstrap_cutoff)
   
+  # Optionally map on user-specified genome names
+  if ( is.na(tree_metadata_filename) == FALSE && is.na(map_genome_names) == FALSE ) {
+    # Load metadata
+    metadata <- load_tree_metadata(tree_metadata_filename)
+    
+    # Map on genome names
+    message(ts(), "Adding user-specified plotting names for genomes on tree")
+  
+    stop("Function unfinished. Sorry.")
+    # TODO - finish this
+    ### Strategy ###
+    # Make another external data frame like for bootstraps, with only tip labels
+    # Change the tip labels to the custom plotting labels via plyr:: mapvalues
+    # Use this as the 'data' source for the addTips function
+    # (Create a dummy if the user doesn't have any custom labels)
+    # This way, you preserve the original data frame contents for future checks
+    # Otherwise, you'd be stuck making a backup to use for data frame checks, different than plotting,
+    # OR making a separate variable with the plotting name and rely on more IF statements to make it work
+    # (Maybe the latter wouldnt be so bad!)
+    
+  }
+  
   # Generate tree plot
   message(ts(), "Generating ggtree plot")
   phylo_tree_fig <- make_tree_plot(phylo_tree, bootstrap_label_data)
   
   # Optionally decorate with metadata
   if ( is.na(tree_metadata_filename) == FALSE && is.na(tree_decorator_colname) == FALSE ) {
-    # Load metadata to decorate the tree
-    message(ts(), "Loading tree metadata")
-    metadata <- read.table(tree_metadata_filename, sep = "\t", header = TRUE, stringsAsFactors = FALSE)
+    # Load metadata
+    metadata <- load_tree_metadata(tree_metadata_filename)
     
-    # Check first column of metadata matches expected
-    if ( colnames(metadata)[1] != "subject_name" ) {
-      stop(ts(), "First column of the tree metadata file must be 'subject_name'; yours is '", colnames(metadata)[1], "'. Exiting...")
-    }
-    if ( identical(sort(unique(metadata$subject_name)), 
-                   sort(dplyr::filter(ggtree(phylo_tree)$data, isTip == TRUE)$label)) == FALSE ) {
-      stop(ts(), "Entries in 'subject_name' of the provided metadata file do not exactly match the tip labels on the tree. Exiting...")
-    }
-    
+    # Decorate
     message(ts(), "Decorating ggtree plot with metadata column '", tree_decorator_colname, "'")
     phylo_tree_fig <- decorate_tree_plot(phylo_tree_fig, metadata, tree_decorator_colname)
   }
