@@ -33,11 +33,12 @@ if (RUN_COMMAND_LINE == FALSE) {
 
 #####################################################
 ## Load required packages: ##########################
+library(getopt)
 library(plyr)
-library(tidyverse)
-library(ggtree)
-library(glue)
-library(egg)
+suppressMessages(library(tidyverse))
+suppressMessages(library(ggtree))
+suppressMessages(library(glue))
+suppressMessages(library(egg))
 # library(RColorBrewer) # Loaded as part of tidyverse?
 # library(phytools) # for re-rooting; optional
 #####################################################
@@ -48,10 +49,10 @@ parse_command_line_input <- function() {
   # Define flags
   params <- matrix(c('tree_filepath', 'i', 1, "character",
                      'blast_table_filepath', 'j', 1, "character",
-                     'output_filepath', 'o', 1, "numeric",
+                     'output_filepath', 'o', 1, "character",
                      'tree_metadata_filename', 'm', 2, "character",
-                     'tree_decorator_colname', 'd', 2, "numeric",
-                     'gene_naming_table_filename', 'd', 2, "numeric",
+                     'tree_decorator_colname', 'd', 2, "character",
+                     'gene_naming_table_filename', 'g', 2, "character",
                      'bootstrap_cutoff', 'b', 2, "character",
                      'root_name', 'r', 2, "character",
                      'help', 'h', 2, "character"), byrow=TRUE, ncol=4)
@@ -62,13 +63,13 @@ parse_command_line_input <- function() {
   if ( !is.null(opt$help) ) {
     
     cat("generate_BackBLAST_heatmap.R: Binds a phylogenetic tree to a BLAST table heatmap.\n")
-    cat("Copyright Lee Bergstrand and Jackson M. Tsuji, 2018\n")
+    cat("Copyright Lee Bergstrand and Jackson M. Tsuji, 2018\n\n")
     
     cat(getopt(params, usage = TRUE))
     
     cat("\n")
     
-    glue::glue("
+    message(glue::glue("
               Required inputs:
                 --tree_filepath               Filepath for newick-format phylogenetic tree of the BLAST subject organisms
                 --blast_table_filepath        Filepath for CSV-format BLAST hit table from CombineBlastTables.R
@@ -111,7 +112,7 @@ parse_command_line_input <- function() {
                   
                   The order of the rows in this table will dictate the order of the genes in the heatmap.
 
-              ")
+              "))
     
     quit(status = 1)
   }
