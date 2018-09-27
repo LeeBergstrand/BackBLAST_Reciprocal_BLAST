@@ -100,6 +100,13 @@ rule generate_heatmap
         "benchmarks/generate_heatmap.txt"
     params:
         tree_file=config.get("phylogenetic_tree_newick")
+        tree_metadata=config.get("tree_metadata_tsv")
+        tree_decorator_colname=config.get("tree_colouring_column_name")
+        plot_custom_names=config.get("plotting_name_column")
         gene_naming=config.get("gene_naming_tsv")
+        bootstrap_cutoff=config.get("bootstrap_cutoff")
+        root_name=config.get("root_name")
     shell:
-        "generate_BackBLAST_heatmap.R -i {input} -o {output} -t {params.tree_file} -g {params.gene_naming} 2> {log}"
+        "generate_BackBLAST_heatmap.R -i {params.tree_file} -j {input} -o {output} -m {params.tree_metadata} "
+            "-d {tree_decorator_colname} -n {plot_custom_names} -g {params.gene_naming} -b {params.bootstrap_cutoff} "
+            "-r {root_name} 2> {log}"
