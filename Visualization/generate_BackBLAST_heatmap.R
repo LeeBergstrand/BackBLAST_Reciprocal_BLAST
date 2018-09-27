@@ -275,11 +275,6 @@ choose_discrete_colour_scale <- function(number_of_entries, data_type) {
 make_tree_plot <- function(phylo_tree, bootstrap_label_data) {
   
   tree_plot <- ggtree(phylo_tree, size = 1.5, colour = "black", ladderize = TRUE) +
-    # Align tips to far right
-    # TODO - make the size a function of total plot size? Or is fixed okay? But need to get it to match the heatmap font on the x-axis
-    # TODO - make the offset a function of total plot size
-    # TODO - ideally, make italic
-    geom_tiplab(align = TRUE, linetype = "dotted", size = 4, offset = 0.1) +
     
     # Add the bootstrap labels from the external file
     # TODO - fine-tune the 'nudge' value so that it works more generically
@@ -305,8 +300,9 @@ make_tree_plot <- function(phylo_tree, bootstrap_label_data) {
 
 # Function: loads tree metadata file and checks for errors
 # Inputs: 'tree_metadata_filename'
+          # 'phylo_tree' - loaded (not plotted) ggtree treefile. Just for checking columns match.
 # Return: tree metadata (data frame)
-load_tree_metadata <- function(tree_metadata_filename) {
+load_tree_metadata <- function(tree_metadata_filename, phylo_tree) {
   
   # Load metadata to decorate the tree
   message(ts(), "Loading tree metadata")
@@ -322,6 +318,52 @@ load_tree_metadata <- function(tree_metadata_filename) {
   }
   
   return(metadata)
+}
+
+
+# Function: adds tip labels to the tree plot, either the standard ones or as specified in metadata
+# Inputs: 'tree_plot' - ggtree plot; '
+# 'metadata' - OPTIONAL data frame of user-supplied information for 'plotting_name' (required column)
+            # If not provided, will just use standard tip labels
+# Return: ggtree plot with labels
+add_tip_labels_to_tree_plot <- function(tree_plot, metadata_with_plotting_name = NULL) {
+  
+  if ( is.null(metadata_with_plotting_name) ) {
+    message(ts(), "Adding standard tip labels to tree")
+    
+    tree_plot <- tree_plot +
+      # Align tips to far right
+      # TODO - make the size a function of total plot size? Or is fixed okay? But need to get it to match the heatmap font on the x-axis
+      # TODO - make the offset a function of total plot size
+      # TODO - ideally, make italic
+      geom_tiplab(align = TRUE, linetype = "dotted", size = 4, offset = 0.1)
+    
+  } else {
+    
+    message(ts(), "Adding custom tip labels as specified by 'plotting_name' columns of tree_metadata")
+    
+    # Check table is okay
+    if ( ("plotting_name" %in% colnames(metadata_with_plotting_name)) == FALSE ) {
+      stop("You set the '--genome_plotting_names' flag but did not provide a 'plotting_name' column in your tree metadata table. Cannot continue. Exiting...")
+    }
+    
+    # Reduce the metadata down to just 'subject_name' and 'plotting_name'
+    required_cols <- c("subject_name", "plotting_name")
+    name_metadata <- dplyr::select(metadata_with_plotting_name, required_cols)
+    
+    # Add the labels
+    # N.B. Adding the 'name_metadata' on the first line binds the metadata table onto the tree's data table for aesthetics later
+    tree_plot <- tree_plot  %<+% name_metadata +
+      # Align tips to far right
+      # TODO - make the size a function of total plot size? Or is fixed okay? But need to get it to match the heatmap font on the x-axis
+      # TODO - make the offset a function of total plot size
+      # TODO - ideally, make italic
+      geom_tiplab(aes(label = plotting_name), align = TRUE, linetype = "dotted", size = 4, offset = 0.1)
+      
+  }
+  
+  return(tree_plot)
+  
 }
 
 
@@ -402,36 +444,25 @@ load_and_plot_phylogenetic_tree <- function(input_phylogenetic_tree_filepath, ro
   message(ts(), "Generating bootstrap labels")
   bootstrap_label_data <- generate_bootstrap_labels(phylo_tree, bootstrap_cutoff)
   
-  # Optionally map on user-specified genome names
-  if ( is.na(tree_metadata_filename) == FALSE && is.na(map_genome_names) == FALSE ) {
-    # Load metadata
-    metadata <- load_tree_metadata(tree_metadata_filename)
-    
-    # Map on genome names
-    message(ts(), "Adding user-specified plotting names for genomes on tree")
-  
-    stop("Function unfinished. Sorry.")
-    # TODO - finish this
-    ### Strategy ###
-    # Make another external data frame like for bootstraps, with only tip labels
-    # Change the tip labels to the custom plotting labels via plyr:: mapvalues
-    # Use this as the 'data' source for the addTips function
-    # (Create a dummy if the user doesn't have any custom labels)
-    # This way, you preserve the original data frame contents for future checks
-    # Otherwise, you'd be stuck making a backup to use for data frame checks, different than plotting,
-    # OR making a separate variable with the plotting name and rely on more IF statements to make it work
-    # (Maybe the latter wouldnt be so bad!)
-    
-  }
   
   # Generate tree plot
   message(ts(), "Generating ggtree plot")
   phylo_tree_fig <- make_tree_plot(phylo_tree, bootstrap_label_data)
   
+  # Add tip labels (either defaults or based on plotting_name)
+  if ( is.na(tree_metadata_filename) == FALSE && is.na(map_genome_names) == FALSE ) {
+    # Load metadata
+    metadata <- load_tree_metadata(tree_metadata_filename, phylo_tree)
+    
+    phylo_tree_fig <- add_tip_labels_to_tree_plot(phylo_tree_fig, metadata)
+  } else {
+    phylo_tree_fig <- add_tip_labels_to_tree_plot(phylo_tree_fig)
+  }
+  
   # Optionally decorate with metadata
   if ( is.na(tree_metadata_filename) == FALSE && is.na(tree_decorator_colname) == FALSE ) {
     # Load metadata
-    metadata <- load_tree_metadata(tree_metadata_filename)
+    metadata <- load_tree_metadata(tree_metadata_filename, phylo_tree)
     
     # Decorate
     message(ts(), "Decorating ggtree plot with metadata column '", tree_decorator_colname, "'")
