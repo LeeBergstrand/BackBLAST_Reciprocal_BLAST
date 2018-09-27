@@ -20,14 +20,28 @@ subjects:
   E_coli_J625DW: /path/to/e_coli_J625DW_orfs.faa
   B_subtilis_168: /path/to/b_subtilis_168_orfs.faa
 
+
 ## Plot input files
-# Tab-separated file containing the accession of each query gene and its corresponding gene name.
-  # Genes will be plotted in the order specified in this TSV file.
-  # See ExampleData/Example_configs/gene_naming.tsv
-gene_naming_tsv: /path/to/gene_naming.tsv
 # Newick file of phylogenetic tree for the input genomes. Should already be in the orientation that you want it to be plotted in.
   # Tree must contain EXACTLY the same organisms as in the 'subjects' above, with the EXACT same names provided for the subjects
 phylogenetic_tree_newick: /path/to/phylogenetic_tree.nwk
+# Optional: Tab-separated file containing the 'subject_name' of each plotted genome, plus additional metadata
+  # See ExampleData/Example_configs/gene_naming.tsv
+tree_metadata_tsv: /path/to/tree_metadata.tsv
+# In the above table, do you have a column that you want to have plotted on the tree as metadata? If so, give the name
+  # of the column. If not, leave as 'NA'.
+tree_colouring_column_name: NA
+# In the above table, do you have a column named 'plotting_name' that contains the names of the genomes that you want
+  # to display on the heatmap? If so, give TRUE. If not, give FALSE.
+plotting_name_column: FALSE
+# Optional: Tab-separated file containing the accession of each query gene and its corresponding gene name.
+  # Genes will be plotted in the order specified in this TSV file.
+  # See ExampleData/Example_configs/gene_naming.tsv
+gene_naming_tsv: /path/to/gene_naming.tsv
+# Optional: set the cutoff for displayed bootstrap values. Anything above the cutoff will be shown.
+bootstrap_cutoff: 80
+# Optional: if you want to re-root your tree, then give the exact name of the tip you want to re-root by. Otherwise, 'NA'.
+root_name: NA
 
 
 ## BLAST settings
