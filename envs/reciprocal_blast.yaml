@@ -3,5 +3,5 @@ channels:
   - defaults
 dependencies:
   - python=2.7
-  - biopython=1.6.5
-  - blast=2.7.1
+  - biopython=1.72
+  - blast=2.6.0
