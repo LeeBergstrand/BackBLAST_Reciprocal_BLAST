@@ -26,16 +26,15 @@ rule run_reciprocal_blast:
         "logs/reciprocal_blast/{subject}.log"
     benchmark:
         "benchmarks/{subject}.reciprocal_blast.benchmark.txt"
-    threads: 1 # TODO - can it support more than one thread? Also, should I add a memory setting?
+    threads: 1
     params:
         query_genes = config.get("query_genes"),
         query_genome_orfs = config.get("query_genome_orfs"),
         eval = config.get("e_value_cutoff"),
         pident = config.get("minimum_percent_identity")
     shell:
-        # TODO - make sure the flags match the real flags.
         "BackBLAST.py --gene_cluster {params.query_genes} --query_proteome {params.query_genome_orfs} --subject_proteome {input} "
-        "--eval {params.eval} --pident {params.pident} --threads {threads} > {output} 2> {log}"
+            "--e_value {params.eval} --min_ident {params.pident} --output_file {output} > {log} 2>&1"
 
 
 # Removes duplicate BLAST hits for each BLAST table
@@ -50,7 +49,7 @@ rule remove_duplicates:
         "benchmarks/{subject}.remove_duplicates.benchmark.txt"
     threads: 1
     shell:
-        "Visualization/RemoveDuplicates.sh {input} > {output} 2> {log}"
+        "RemoveDuplicates.sh {input} > {output} 2> {log}"
 
 
 # If BLAST CSV is empty, creates a blank BLAST table
@@ -68,7 +67,7 @@ rule create_blank_results:
     params:
         query_genes=config.get("query_genes")
     shell:
-        "Visualization/CreateBlankResults.py {input} {params.query_genes} {output} 2> {log}"
+        "CreateBlankResults.py {input} {params.query_genes} {output} > {log} 2>&1"
 
 
 # Combine the BLAST tables into a single table, and add a column for sample ID
@@ -84,7 +83,7 @@ rule combine_blast_tables:
     benchmark:
         "benchmarks/combine_blast_tables.txt"
     shell:
-        "Visualization/CombineBlastTables.R {input} {output} 2> {log}"
+        "CombineBlastTables.R {input} {output} 2> {log}"
 
 
 # Generate the final heatmap
