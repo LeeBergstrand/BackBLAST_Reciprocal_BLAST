@@ -1,5 +1,6 @@
 # Snakefile rules for BackBLAST pipeline
 # Copyright Lee Bergstrand and Jackson M. Tsuji, 2018
+from snakemake.utils import logger, min_version, update_config
 
 # Specify the minimum snakemake version allowable
 min_version("5.0")
@@ -27,14 +28,14 @@ rule run_reciprocal_blast:
         "benchmarks/{subject}.reciprocal_blast.benchmark.txt"
     threads: 1 # TODO - can it support more than one thread? Also, should I add a memory setting?
     params:
-        query_genes = config.get("query_genes")
-        query_genome_orfs = config.get("query_genome_orfs")
-        eval = config.get("e_value_cutoff")
+        query_genes = config.get("query_genes"),
+        query_genome_orfs = config.get("query_genome_orfs"),
+        eval = config.get("e_value_cutoff"),
         pident = config.get("minimum_percent_identity")
     shell:
         # TODO - make sure the flags match the real flags.
         "BackBLAST.py --gene_cluster {params.query_genes} --query_proteome {params.query_genome_orfs} --subject_proteome {input} "
-            "--eval {params.eval} --pident {params.pident} --threads {threads} > {output} 2> {log}"
+        "--eval {params.eval} --pident {params.pident} --threads {threads} > {output} 2> {log}"
 
 
 # Removes duplicate BLAST hits for each BLAST table
@@ -73,7 +74,7 @@ rule create_blank_results:
 # Combine the BLAST tables into a single table, and add a column for sample ID
 rule combine_blast_tables:
     input:
-        tables=expand("fix_blank_results/{subject}.csv", samples=SAMPLES)
+        blast_tables=expand("fix_blank_results/{subject}.csv", subject=config.get("subjects"))
     output:
         "combine_blast_tables/blast_tables_combined.csv"
     conda:
@@ -83,7 +84,7 @@ rule combine_blast_tables:
     benchmark:
         "benchmarks/combine_blast_tables.txt"
     shell:
-        "Visualization/CombineBlastTables.R {tables} {output} 2> {log}"
+        "Visualization/CombineBlastTables.R {input} {output} 2> {log}"
 
 
 # Generate the final heatmap
@@ -93,20 +94,20 @@ rule generate_heatmap:
     output:
         "generate_heatmap/BackBLAST_heatmap.pdf"
     conda:
-        "envs/R_viz/yaml"
+        "envs/R_viz.yaml"
     log:
         "logs/generate_heatmap/generate_heatmap.log"
     benchmark:
         "benchmarks/generate_heatmap.txt"
     params:
-        tree_file=config.get("phylogenetic_tree_newick")
-        tree_metadata=config.get("tree_metadata_tsv")
-        tree_decorator_colname=config.get("tree_colouring_column_name")
-        plot_custom_names=config.get("plotting_name_column")
-        gene_naming=config.get("gene_naming_tsv")
-        bootstrap_cutoff=config.get("bootstrap_cutoff")
+        tree_file=config.get("phylogenetic_tree_newick"),
+        tree_metadata=config.get("tree_metadata_tsv"),
+        tree_decorator_colname=config.get("tree_colouring_column_name"),
+        plot_custom_names=config.get("plotting_name_column"),
+        gene_naming=config.get("gene_naming_tsv"),
+        bootstrap_cutoff=config.get("bootstrap_cutoff"),
         root_name=config.get("root_name")
     shell:
         "generate_BackBLAST_heatmap.R -i {params.tree_file} -j {input} -o {output} -m {params.tree_metadata} "
-            "-d {tree_decorator_colname} -n {plot_custom_names} -g {params.gene_naming} -b {params.bootstrap_cutoff} "
-            "-r {root_name} 2> {log}"
+            "-d {params.tree_decorator_colname} -n {params.plot_custom_names} -g {params.gene_naming} "
+            "-b {params.bootstrap_cutoff} -r {params.root_name} 2> {log}"
