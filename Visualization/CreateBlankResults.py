@@ -45,7 +45,6 @@ def check_if_input_csv_is_empty(input_csv):
         return False
 
 
-
 # Checks whether or not the provided file has the expected extension. Throws warning if not. No return.
 def file_extension_check(filename, extension):
     # Throws a warning if file extension does not appear to be appropriate
@@ -59,17 +58,12 @@ def generate_blank_results(query_proteins):
 
     blank_results_list = []
 
-    try:
-        handle = open(query_proteins, "rU")
-        fasta_entries = SeqIO.parse(handle, "fasta")
-        for entry in fasta_entries:
-            blank_results_list.append(
-                entry.id + ",NA,NA,NA,NA,NA")  # qseqid sseqid pident evalue qcovhsp bitscore
-        handle.close()
+    with open(query_proteins, "rU") as fasta_file:
+        fasta_entries = SeqIO.parse(fasta_file, "fasta")
 
-    except IOError:
-        logger.error("Failed to open " + query_proteins)
-        sys.exit(1)
+    for entry in fasta_entries:
+        blank_results_list.append(
+            entry.id + ",NA,NA,NA,NA,NA")  # qseqid sseqid pident evalue qcovhsp bitscore
 
     blank_results = "\n".join(blank_results_list)
 
@@ -79,14 +73,8 @@ def generate_blank_results(query_proteins):
 # Writes a blank_results table to a file with name new_blast_file. No return.
 def write_blank_results(blank_results, new_blast_file):
 
-    try:
-        writeFile = open(new_blast_file, "w")
+    with open(new_blast_file, "w") as writeFile:
         writeFile.write(blank_results)
-        writeFile.close()
-
-    except IOError:
-        logger.error("Failed to create " + new_blast_file)
-        sys.exit(1)
 
 
 def main(args):
