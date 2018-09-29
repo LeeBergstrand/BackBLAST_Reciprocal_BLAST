@@ -27,8 +27,7 @@ from shutil import copyfile
 # Checks if the proper number of arguments are passed gives instructions on proper use.
 def argsCheck(numArgs):
     if len(sys.argv) < numArgs or len(sys.argv) > numArgs:
-        print(
-            "Takes a nucleotide FASTA file and returns the exact same FASTA file with a reverse complemented sequence.")
+        print("Will make a blank file if the input blast file is blank, and will otherwise return the original file.")
         print("Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2018\n")
         print("Usage: " + sys.argv[0] + "  <blast_output_file.csv> <query_proteins.faa> <new_blast_output_file.csv>")
         sys.exit(1)
@@ -36,43 +35,34 @@ def argsCheck(numArgs):
 
 # Checks whether or not the provided input_csv is an empty file. Returns logical.
 def check_if_input_csv_is_empty(input_csv):
-    # Returns True is the CSV is empty and False if not
-
-    if os.stat(input_csv).st_size == 0:
+    if os.stat(input_csv).st_size == 0: # Returns True is the CSV is empty and False if not
         return True
-
     else:
         return False
 
 
 # Checks whether or not the provided file has the expected extension. Throws warning if not. No return.
 def file_extension_check(filename, extension):
-    # Throws a warning if file extension does not appear to be appropriate
-
     if not filename.endswith('.' + extension):
         logger.warning("'" + filename + "' may not be a '" + extension + "' file!")
 
 
 # Uses input query_proteins FAA file to build a blank BLAST CSV table. Returns the table.
 def generate_blank_results(query_proteins):
-
-    blank_results_list = []
-
     with open(query_proteins, "rU") as fasta_file:
         fasta_entries = SeqIO.parse(fasta_file, "fasta")
 
+    blank_results_list = []
     for entry in fasta_entries:
         blank_results_list.append(
             entry.id + ",NA,NA,NA,NA,NA")  # qseqid sseqid pident evalue qcovhsp bitscore
 
     blank_results = "\n".join(blank_results_list)
-
     return(blank_results)
 
 
 # Writes a blank_results table to a file with name new_blast_file. No return.
 def write_blank_results(blank_results, new_blast_file):
-
     with open(new_blast_file, "w") as writeFile:
         writeFile.write(blank_results)
 
@@ -104,20 +94,16 @@ def main(args):
 
     # If the CSV file is not empty, then just keep the file as is.
     if check_if_input_csv_is_empty(original_blast_file) == False:
-
         logger.debug("Provided BLAST file has content - no need to replace. Copying to output file.")
         copyfile(original_blast_file, new_blast_file)
 
     # If it is empty, then make a fake file.
     elif check_if_input_csv_is_empty(original_blast_file) == True:
-
-        # Stores file one for input checking.
         logger.debug("Generating blank BLAST table based on FAA file provided")
-        blank_results = generate_blank_results(query_proteins)
+        blank_results = generate_blank_results(query_proteins) # Stores file one for input checking.
 
         logger.debug("Writing to CSV file '" + new_blast_file + "'")
         write_blank_results(blank_results, new_blast_file)
-
     else:
         logger.error("Something went wrong. Exiting...")
         sys.exit(1)
