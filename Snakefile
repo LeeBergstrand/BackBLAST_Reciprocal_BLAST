@@ -76,14 +76,14 @@ rule combine_blast_tables:
         blast_tables=expand("fix_blank_results/{subject}.csv", subject=config.get("subjects"))
     output:
         "combine_blast_tables/blast_tables_combined.csv"
-    conda:
-        "envs/R_viz.yaml"
+    #conda:
+    #    "envs/R_viz.yaml"
     log:
         "logs/combine_blast_tables/combine_blast_tables.log"
     benchmark:
         "benchmarks/combine_blast_tables.txt"
     shell:
-        "CombineBlastTables.R {input} {output} 2> {log}"
+        "CombineBlastTables.R {input} {output} > {log} 2>&1"
 
 
 # Generate the final heatmap
@@ -92,8 +92,8 @@ rule generate_heatmap:
         "combine_blast_tables/blast_tables_combined.csv"
     output:
         "generate_heatmap/BackBLAST_heatmap.pdf"
-    conda:
-        "envs/R_viz.yaml"
+    #conda:
+    #    "envs/R_viz.yaml"
     log:
         "logs/generate_heatmap/generate_heatmap.log"
     benchmark:
@@ -110,3 +110,4 @@ rule generate_heatmap:
         "generate_BackBLAST_heatmap.R -i {params.tree_file} -j {input} -o {output} -m {params.tree_metadata} "
             "-d {params.tree_decorator_colname} -n {params.plot_custom_names} -g {params.gene_naming} "
             "-b {params.bootstrap_cutoff} -r {params.root_name} 2> {log}"
+
