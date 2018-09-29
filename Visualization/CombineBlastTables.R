@@ -1,8 +1,7 @@
 #!/usr/bin/env Rscript
 
 # CombineBlastTables.R
-# Copyright Jackson M. Tsuji, 2018
-# Neufeld Research Group
+# Copyright Lee Bergstrand and Jackson M. Tsuji, 2018
 # See required R packages below.
 
 #####################################################
@@ -35,7 +34,7 @@ parse_command_line_input <- function() {
   inputArgs <- commandArgs(trailingOnly = TRUE)
   if (length(inputArgs) < 2) {
     cat("CombineBlastTables.R: Combines BLAST tables and makes new column for sample ID based on the filenames.\n")
-    cat("Copyright Neufeld Lab, 2018\n")
+    cat("Lee Bergstrand and Jackson M. Tsuji, 2018\n")
     cat("Contact Jackson M. Tsuji (jackson.@uwaterloo.ca) for bug reports or feature requests.\n\n")
     
     cat("Usage: CombineBlastTables.R subject1.csv subject2.csv ... subjectN.csv combined_blast_tables.csv\n\n")
@@ -56,7 +55,7 @@ parse_command_line_input <- function() {
 }
 
 # Helper function for timestamps
-ts <- function() {
+timestamp <- function() {
   
   datetime_utc <- format(as.POSIXlt(Sys.time(), tz = "UTC"), "%a %d %b %Y %H:%M:%S %Z")
   
@@ -68,7 +67,7 @@ ts <- function() {
 
 # Function to load table of data, add header IDs, and add query/subject name by parsing filename
 load_individual_table <- function(table_filename, header_names) {
-  cat(paste(ts(), "Reading table '", table_filename, "'\n", sep = ""))
+  cat(paste(timestamp(), "Reading table '", table_filename, "'\n", sep = ""))
   
   # Read the table and add columns
   data_table <- read.table(table_filename, header = FALSE, sep = ",", stringsAsFactors = FALSE, comment.char = "")
@@ -80,7 +79,7 @@ load_individual_table <- function(table_filename, header_names) {
   # Add new columns to table
   # TODO - consider also adding query_name
   # data_table$query_name <- query_name
-  cat(paste(ts(), "Adding subject_name of '", subject_name, "'\n", sep = ""))
+  cat(paste(timestamp(), "Adding subject_name of '", subject_name, "'\n", sep = ""))
   data_table$subject_name <- subject_name
   
   # Re-order columns to be more user friendly
@@ -97,21 +96,21 @@ main <- function() {
   }
   
   # Startup messages
-  cat(paste(ts(), "Running CombineBlastTables.R\n", sep = ""))
-  cat(paste(ts(), "Input tables: ", length(input_filenames), " total\n", sep = ""))
-  cat(paste(ts(), "Output table: ", output_filename, "\n", sep = ""))
+  cat(paste(timestamp(), "Running CombineBlastTables.R\n", sep = ""))
+  cat(paste(timestamp(), "Input tables: ", length(input_filenames), " total\n", sep = ""))
+  cat(paste(timestamp(), "Output table: ", output_filename, "\n", sep = ""))
   
   # Load all tables
-  cat(paste(ts(), "Loading BLAST tables\n", sep = ""))
+  cat(paste(timestamp(), "Loading BLAST tables\n", sep = ""))
   blast_tables <- lapply(input_filenames, function(x) { load_individual_table(x, header_names) })
   
-  cat(paste(ts(), "Combining BLAST tables\n", sep = ""))
+  cat(paste(timestamp(), "Combining BLAST tables\n", sep = ""))
   output_table <- dplyr::bind_rows(blast_tables)
   
-  cat(paste(ts(), "Writing combining BLAST table to file (**with headers**)\n", sep = ""))
+  cat(paste(timestamp(), "Writing combining BLAST table to file (**with headers**)\n", sep = ""))
   write.table(output_table, file = output_filename, sep = ",", row.names = FALSE, col.names = TRUE)
   
-  cat(paste(ts(), "Done\n", sep = ""))
+  cat(paste(timestamp(), "Done\n", sep = ""))
 }
 
 main()
