@@ -199,7 +199,6 @@ def main(args):
     if not subject_proteome_file.endswith(".faa"):
         print("[Warning] " + subject_proteome_file + " may not be a amino acid FASTA file!")
 
-    # out_file = subject_proteome_file.rstrip(".faa") + ".csv"
 
     print(">> Forward Blasting to subject proteome...")
     # Forward BLASTs from query proteins to subject proteome and filters BLAST results by percent identity.
@@ -286,7 +285,7 @@ if __name__ == '__main__':
                              '''The larger this number is, the stricter the BLAST search.''')
 
     parser.add_argument('-o', '--output_file', metavar='OUTPUT', required=True,
-                        help='''Output CSV-format BLAST results table.''')
+                        help='''The path to write CSV-format BLAST results to.''')
 
     cli_args = parser.parse_args()
     main(cli_args)
