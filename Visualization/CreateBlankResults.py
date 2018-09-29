@@ -30,7 +30,7 @@ def argsCheck(numArgs):
             "Takes a nucleotide FASTA file and returns the exact same FASTA file with a reverse complemented sequence.")
         print("Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2018\n")
         print("Usage: " + sys.argv[0] + "  <blast_output_file.csv> <query_proteins.faa> <new_blast_output_file.csv>")
-        exit(1)  # Aborts program. (exit(1) indicates that an error occurred)
+        sys.exit(1)
 
 
 # Gives a timestamp (string) for help with logging
@@ -44,35 +44,23 @@ def ts():
 
 
 # Checks whether or not the provided input_csv is an empty file. Returns logical.
-def check_if_input_CSV_is_empty(input_csv):
+def check_if_input_csv_is_empty(input_csv):
     # Returns True is the CSV is empty and False if not
 
     if os.stat(input_csv).st_size == 0:
         return True
 
-    elif os.stat(input_csv).st_size > 0:
+    else:
         return False
 
-    else:
-        print(ts() + "ERROR: the input file appears to neither be empty nor non-empty. Exiting...")
-        exit(1)
 
 
 # Checks whether or not the provided file has the expected extension. Throws warning if not. No return.
 def file_extension_check(filename, extension):
     # Throws a warning if file extension does not appear to be appropriate
 
-    if extension == "csv":
-        if not filename.endswith(".csv"):
-            print(ts() + "WARNING: '" + filename + "' may not be a CSV file!")
-
-    elif extension == "faa":
-        if not filename.endswith(".faa"):
-            print(ts() + "WARNING: '" + filename + "' may not be an amino acid FASTA file!")
-
-    else:
-        print(ts() + "ERROR: extension must be 'csv' or 'faa'. Exiting...")
-        exit(1)
+    if not filename.endswith('.' + extension):
+        print(ts() + "WARNING: '" + filename + "' may not be a '" + extension + "' file!")
 
 
 # Uses input query_proteins FAA file to build a blank BLAST CSV table. Returns the table.
@@ -90,7 +78,7 @@ def generate_blank_results(query_proteins):
 
     except IOError:
         print(ts() + "Failed to open " + query_proteins)
-        exit(1)
+        sys.exit(1)
 
     blank_results = "\n".join(blank_results_list)
 
@@ -107,7 +95,7 @@ def write_blank_results(blank_results, new_blast_file):
 
     except IOError:
         print(ts() + "Failed to create " + new_blast_file)
-        exit(1)
+        sys.exit(1)
 
 
 def main(args):
@@ -148,7 +136,7 @@ def main(args):
 
     else:
         print(ts() + "Something went wrong. Exiting...")
-        exit(1)
+        sys.exit(1)
 
     print(ts() + "Done")
 
