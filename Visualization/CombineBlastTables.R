@@ -1,4 +1,5 @@
 #!/usr/bin/env Rscript
+
 # CombineBlastTables.R
 # Copyright Jackson M. Tsuji, 2018
 # Neufeld Research Group
@@ -19,6 +20,7 @@ if (RUN_COMMAND_LINE == FALSE) {
 #####################################################
 ## Load required packages: ##########################
 library(getopt)
+library(tools)
 library(plyr)
 suppressMessages(library(dplyr))
 #####################################################
@@ -73,10 +75,7 @@ load_individual_table <- function(table_filename, header_names) {
   colnames(data_table) <- header_names
   
   # Remove CSV ending and folder path. Set to subject_name.
-  table_filename_base <- gsub(pattern = ".csv$", replacement = "", x = table_filename)
-  table_filename_base <- strsplit(table_filename_base, split = "/")[[1]]
-  table_filename_base <- table_filename_base[length(table_filename_base)]
-  subject_name <- table_filename_base
+  subject_name <- tools::file_path_sans_ext(basename(table_filename))
   
   # Add new columns to table
   # TODO - consider also adding query_name
@@ -116,4 +115,3 @@ main <- function() {
 }
 
 main()
-
