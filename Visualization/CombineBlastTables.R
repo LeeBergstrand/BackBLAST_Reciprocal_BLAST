@@ -85,7 +85,7 @@ load_individual_table <- function(table_filename, header_names) {
   data_table$subject_name <- subject_name
   
   # Re-order columns to be more user friendly
-  data_table <- cbind(data_table[,ncol(data_table)], data_table[,1:(ncol(data_table)-1)])
+  data_table <- dplyr::select(data_table, subject_name, everything())
   
   return(data_table)
   
@@ -109,12 +109,11 @@ main <- function() {
   cat(paste(ts(), "Combining BLAST tables\n", sep = ""))
   output_table <- dplyr::bind_rows(blast_tables)
   
-  cat(paste(ts(), "Writing combining BLAST table to file (no headers, for convention)\n", sep = ""))
-  write.table(output_table, file = output_filename, sep = ",", row.names = FALSE, col.names = FALSE)
+  cat(paste(ts(), "Writing combining BLAST table to file (**with headers**)\n", sep = ""))
+  write.table(output_table, file = output_filename, sep = ",", row.names = FALSE, col.names = TRUE)
   
   cat(paste(ts(), "Done\n", sep = ""))
 }
 
 main()
 
-  
