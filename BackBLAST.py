@@ -187,6 +187,7 @@ def main(args):
     subject_proteome_file = args.subject_proteome
     input_e_value_cutoff = args.e_value
     input_min_ident_cutoff = args.min_ident
+    out_file = args.output_file
 
     print("Opening " + subject_proteome_file + "...")
 
@@ -198,7 +199,6 @@ def main(args):
     if not subject_proteome_file.endswith(".faa"):
         print("[Warning] " + subject_proteome_file + " may not be a amino acid FASTA file!")
 
-    out_file = subject_proteome_file.rstrip(".faa") + ".csv"
 
     print(">> Forward Blasting to subject proteome...")
     # Forward BLASTs from query proteins to subject proteome and filters BLAST results by percent identity.
@@ -281,8 +281,11 @@ if __name__ == '__main__':
                              '''The smaller this number is, the stricter the BLAST search.''')
 
     parser.add_argument('-i', '--min_ident', metavar='IDENT', default=DEFAULT_MINIMUM_IDENTITY_CUTOFF,
-                        help='''The minimum sequence identify cutoff for removing high scoring pairs. ''' +
+                        help='''The minimum sequence identify cutoff for removing high scoring pairs.''' +
                              '''The larger this number is, the stricter the BLAST search.''')
+
+    parser.add_argument('-o', '--output_file', metavar='OUTPUT', required=True,
+                        help='''The path to write CSV-format BLAST results to.''')
 
     cli_args = parser.parse_args()
     main(cli_args)
