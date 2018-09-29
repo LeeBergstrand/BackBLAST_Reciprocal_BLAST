@@ -314,7 +314,12 @@ load_tree_metadata <- function(tree_metadata_filename, phylo_tree) {
   }
   if ( identical(sort(unique(metadata$subject_name)), 
                  sort(dplyr::filter(ggtree(phylo_tree)$data, isTip == TRUE)$label)) == FALSE ) {
-    stop(ts(), "Entries in 'subject_name' of the provided metadata file do not exactly match the tip labels on the tree. Exiting...")
+    
+    # Determine which entries differ
+    missing_entries <- !(unique(metadata$subject_name) %in% dplyr::filter(ggtree(phylo_tree)$data, isTip == TRUE)$label)
+    missing_entries <- unique(metadata$subject_name)[missing_entries]
+    
+    stop(ts(), "Entries in 'subject_name' of the provided metadata file do not exactly match the tip labels on the tree. The following tip labels don't match: '", glue::glue_collapse(missing_entries, sep = "; "),  "'. Exiting...")
   }
   
   return(metadata)
@@ -344,7 +349,8 @@ add_tip_labels_to_tree_plot <- function(tree_plot, metadata_with_plotting_name =
     
     # Check table is okay
     if ( ("plotting_name" %in% colnames(metadata_with_plotting_name)) == FALSE ) {
-      stop("You set the '--genome_plotting_names' flag but did not provide a 'plotting_name' column in your tree metadata table. Cannot continue. Exiting...")
+      stop("You set the '--genome_plotting_names' flag but did not provide a 'plotting_name' column in your tree 
+           metadata table. Cannot continue. Exiting...")
     }
     
     # Reduce the metadata down to just 'subject_name' and 'plotting_name'
@@ -380,6 +386,12 @@ decorate_tree_plot <- function(tree_plot, metadata, tree_decorator_colname) {
   # Confirm the tree_decorator_colname is real
   if ( (tree_decorator_colname %in% colnames(metadata)) == FALSE) {
     stop("Cannot find column named '", tree_decorator_colname, "' in the supplied metadata table for mapping onto the tree. Exiting...")
+  }
+  
+  # Remove the plotting_name if it was already bound on earlier
+  # Check table is okay
+  if ( ("plotting_name" %in% colnames(metadata)) == TRUE ) {
+    metadata <- dplyr::select(metadata, -plotting_name)
   }
   
   # Add the decorator onto the tree
@@ -434,7 +446,7 @@ load_and_plot_phylogenetic_tree <- function(input_phylogenetic_tree_filepath, ro
   phylo_tree <- read.tree(input_phylogenetic_tree_filepath)
   
   # Optionally re-root tree
-  if (is.na(root_name) == FALSE) {
+  if ( is.na(root_name) == FALSE && root_name != "NA" ) {
     message(ts(), "Re-rooting tree to '", root_name, "'")
     phylo_tree <- reroot_tree(phylo_tree, root_name)
   }
@@ -491,8 +503,8 @@ read_blast_table <- function(input_blast_table_filename) {
   # Confirm the columns look okay
   if ( identical(colnames(blast_table), expected_header_names) == FALSE ) {
     
-    stop("BLAST data table did not have expected column names (", glue::glue_collapse(expected_header_names, sep = ", "),
-         "). Instead, had: ", glue::glue_collapse(colnames(blast_table, sep = ", ")), ". Exiting...")
+    stop("BLAST data table did not have expected column names ('", glue::glue_collapse(expected_header_names, sep = "; "),
+         "'). Instead, had: '", glue::glue_collapse(colnames(blast_table), sep = "; "), "'. Exiting...")
     
   }
   
@@ -538,7 +550,19 @@ overlay_gene_naming <- function(blast_table, gene_naming_table_filename) {
   gene_table_queries <- sort(gene_naming_table$qseqid)
   blast_table_queries <- sort(unique(blast_table$qseqid))
   if ( length(unique(blast_table_queries %in% gene_table_queries)) > 1 ) {
-    stop(ts(), "Query sequence IDs from the BLAST table are not contained in the gene naming table provided. Exiting...")
+    
+    # Determine missing entries
+    missing_entries <- blast_table_queries[!(blast_table_queries %in% gene_table_queries)]
+    good_entries <- blast_table_queries[(blast_table_queries %in% gene_table_queries)]
+    
+    # Warn user
+    warning(ts(), "Some query sequence IDs from the BLAST table are not contained in the gene naming table provided.
+            These will be REMOVED from the heatmap plot! The following will be removed: '", 
+            glue::glue_collapse(missing_entries, sep = "; "), "'. Exiting...")
+    
+    # Remove entries from BLAST table and proceed
+    blast_table <- dplyr::filter(blast_table, qseqid %in% good_entries)
+    
   } else if ( unique(blast_table_queries %in% gene_table_queries) == FALSE ) {
     stop(ts(), "None of the query sequence IDs from the BLAST table match the gene naming table provided. Exiting...")
   }
