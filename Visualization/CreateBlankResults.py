@@ -14,24 +14,20 @@
 # Imports:
 import sys
 import os
+import argparse
 import logging
 import time
 
 from Bio import SeqIO
 from shutil import copyfile
 
+# Set up the logger
+logging.basicConfig(level=logging.DEBUG, format="[ %(asctime)s UTC ]: %(levelname)s: %(module)s: %(message)s")
+logging.Formatter.converter = time.gmtime
+logger = logging.getLogger(__name__)
 
 # ===========================================================================================================
 # Functions:
-
-# Checks if the proper number of arguments are passed gives instructions on proper use.
-def argsCheck(numArgs):
-    if len(sys.argv) < numArgs or len(sys.argv) > numArgs:
-        print("Will make a blank file if the input blast file is blank, and will otherwise return the original file.")
-        print("Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2018\n")
-        print("Usage: " + sys.argv[0] + "  <blast_output_file.csv> <query_proteins.faa> <new_blast_output_file.csv>")
-        sys.exit(1)
-
 
 # Checks whether or not the provided input_csv is an empty file. Returns logical.
 def check_if_input_csv_is_empty(input_csv):
@@ -49,13 +45,14 @@ def file_extension_check(filename, extension):
 
 # Uses input query_proteins FAA file to build a blank BLAST CSV table. Returns the table.
 def generate_blank_results(query_proteins):
+    blank_results_list = []
+
     with open(query_proteins, "rU") as fasta_file:
         fasta_entries = SeqIO.parse(fasta_file, "fasta")
 
-    blank_results_list = []
-    for entry in fasta_entries:
-        blank_results_list.append(
-            entry.id + ",NA,NA,NA,NA,NA")  # qseqid sseqid pident evalue qcovhsp bitscore
+        for entry in fasta_entries:
+            blank_results_list.append(
+                entry.id + ",NA,NA,NA,NA,NA")  # qseqid sseqid pident evalue qcovhsp bitscore
 
     blank_results = "\n".join(blank_results_list)
     return(blank_results)
@@ -68,18 +65,10 @@ def write_blank_results(blank_results, new_blast_file):
 
 
 def main(args):
-    # Set up the logger
-    logging.basicConfig(level=logging.DEBUG, format="[ %(asctime)s UTC ]: %(levelname)s: %(module)s: %(message)s")
-    logging.Formatter.converter = time.gmtime
-    logger = logging.getLogger(__name__)  # Not sure if this is needed
-
-    # Check if the number of arguments are correct.
-    argsCheck(4)
-
     # Get user-provided variables
-    original_blast_file = sys.argv[1]
-    query_proteins = sys.argv[2]
-    new_blast_file = sys.argv[3]
+    original_blast_file = args.blast_results
+    query_proteins = args.query_proteome
+    new_blast_file = args.output_file
 
     # Report the input arguments
     logger.debug("Running " + os.path.basename(sys.argv[0]))
@@ -110,4 +99,23 @@ def main(args):
 
     logger.debug("Done")
 
-main(sys.argv)
+
+if __name__ == '__main__':
+    """Command Line Interface Options"""
+
+    parser = argparse.ArgumentParser(description = "A simple utility for working with BLAST results in batch. "
+                                                   "Creates a BLAST results template based on the query_proteome "
+                                                   "if the input blast file is blank. "
+                                                   "Returns the original file if not blank. "
+                                                   "Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2018.")
+    parser.add_argument('-i', '--blast_results', metavar='BLAST_IN', required=True,
+                        help='''The path to CSV-format BLAST results (to be checked by this script if empty or not).''')
+
+    parser.add_argument('-q', '--query_proteome', metavar='FASTA', required=True,
+                        help='''The path to a protein FASTA file used as the original BLAST query.''')
+
+    parser.add_argument('-o', '--output_file', metavar='BLAST_OUT', required=True,
+                        help='''The path to write the output CSV-format BLAST results to.''')
+
+    cli_args = parser.parse_args()
+    main(cli_args)
