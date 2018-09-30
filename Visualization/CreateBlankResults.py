@@ -6,7 +6,7 @@
 #
 # Requirements: - This script requires the Biopython module: http://biopython.org/wiki/Download
 #
-# Usage: CreateBlankResults.py blast_output_file.csv query_proteins.faa new_blast_output_file.csv
+# Usage: CreateBlankResults.py -i blast_file.csv -q query_proteins.faa -o new_blast_output_file.csv
 #       Will make a blank file if the input blast file is blank, and will otherwise return the original file.
 # -----------------------------------------------------------------------------------------------------------
 # ===========================================================================================================
