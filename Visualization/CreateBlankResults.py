@@ -5,88 +5,117 @@
 # Description: A simple program that takes a FASTA file query and makes a csv of blank BLAST results.
 #
 # Requirements: - This script requires the Biopython module: http://biopython.org/wiki/Download
-#     
-# Usage: CreateBlankResults.py <sequence_files.txt> <query.faa>
-# Example: CreateBlankResults.py sequences_files_to_replace.txt query_proteins.faa
+#
+# Usage: CreateBlankResults.py -i blast_file.csv -q query_proteins.faa -o new_blast_output_file.csv
+#       Will make a blank file if the input blast file is blank, and will otherwise return the original file.
 # -----------------------------------------------------------------------------------------------------------
 # ===========================================================================================================
 
 # Imports:
 import sys
+import os
+import argparse
+import logging
+import time
 
 from Bio import SeqIO
+from shutil import copyfile
 
+# Set up the logger
+logging.basicConfig(level=logging.DEBUG, format="[ %(asctime)s UTC ]: %(levelname)s: %(module)s: %(message)s")
+logging.Formatter.converter = time.gmtime
+logger = logging.getLogger(__name__)
 
 # ===========================================================================================================
 # Functions:
 
-# 1: Checks if in proper number of arguments are passed gives instructions on proper use.
-def argsCheck(numArgs):
-    if len(sys.argv) < numArgs or len(sys.argv) > numArgs:
-        print(
-            "Takes a nucleotide FASTA file and returns the exact same FASTA file with a reverse complemented sequence.")
-        print("By Lee Bergstrand\n")
-        print("Usage: " + sys.argv[0] + "  <sequence_files.txt> <query.faa>")
-        print("Examples: " + sys.argv[0] + " sequences_files_to_replace.txt query_proteins.faa\n")
-        exit(1)  # Aborts program. (exit(1) indicates that an error occurred)
+# Checks whether or not the provided input_csv is an empty file. Returns logical.
+def check_if_input_csv_is_empty(input_csv):
+    if os.stat(input_csv).st_size == 0: # Returns True is the CSV is empty and False if not
+        return True
+    else:
+        return False
 
 
-# ===========================================================================================================
-# Main program code:
+# Checks whether or not the provided file has the expected extension. Throws warning if not. No return.
+def file_extension_check(filename, extension):
+    if not filename.endswith('.' + extension):
+        logger.warning("'" + filename + "' may not be a '" + extension + "' file!")
 
-# House keeping...
-argsCheck(3)  # Checks if the number of arguments are correct.
 
-# Stores file one for input checking.
-print(">> Opening FASTA file...")
-filesToReplace = sys.argv[1]
-geneList = sys.argv[2]
+# Uses input query_proteins FAA file to build a blank BLAST CSV table. Returns the table.
+def generate_blank_results(query_proteins):
+    blank_results_list = []
 
-# File extension check
-if not filesToReplace.endswith(".txt"):
-    print("[Warning] " + geneList + " may not be a text file!")
+    with open(query_proteins, "rU") as fasta_file:
+        fasta_entries = SeqIO.parse(fasta_file, "fasta")
 
-# File extension check
-if not geneList.endswith(".faa"):
-    print("[Warning] " + geneList + " may not be a FASTA file!")
+        for entry in fasta_entries:
+            blank_results_list.append(
+                entry.id + ",NA,NA,NA,NA,NA")  # qseqid sseqid pident evalue qcovhsp bitscore
 
-# Reads sequence file list and stores it as a string.
-try:
-    with open(filesToReplace, "rU") as newFile:
-        filesToReplace = newFile.read()
-        newFile.close()
-except IOError:
-    print("Failed to open " + filesToReplace)
-    exit(1)
+    blank_results = "\n".join(blank_results_list)
+    return(blank_results)
 
-# Splits string into a list. Each element is a single line from the string.
-filesToReplaceList = filesToReplace.splitlines()
 
-FakeResults = []
-try:
-    handle = open(geneList, "rU")
-    SeqRecords = SeqIO.parse(handle, "fasta")
-    for record in SeqRecords:
-        FakeResults.append(
-            record.id + ",sseqid,0,evalue,qcovhsp,bitscore")  # qseqid sseqid pident evalue qcovhsp bitscore
-    handle.close()
-except IOError:
-    print("Failed to open " + filesToReplace + " or " + geneList)
-    exit(1)
+# Writes a blank_results table to a file with name new_blast_file. No return.
+def write_blank_results(blank_results, new_blast_file):
+    with open(new_blast_file, "w") as writeFile:
+        writeFile.write(blank_results)
 
-FakeResultsOut = "\n".join(FakeResults)
 
-print(">> Writing Fake Results...")
+def main(args):
+    # Get user-provided variables
+    original_blast_file = args.blast_results
+    query_proteins = args.query_proteome
+    new_blast_file = args.output_file
 
-for x in filesToReplaceList:
-    replacementFileName = x + ".csv"
+    # Report the input arguments
+    logger.debug("Running " + os.path.basename(sys.argv[0]))
+    logger.debug("Settings: Input BLAST CSV table: " + original_blast_file)
+    logger.debug("Settings: Query protein FastA file: " + query_proteins)
+    logger.debug("Settings: Output BLAST CSV table: " + new_blast_file)
 
-    try:
-        writeFile = open(replacementFileName, "w")
-        writeFile.write(FakeResultsOut)
-        writeFile.close()
-    except IOError:
-        print("Failed to create " + replacementFileName)
-        exit(1)
+    # Check file extensions
+    file_extension_check(original_blast_file, "csv")
+    file_extension_check(query_proteins, "faa")
+    file_extension_check(new_blast_file, "csv")
 
-print(">> Done.")
+    # If the CSV file is not empty, then just keep the file as is.
+    if check_if_input_csv_is_empty(original_blast_file) == False:
+        logger.debug("Provided BLAST file has content - no need to replace. Copying to output file.")
+        copyfile(original_blast_file, new_blast_file)
+
+    # If it is empty, then make a fake file.
+    elif check_if_input_csv_is_empty(original_blast_file) == True:
+        logger.debug("Generating blank BLAST table based on FAA file provided")
+        blank_results = generate_blank_results(query_proteins) # Stores file one for input checking.
+
+        logger.debug("Writing to CSV file '" + new_blast_file + "'")
+        write_blank_results(blank_results, new_blast_file)
+    else:
+        logger.error("Something went wrong. Exiting...")
+        sys.exit(1)
+
+    logger.debug("Done")
+
+
+if __name__ == '__main__':
+    """Command Line Interface Options"""
+
+    parser = argparse.ArgumentParser(description = "A simple utility for working with BLAST results in batch. "
+                                                   "Creates a BLAST results template based on the query_proteome "
+                                                   "if the input blast file is blank. "
+                                                   "Returns the original file if not blank. "
+                                                   "Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2018.")
+    parser.add_argument('-i', '--blast_results', metavar='BLAST_IN', required=True,
+                        help='''The path to CSV-format BLAST results (to be checked by this script if empty or not).''')
+
+    parser.add_argument('-q', '--query_proteome', metavar='FASTA', required=True,
+                        help='''The path to a protein FASTA file used as the original BLAST query.''')
+
+    parser.add_argument('-o', '--output_file', metavar='BLAST_OUT', required=True,
+                        help='''The path to write the output CSV-format BLAST results to.''')
+
+    cli_args = parser.parse_args()
+    main(cli_args)
