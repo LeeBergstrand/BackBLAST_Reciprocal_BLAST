@@ -76,8 +76,8 @@ rule combine_blast_tables:
         blast_tables=expand("fix_blank_results/{subject}.csv", subject=config.get("subjects"))
     output:
         "combine_blast_tables/blast_tables_combined.csv"
-    #conda:
-    #    "envs/R_viz.yaml"
+    conda:
+        "envs/R_viz.yaml"
     log:
         "logs/combine_blast_tables/combine_blast_tables.log"
     benchmark:
@@ -92,8 +92,8 @@ rule generate_heatmap:
         "combine_blast_tables/blast_tables_combined.csv"
     output:
         "generate_heatmap/BackBLAST_heatmap.pdf"
-    #conda:
-    #    "envs/R_viz.yaml"
+    conda:
+        "envs/R_viz.yaml"
     log:
         "logs/generate_heatmap/generate_heatmap.log"
     benchmark:
