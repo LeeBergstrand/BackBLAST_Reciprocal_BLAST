@@ -276,11 +276,11 @@ if __name__ == '__main__':
     parser.add_argument('-s', '--subject_proteome', metavar='FASTA', required=True,
                         help='''The path to a FASTA file containing all proteins from subject organism.''')
 
-    parser.add_argument('-e', '--e_value', metavar='E-VALUE', default=DEFAULT_E_VALUE_CUTOFF,
+    parser.add_argument('-e', '--e_value', metavar='E-VALUE', default=DEFAULT_E_VALUE_CUTOFF, type=float,
                         help='''The Expect value (E) cutoff for removing high scoring pairs. ''' +
                              '''The smaller this number is, the stricter the BLAST search.''')
 
-    parser.add_argument('-i', '--min_ident', metavar='IDENT', default=DEFAULT_MINIMUM_IDENTITY_CUTOFF,
+    parser.add_argument('-i', '--min_ident', metavar='IDENT', default=DEFAULT_MINIMUM_IDENTITY_CUTOFF, type=float,
                         help='''The minimum sequence identify cutoff for removing high scoring pairs.''' +
                              '''The larger this number is, the stricter the BLAST search.''')
 
