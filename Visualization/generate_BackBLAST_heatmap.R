@@ -125,8 +125,13 @@ generate_bootstrap_labels <- function(phylo_tree, bootstrap_cutoff) {
   bootstrap_label_data <- ggtree::ggtree(phylo_tree)$data
   
   # Set the labels to numeric (instead of character; will make non character go 'NA', like perhaps tip labels)
-  bootstrap_label_data$label <- as.numeric(bootstrap_label_data$label)
-  # TODO - make this more elegant to avoid warning
+  # This longer lapply function tries to avoid warnings from coersion while still allowing for transparent error reporting otherwise
+  bootstrap_label_data$label <- unlist(lapply(bootstrap_label_data$label, function(x) {
+    if(suppressWarnings(as.numeric(x)) %>% is.na == FALSE) {
+      return(as.numeric(x))
+    } else {
+      return(NA)}
+  }))
   
   # Filter out tip labels and 'NA' labels
   bootstrap_label_data <- dplyr::filter(bootstrap_label_data, is.na(label) == FALSE & isTip == FALSE)
@@ -523,8 +528,9 @@ main <- function(params) {
 
 if (interactive() == FALSE) {
   
-  parser <- argparser::arg_parser(description = glue::glue("generate_BackBLAST_heatmap.R: Binds a phylogenetic tree to a BLAST table heatmap.
-                                             Copyright Lee Bergstrand and Jackson M. Tsuji, 2019."))
+  parser <- argparser::arg_parser(
+      description = glue::glue("generate_BackBLAST_heatmap.R: Binds a phylogenetic tree to a BLAST table heatmap.
+                                Copyright Lee Bergstrand and Jackson M. Tsuji, 2019."))
   
   # Add required args
   parser <- argparser::add_argument(parser = parser, arg = "input_phylogenetic_tree_filepath", 
@@ -552,25 +558,6 @@ if (interactive() == FALSE) {
                                     type = "character", default = NA)
   
   params <- argparser::parse_args(parser)
-  
-  main(params)
-  
-} else {
-  
-  # Manually set when running in RStudio for development
-  params <- list()
-  setwd("/home/jmtsuji/Research_General/Bioinformatics/02_git/BackBLAST_Reciprocal_BLAST/test")
-  
-  # Required inputs
-  params$input_phylogenetic_tree_filepath <- "GSB_riboproteins_tree_vs3.treefile"
-  params$input_blast_table_filepath <- "GSB_pathway_vs7_e40_best_hits_MOD3.csv"
-  params$output_pdf_filepath <- "test4.pdf"
-  
-  # Optional inputs (set to 'NA' to ignore)
-  params$genome_metadata_filepath <- NA
-  params$gene_metadata_filepath <- NA
-  params$bootstrap_cutoff <- 90
-  params$root_name <- "Ignavibacterium_album_JCM_16511_NC_017464.1" # Optional; set to NA if you want to use the tree as-is.
   
   main(params)
   
