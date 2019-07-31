@@ -14,9 +14,9 @@ library(plyr, warn.conflicts = FALSE)
 library(dplyr, warn.conflicts = FALSE)
 library(tibble, warn.conflicts = FALSE)
 library(reshape2, warn.conflicts = FALSE)
+suppressMessages(library(ggplot2, warn.conflicts = FALSE))
 library(RColorBrewer, warn.conflicts = FALSE)
-library(ggplot2, warn.conflicts = FALSE)
-library(ggtree, quietly = TRUE, warn.conflicts = FALSE)
+suppressMessages(library(ggtree))
 library(ape, warn.conflicts = FALSE)
 library(maps, warn.conflicts = FALSE)
 library(phytools, warn.conflicts = FALSE)
@@ -498,8 +498,8 @@ main <- function(params) {
 
 if (interactive() == FALSE) {
   
-  parser <- argparser::arg_parser("generate_BackBLAST_heatmap.R: Binds a phylogenetic tree to a BLAST table heatmap.")
-  parser <- argparser::arg_parser("Copyright Lee Bergstrand and Jackson M. Tsuji, 2019.")
+  parser <- argparser::arg_parser(description = glue::glue("generate_BackBLAST_heatmap.R: Binds a phylogenetic tree to a BLAST table heatmap.
+                                             Copyright Lee Bergstrand and Jackson M. Tsuji, 2019."))
   
   # Add required args
   parser <- argparser::add_argument(parser = parser, arg = "input_phylogenetic_tree_filepath", 
@@ -511,21 +511,18 @@ if (interactive() == FALSE) {
   parser <- argparser::add_argument(parser = parser, arg = "output_pdf_filepath", 
                                     help = "Output PDF filepath", 
                                     type = "character", default = NULL)
-  parser <- argparser::add_argument(parser = parser, arg = "input_phylogenetic_tree_filepath", 
-                                    help = "Input phylogenetic tree filepath", 
-                                    type = "character", default = NULL)
   
   # Add optional args (set to 'NA' to ignore)
-  parser <- argparser::add_argument(parser = parser, arg = "--genome_metadata_filepath", short = "m",
+  parser <- argparser::add_argument(parser = parser, arg = "--genome_metadata_filepath", short = "-m",
                                     help = "Genome metadata filepath", 
                                     type = "character", default = NA)
-  parser <- argparser::add_argument(parser = parser, arg = "--gene_naming_table_filepath", short = "g",
+  parser <- argparser::add_argument(parser = parser, arg = "--gene_naming_table_filepath", short = "-g",
                                     help = "Gene naming table filepath",
                                     type = "character", default = NA)
-  parser <- argparser::add_argument(parser = parser, arg = "--bootstrap_cutoff", short = "b",
+  parser <- argparser::add_argument(parser = parser, arg = "--bootstrap_cutoff", short = "-b",
                                     help = "Bootstrap cutoff value",
                                     type = "numeric", default = NA)
-  parser <- argparser::add_argument(parser = parser, arg = "--root_name", short = "r",
+  parser <- argparser::add_argument(parser = parser, arg = "--root_name", short = "-r",
                                     help = "Root name",
                                     type = "character", default = NA)
   
@@ -554,54 +551,3 @@ if (interactive() == FALSE) {
   
 }
 
-
-# message(glue::glue("
-#               Required inputs:
-#                    --tree_filepath               Filepath for newick-format phylogenetic tree of the BLAST subject organisms
-#                    --blast_table_filepath        Filepath for CSV-format BLAST hit table from CombineBlastTables.R
-#                    --output_filepath             Output filepath for the PDF
-#                    
-#                    Optional inputs:
-#                    --tree_metadata_filename      Filepath for TSV-format metadata file for the phylogenetic tree. Details below.
-#                    --tree_decorator_colname      Column name from the metadata to map onto the tree as fill colours.
-#                    Requires that --tree_metadata_filename is set. Details below.
-#                    --genome_plotting_names       Set this flag to include a vector of genome names to plot in the tree_metadata_filename
-#                    called 'plotting_name'. Details below.
-#                    --gene_naming_table_filename  Filepath for TSV-format table linking query gene IDs in the BLAST table to proper
-#                    gene names. Details below.
-#                    --bootstrap_cutoff            A percentage at or above which to display the bootstrap values on the tree (e.g., 80)
-#                    --root_name                   Exact name of the tip you wish to use as the root of the tree, if your tree is not 
-#                    already rooted
-#                    
-#                    Tree vs. the BLAST table
-#                    Note that the subject organism names MUST be EXACTLY the same between the tree tips and the BLAST table 
-#                    'subject_name' column. Otherwise, the script will fail.
-#                    
-#                    Tree metadata:
-#                    You can optionally provide a tree_metadata table to overlay additional information onto the phylogenetic tree.
-#                    
-#                    The first column of this TSV (tab-separated) table MUST be called 'subject_name' and include the EXACT names
-#                    of all genomes in the phylogenetic tree. You can then optionally include the following:
-#                    
-#                    1. genome_plotting_names: add a column called 'plotting_name' to include the names of the organisms that you 
-#                    want to appear on the final plot. You can use spaces, most special characters, and so on.
-#                    
-#                    2. tree_decorator_colname: you can overlay characteristics of the organisms/genomes as fill colours on the tips
-#                    of the tree. Add a column to the metadata table with any name you'd like, e.g., 'GC_content', 
-#                       'predicted_metabolism', 'pathogenicity', and so on. Fill with meaningful data to you. Then, specify the
-#                       'tree_decorator_colname' to EXACTLY match the name of ONE of the additional columns. That info will then
-#                       be plotted on the tree. Enjoy! (We might expand this in the future to allow for font colours and so on to 
-#                       be varied.)
-# 
-#               Gene naming for BLAST table:
-#                   You can provide a gene_naming_table to provide custom names and ordering for query genes in your BLAST search, 
-#                   in place of the qseqid from NCBI, which may not be very human-readable.
-# 
-#                   The gene naming table must meet the following criteria:
-#                     - First column: 'qseqid' - the EXACT ID of ALL of the unique query proteins in the BLAST table must be included.
-#                           You can include additional qseqid's here if you'd like, they just won't be used.
-#                    - Second column: 'gene_name' - a corresponding name of your choice (e.g., rpoB, dsrA, and so on)
-#                    
-#                    The order of the rows in this table will dictate the order of the genes in the heatmap.
-#                    
-#                    "))
