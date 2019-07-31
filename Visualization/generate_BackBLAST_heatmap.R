@@ -488,9 +488,12 @@ main <- function(params) {
   futile.logger::flog.info(glue::glue("Output PDF filepath: ", params$output_pdf_filepath))
   futile.logger::flog.info(glue::glue("Bootstrap display cutoff (%; ignored if 'NA'): ", params$bootstrap_cutoff))
   futile.logger::flog.info(glue::glue("Root name (ignored if 'NA'): ", params$root_name))
-  futile.logger::flog.info(glue::glue("Genome metadata filepath (ignored if 'NA'): ", params$genome_metadata_filepath))
-  futile.logger::flog.info(glue::glue("Input gene naming table filepath (ignored if 'NA'): ", 
+  futile.logger::flog.info(glue::glue("Input genome metadata filepath (ignored if 'NA'): ", 
+                                      params$genome_metadata_filepath))
+  futile.logger::flog.info(glue::glue("Input gene metadata filepath (ignored if 'NA'): ", 
                                       params$gene_metadata_filepath))
+  futile.logger::flog.info(glue::glue("Plot width (mm): ", params$plot_width))
+  futile.logger::flog.info(glue::glue("Plot height (mm): ", params$plot_height))
   futile.logger::flog.info("############################")
   
   # Load and plot the tree
@@ -514,13 +517,15 @@ main <- function(params) {
   # TODO - make the dimensions a function of the gene number and the subject number
   futile.logger::flog.info("Combining the ggtree and the heatmap")
   combined_plot <- egg::ggarrange(phylo_tree_list[[2]], blast_tibble_list[[2]], 
-                                  nrow = 1, widths = c(5, 8), heights = c(5), padding = unit(0, "mm"))
+                                  nrow = 1, widths = c(4, 8), heights = c(5), padding = unit(0, "mm"))
   # N.B., set debug = TRUE to see grid lines
   
   # Print a PDF of the combined plot
   # TODO - set dimensions as a function of the gene number and the subject number
+  # N.B., dimensions need to be input in inches (25.4 mm per inch)
   futile.logger::flog.info("Saving to PDF")
-  pdf(file = params$output_pdf_filepath, width = 17, height = 7)
+  pdf(file = params$output_pdf_filepath, width = params$plot_width / 25.4, 
+      height = params$plot_height / 25.4)
   print(combined_plot)
   dev.off()
   
@@ -558,6 +563,12 @@ if (interactive() == FALSE) {
   parser <- argparser::add_argument(parser = parser, arg = "--root_name", short = "-r",
                                     help = "Root name",
                                     type = "character", default = NA)
+  parser <- argparser::add_argument(parser = parser, arg = "--plot_width", short = "-w",
+                                    help = "Plot width (mm)",
+                                    type = "numeric", default = 400)
+  parser <- argparser::add_argument(parser = parser, arg = "--plot_height", short = "-z",
+                                    help = "Plot height (mm)",
+                                    type = "numeric", default = 200)
   
   params <- argparser::parse_args(parser)
   
