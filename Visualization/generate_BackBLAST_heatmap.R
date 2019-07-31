@@ -262,75 +262,11 @@ add_tip_labels_to_tree_plot <- function(tree_plot, metadata_with_plotting_name =
   
 }
 
-
-# Function: decorates an existing ggtree plot with custom fill/colour based on user-supplied metadata
-# Inputs: 'tree_plot' - ggtree plot; '
-          # 'metadata' - data frame of user-supplied information with row names matching the tree's tip labels;
-          # 'tree_decorator_colname' - character vector (length 1) of the name of the column in 'metadata' that you want to overlay on the plot
-# Return: ggtree plot
-decorate_tree_plot <- function(tree_plot, metadata, tree_decorator_colname) {
-  # For decorating with metadata, see https://bioconductor.org/packages/devel/bioc/vignettes/ggtree/inst/doc/treeAnnotation.html#tree-annotation-with-user-specified-annotation (accessed Sept. 15, 2018)
-  
-  # TODO - add more options for the user (e.g., fill size, or maybe even colouring text instead?)
-  
-  # Confirm the tree_decorator_colname is real
-  if ( (tree_decorator_colname %in% colnames(metadata)) == FALSE) {
-    stop("Cannot find column named '", tree_decorator_colname, "' in the supplied metadata table for mapping onto the tree. Exiting...")
-  }
-  
-  # Remove the plotting_name if it was already bound on earlier
-  # Check table is okay
-  if ( ("plotting_name" %in% colnames(metadata)) == TRUE ) {
-    metadata <- dplyr::select(metadata, -plotting_name)
-  }
-  
-  # Add the decorator onto the tree
-  # N.B. Adding the 'metadata' on the first line binds the metadata table onto the tree's data table for aesthetics later
-  tree_plot <- tree_plot  %<+% metadata +
-    # TODO - check: does aes_string work?
-    geom_tippoint(aes_string(fill = tree_decorator_colname), shape = 21, alpha = 0.8, size = 5) +
-    # geom_tiplab(align = TRUE, linetype = NULL, size = 2) + # aes(colour = metabolism) , linetype = "dotted", size = 2
-    theme(legend.position = "left")
-  
-  # Extract a vector of the decorator column to decide on appropriate colour scale
-  decorators <- metadata[,match(tree_decorator_colname, colnames(metadata))]
-  
-  # Add colour scale
-  if ( is.numeric(decorators) == TRUE ) {
-    # Continuous data
-    colour_palette <- rev(RColorBrewer::brewer.pal(name = "YlGnBu", n = 5))
-    
-    tree_plot <- tree_plot + scale_fill_gradientn(colours = colour_palette, na.value = "grey50")
-    
-  } else if ( is.character(decorators) == TRUE ) {
-    # Discrete data
-    # Determine the fill colours for the tree based on the number of unique entries
-    num_factors <- length(unique(decorators))
-    colour_palette <- choose_discrete_colour_scale(num_factors)
-    
-    tree_plot <- tree_plot + scale_fill_manual(values = colour_palette)
-    
-  } else {
-    # Discrete data?
-    warning("The decorator_column in the metadata table is not numeric or character; fishy! Watch for possible errors...")
-    # Determine the fill colours for the tree based on the number of unique entries
-    num_factors <- length(unique(decorators))
-    colour_palette <- choose_discrete_colour_scale(num_factors)
-    
-    tree_plot <- tree_plot + scale_fill_manual(values = colour_palette)
-    
-  }
-  
-  return(tree_plot)
-  
-}
-
-
 # Function: master function to load and plot the phylogenetic tree
 # Inputs: described above
 # Return: list of two: 'phylo_tree' - ggtree unplotted object ; 'phylo_tree_fig' - ggtree figure
 load_and_plot_phylogenetic_tree <- function(input_phylogenetic_tree_filepath, root_name, bootstrap_cutoff, 
-                                   tree_metadata_filename, tree_decorator_colname) {
+                                   tree_metadata_filename) {
   # Read tree
   futile.logger::flog.info("Reading input phylogenetic tree")
   phylo_tree <- ape::read.tree(input_phylogenetic_tree_filepath)
@@ -358,16 +294,6 @@ load_and_plot_phylogenetic_tree <- function(input_phylogenetic_tree_filepath, ro
     phylo_tree_fig <- add_tip_labels_to_tree_plot(phylo_tree_fig, metadata)
   } else {
     phylo_tree_fig <- add_tip_labels_to_tree_plot(phylo_tree_fig)
-  }
-  
-  # Optionally decorate with metadata
-  if ( is.na(tree_metadata_filename) == FALSE && is.na(tree_decorator_colname) == FALSE ) {
-    # Load metadata
-    metadata <- load_tree_metadata(tree_metadata_filename, phylo_tree)
-    
-    # Decorate
-    futile.logger::flog.info(glue::glue("Decorating ggtree plot with metadata column '", tree_decorator_colname, "'"))
-    phylo_tree_fig <- decorate_tree_plot(phylo_tree_fig, metadata, tree_decorator_colname)
   }
   
   # Make list to return to user
@@ -541,8 +467,6 @@ main <- function(params) {
   futile.logger::flog.info(glue::glue("Bootstrap display cutoff (%; ignored if 'NA'): ", params$bootstrap_cutoff))
   futile.logger::flog.info(glue::glue("Root name (ignored if 'NA'): ", params$root_name))
   futile.logger::flog.info(glue::glue("Tree metadata filename (ignored if 'NA'): ", params$tree_metadata_filepath))
-  futile.logger::flog.info(glue::glue("Decorator column name in tree metadata (ignored if 'NA'): ", 
-                                      params$tree_decorator_colname))
   futile.logger::flog.info(glue::glue("Input gene naming table filename (ignored if 'NA'): ", 
                                       params$gene_naming_table_filepath))
   
@@ -550,7 +474,7 @@ main <- function(params) {
   # TODO - after reading metadata table, CHECK that the first column names correspond to the tree tip labels
   phylo_tree_list <- load_and_plot_phylogenetic_tree(params$input_phylogenetic_tree_filepath, 
                                                      params$root_name, params$bootstrap_cutoff, 
-                                                     params$tree_metadata_filepath, params$tree_decorator_colname)
+                                                     params$tree_metadata_filepath)
   
   # Get tip order of the tree, to match with heatmap later
   # Based on https://groups.google.com/forum/#!topic/bioc-ggtree/LqRDK78m3U4 (accessed Sept. 15, 2018)
@@ -605,9 +529,6 @@ if (interactive() == FALSE) {
   parser <- argparser::add_argument(parser = parser, arg = "--tree_metadata_filepath", short = "m",
                                     help = "Tree metadata filepath", 
                                     type = "character", default = NA)
-  parser <- argparser::add_argument(parser = parser, arg = "--tree_decorator_colname", short = "d",
-                                    help = "Tree decorator colname filepath",
-                                    type = "character", default = NA)
   parser <- argparser::add_argument(parser = parser, arg = "--map_genome_names", short = "n",
                                     help = "Map genome names", flag = TRUE, default = NA)
   parser <- argparser::add_argument(parser = parser, arg = "--gene_naming_table_filepath", short = "g",
@@ -637,7 +558,6 @@ if (interactive() == FALSE) {
   
   # Optional inputs (set to 'NA' to ignore)
   params$tree_metadata_filepath <- NA
-  params$tree_decorator_colname <- NA
   params$map_genome_names <- NA
   params$gene_naming_table_filepath <- NA
   params$bootstrap_cutoff <- NA
