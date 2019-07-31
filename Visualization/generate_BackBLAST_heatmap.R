@@ -1,8 +1,7 @@
 #!/usr/bin/env Rscript
 # generate_BackBLAST_heatmap.R
-# Copyright Lee Bergstrand and Jackson M. Tsuji, 2018
+# Copyright Lee Bergstrand and Jackson M. Tsuji, 2019
 # Plots a newick treefile and BLAST table together as a phylogenetic tree and heatmap
-# See required R packages below.
 
 # Load libraries
 library(argparser, quietly = TRUE)
@@ -105,7 +104,6 @@ reroot_ggtree <- function(phylo_tree, root_name) {
   }
   
   # Re-root
-  # TODO - consider suppressMessages()
   tree_rooted <- ggtree::reroot(phylo_tree, node = tip_label_index)
   
   return(tree_rooted)
@@ -160,27 +158,19 @@ plot_ggtree <- function(phylo_tree, bootstrap_label_data) {
                       branch.length = 0.1) +
     
     # Add the bootstrap labels from the external file
-    # TODO - fine-tune the 'nudge' value so that it works more generically
     geom_text(data = bootstrap_label_data, aes(label = label), nudge_x = -0.035, nudge_y = 0.35, size = 3) +
-    # TODO - ALT CODE
-    # geom_text2(aes(subset = (grepl(pattern = "^[0-9]+$", x = label) & !(isTip) & as.numeric(label) > bootstrap_cutoff), 
-    #                label = as.numeric(label)),
-    #            nudge_x = -0.03, nudge_y = 0.4, size = 2.5) +
-
+    
     # Add the dotted lines from the tree tips
-    # TODO - check if 'size' is okay
     geom_tiplab(align = TRUE, linetype = "dotted", size = 0.1, offset = 0.1) +
     
     # Add scale bar
-    # TODO - set y based on tree topography?
     geom_treescale(x = 0, y = 8, linesize = 1, fontsize = 3, offset = 0.5) +
     
     # Manually tune the y-axis boundaries to match the heatmap: https://stackoverflow.com/a/18718196 (accessed Sept. 15, 2018)
-    # TODO - change this to be a function of the number of entries
+    # TODO - this might need to be a function of the number of entries
     scale_y_discrete(expand = c(0,0.6)) +
   
     ## Manually set the righthand cutoff for the tree
-    # TODO - change this to be a function of the tree branch length?? Or is 1 always okay?
     xlim_tree(1)
     # xlim etc.: https://guangchuangyu.github.io/2016/10/xlim_tree-set-x-axis-limits-for-only-tree-panel/ (accessed Sept 15, 2018)
   
@@ -514,14 +504,12 @@ main <- function(params) {
   
   # Combine the tree and heatmap
   # Got ggarrange ideas from https://cran.r-project.org/web/packages/egg/vignettes/Ecosystem.html (accessed Sept. 15, 2018)
-  # TODO - make the dimensions a function of the gene number and the subject number
   futile.logger::flog.info("Combining the ggtree and the heatmap")
   combined_plot <- egg::ggarrange(phylo_tree_list[[2]], blast_tibble_list[[2]], 
                                   nrow = 1, widths = c(4, 8), heights = c(5), padding = unit(0, "mm"))
   # N.B., set debug = TRUE to see grid lines
   
   # Print a PDF of the combined plot
-  # TODO - set dimensions as a function of the gene number and the subject number
   # N.B., dimensions need to be input in inches (25.4 mm per inch)
   futile.logger::flog.info("Saving to PDF")
   pdf(file = params$output_pdf_filepath, width = params$plot_width / 25.4, 
