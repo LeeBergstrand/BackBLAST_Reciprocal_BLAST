@@ -7,8 +7,6 @@
 # Load libraries
 library(argparser, quietly = TRUE)
 library(futile.logger)
-library(roxygen2)
-library(tools)
 library(glue, warn.conflicts = FALSE)
 library(plyr, warn.conflicts = FALSE)
 library(dplyr, warn.conflicts = FALSE)
@@ -485,7 +483,7 @@ main <- function(params) {
   futile.logger::flog.info(glue::glue("Root name (ignored if 'NA'): ", params$root_name))
   futile.logger::flog.info(glue::glue("Genome metadata filepath (ignored if 'NA'): ", params$genome_metadata_filepath))
   futile.logger::flog.info(glue::glue("Input gene naming table filepath (ignored if 'NA'): ", 
-                                      params$gene_naming_table_filepath))
+                                      params$gene_metadata_filepath))
   
   # Load and plot the tree
   # TODO - after reading metadata table, CHECK that the first column names correspond to the tree tip labels
@@ -501,7 +499,7 @@ main <- function(params) {
   
   # Load and plot the BLAST table as a heatmap
   blast_tibble_list <- load_and_plot_blast_tibble(params$input_blast_table_filepath, 
-                                                tip_order, params$gene_naming_table_filepath,
+                                                tip_order, params$gene_metadata_filepath,
                                                 params$genome_metadata_filepath)
   
   # Combine the tree and heatmap
@@ -570,7 +568,7 @@ if (interactive() == FALSE) {
   
   # Optional inputs (set to 'NA' to ignore)
   params$genome_metadata_filepath <- NA
-  params$gene_naming_table_filepath <- NA
+  params$gene_metadata_filepath <- NA
   params$bootstrap_cutoff <- 90
   params$root_name <- "Ignavibacterium_album_JCM_16511_NC_017464.1" # Optional; set to NA if you want to use the tree as-is.
   
