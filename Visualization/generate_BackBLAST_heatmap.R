@@ -80,7 +80,7 @@ choose_discrete_colour_scale <- function(length) {
 #' Re-root a ggtree
 #' 
 #' @param phylo_tree ggtree-format tree
-#' @param root_name Character; the exact name of the to-be root
+#' @param root_name Character (length 1 vector); the exact name of the to-be root
 #' @return ggtree-format tree, rooted
 #' @export
 reroot_ggtree <- function(phylo_tree, root_name) {
@@ -112,11 +112,13 @@ reroot_ggtree <- function(phylo_tree, root_name) {
   return(tree_rooted)
 }
 
-
-# Function: extracts tree label (bootstrap) data and applies bootstrap cutoff if desired
-# Input: 'phylo_tree' - ggtree-format tree; 'bootstrap_cutoff' - numeric vector (length 1) with minimum bootstrap cutoff in %
-# Return: extracted tree data as a data frame with labels adjusted to only contain bootstraps (numeric) (optionally) above bootstrap cutoff for branches.
-        # To be mapped onto the main tree during plotting.
+#' Extracts tree label (bootstrap) data and applies bootstrap cutoff if desired
+#' 
+#' @param phylo_tree ggtree-format tree
+#' @param bootstrap_cutoff Numeric (length 1 vector); the minimum bootstrap cutoff, in percent
+#' @return extracted tree data as a data frame with labels adjusted to only contain bootstraps (numeric) (optionally) above bootstrap cutoff for branches.
+#' To be mapped onto the main tree during plotting.
+#' @export
 generate_bootstrap_labels <- function(phylo_tree, bootstrap_cutoff) {
   # For adding bootstrap labels like this, see https://guangchuangyu.github.io/software/ggtree/faq/ (accessed Sept 14, 2018)
   # Note that 'labels' encompasses tip labels and node labels. You can to extract the tip labels alone.
@@ -142,10 +144,12 @@ generate_bootstrap_labels <- function(phylo_tree, bootstrap_cutoff) {
   
 }
 
-
-# Function: makes an initial plot of the tree with overlaid bootstrap labels
-# Inputs: 'phylo_tree' - ggtree-format tree; 'bootstrap_label_data' - data frame extracted from tree and possibly modified, generated in 'generate_bootstrap_labels'
-# Return: ggtree plot
+#' Makes an initial plot of the tree with overlaid bootstrap labels
+#' 
+#' @param phylo_tree ggtree-format tree
+#' @param bootstrap_label_data data frame extracted from tree and possibly modified, generated in 'generate_bootstrap_labels'
+#' @return ggtree plot
+#' @export
 plot_ggtree <- function(phylo_tree, bootstrap_label_data) {
   
   tree_plot <- ggtree::ggtree(phylo_tree, size = 1, colour = "black", ladderize = TRUE,
@@ -181,9 +185,13 @@ plot_ggtree <- function(phylo_tree, bootstrap_label_data) {
 }
 
 
-# Function: master function to load and plot the phylogenetic tree
-# Inputs: described above
-# Return: list of two: 'phylo_tree' - ggtree unplotted object ; 'phylo_tree_fig' - ggtree figure
+#' Master function to load and plot the phylogenetic tree
+#' 
+#' @param input_phylogenetic_tree_filepath Character (length 1 vector); the filepath to the phylogenetic tree
+#' @param root_name Character (length 1 vector); the exact name of the to-be root
+#' @param bootstrap_cutoff Numeric (length 1 vector); the minimum bootstrap cutoff, in percent
+#' @return list of two: 'phylo_tree' - ggtree unplotted object ; 'phylo_tree_fig' - ggtree figure
+#' @export
 load_and_plot_phylogenetic_tree <- function(input_phylogenetic_tree_filepath, root_name, bootstrap_cutoff) {
   # Read tree
   futile.logger::flog.info("Reading input phylogenetic tree")
@@ -212,13 +220,16 @@ load_and_plot_phylogenetic_tree <- function(input_phylogenetic_tree_filepath, ro
   
 }
 
-# Function: loads BLAST table and checks for expected column names (HARD-CODED in function)
-# Inputs: 'input_blast_table_filename'
-# Return: blast_tibble (data frame)
-read_blast_tibble <- function(input_blast_table_filename) {
+
+#' Loads BLAST table and checks for expected column names (HARD-CODED in function)
+#' 
+#' @param input_blast_table_filepath Character (length 1 vector); the filepath to the BLAST table (comma-separated)
+#' @return tibble of BLAST data
+#' @export
+read_blast_tibble <- function(input_blast_table_filepath) {
   
   # Load the data
-  blast_tibble <- read_tibble(input_blast_table_filename, sep = ",")
+  blast_tibble <- read_tibble(input_blast_table_filepath, sep = ",")
   
   # HARD-CODED expected header names
   expected_header_names <- c("subject_name", "qseqid", "sseqid", "pident", "evalue", "qcovhsp", "bitscore")
@@ -239,10 +250,12 @@ read_blast_tibble <- function(input_blast_table_filename) {
 }
 
 
-# Function: changes the order of the subject_name in the BLAST table to match that of the ggtree tips. Checks for perfect match.
-# Inputs: 'blast_tibble' data frame; 'tip_order' - character vector of the ggtree tips in order
-# Return: blast_tibble (data frame) with subject_name as an ordered factor
-# TODO - reduce to match tree names if needed
+#' Changes the order of the subject_name in the BLAST table to match that of the ggtree tips
+#' 
+#' @param blast_tibble Tibble output of read_blast_tibble
+#' @param tip_order Character vector of the exact order of the tip labels in the phylogenetic tree
+#' @return tibble of BLAST data with subject_name as an ordered factor and reduced to match phylogenetic tree names (if needed)
+#' @export
 order_blast_tibble_subjects <- function(blast_tibble, tip_order) {
   
   # If entries are not identical, try filtering down to just what is in the phylogenetic tree
@@ -282,12 +295,13 @@ order_blast_tibble_subjects <- function(blast_tibble, tip_order) {
 }
 
 
-# TODO - finish modifications
-# Function: adds tip labels to the tree plot, either the standard ones or as specified in metadata
-# Inputs: 'tree_plot' - ggtree plot; '
-# 'metadata' - OPTIONAL data frame of user-supplied information for 'plotting_name' (required column)
-# If not provided, will just use standard tip labels
-# Return: ggtree plot with labels
+#' Overlays user-given genome names for the heatmap y-axis
+#' 
+#' @param blast_tibble Tibble output of read_blast_tibble
+#' @param genome_metadata_filepath Character (length 1 vector); the filepath of the tab-separated genome metadata file.
+#' Must at least have the columns 'subject_name' and 'plotting_name' as the first and second columns, respectively.
+#' @return tibble of BLAST data with subject_name renamed with the user-desired values
+#' @export
 overlay_genome_naming <- function(blast_tibble, genome_metadata_filepath) {
   
   # Load the metadata tibble
@@ -323,13 +337,17 @@ overlay_genome_naming <- function(blast_tibble, genome_metadata_filepath) {
 }
 
 
-# Function: reads the optional gene_naming_table and then overlays the names and order onto the BLAST table
-# Inputs: 'blast_tibble' data frame; 'gene_naming_table_filename' - character vector (length 1) specifying the filename
-# Return: blast_tibble (data frame) with qseqid as an ordered factor with human-readable names
-overlay_gene_naming <- function(blast_tibble, gene_naming_table_filename) {
+#' Overlays user-given gene names for the heatmap x-axis
+#' 
+#' @param blast_tibble Tibble output of read_blast_tibble
+#' @param gene_metadata_filepath Character (length 1 vector); the filepath of the tab-separated gene metadata file.
+#' Must at least have the columns 'qseqid' and 'gene_name' as the first and second columns, respectively.
+#' @return tibble of BLAST data with qseqid renamed with the user-desired values
+#' @export
+overlay_gene_naming <- function(blast_tibble, gene_metadata_filepath) {
   
   # Load gene naming table
-  gene_naming_tibble <- read_tibble(gene_naming_table_filename)
+  gene_naming_tibble <- read_tibble(gene_metadata_filepath)
   
   # Check that the column names match expected (for the first two columns; doesn't matter after that)
   # HARD-CODED
@@ -376,9 +394,11 @@ overlay_gene_naming <- function(blast_tibble, gene_naming_table_filename) {
 }
 
 
-# Function: plots the BLAST table as a heatmap in ggplot
-# Inputs: 'blast_tibble' data frame
-# Return: ggplot heatmap
+#' Plots the BLAST table as a heatmap in ggplot
+#' 
+#' @param blast_tibble Tibble output of read_blast_tibble
+#' @return ggplot heatmap
+#' @export
 plot_blast_heatmap <- function(blast_tibble) {
   
   # Add NA values for missing grid values so that grid lines will appear in the final plot
@@ -409,15 +429,22 @@ plot_blast_heatmap <- function(blast_tibble) {
 }
 
 
-# Function: master function to load and plot the BLAST table and gene_naming_table to produce a heatmap
-# Inputs: see above
-# Return: list of two: 'blast_tibble' data frame; 'blast_heatmap' ggplot object
-load_and_plot_blast_tibble <- function(input_blast_table_filename, tip_order, gene_naming_table_filename,
+#' Master function to load and plot the BLAST table and gene_naming_table to produce a heatmap
+#' 
+#' @param input_blast_table_filepath Character (length 1 vector); the filepath to the BLAST table (comma-separated)
+#' @param tip_order Character vector of the exact order of the tip labels in the phylogenetic tree
+#' @param genome_metadata_filepath Character (length 1 vector); the filepath of the tab-separated genome metadata file. 
+#' Must at least have the columns 'subject_name' and 'plotting_name' as the first and second columns, respectively.
+#' @param gene_metadata_filepath Character (length 1 vector); the filepath of the tab-separated gene metadata file. 
+#' Must at least have the columns 'qseqid' and 'gene_name' as the first and second columns, respectively.
+#' @return list of two: 'blast_tibble' data frame; 'blast_heatmap' ggplot object
+#' @export
+load_and_plot_blast_tibble <- function(input_blast_table_filepath, tip_order, gene_metadata_filepath,
                                        genome_metadata_filepath) {
   
   # Load the blast table
   futile.logger::flog.info("Loading the BLAST table")
-  blast_tibble <- read_blast_tibble(input_blast_table_filename)
+  blast_tibble <- read_blast_tibble(input_blast_table_filepath)
   
   # Order the BLAST table subject names to match the ggtree
   futile.logger::flog.info("Aligning BLAST table's subject names to match order of the ggtree")
@@ -430,9 +457,9 @@ load_and_plot_blast_tibble <- function(input_blast_table_filename, tip_order, ge
   }
   
   # Overlay gene names and gene naming order, if provided
-  if ( is.na(gene_naming_table_filename) == FALSE ) {
+  if ( is.na(gene_metadata_filepath) == FALSE ) {
     futile.logger::flog.info("Overlaying gene naming and ordering onto the BLAST table")
-    blast_tibble <- overlay_gene_naming(blast_tibble, gene_naming_table_filename)
+    blast_tibble <- overlay_gene_naming(blast_tibble, gene_metadata_filepath)
   }
   
   # Create the heatmap
@@ -516,8 +543,8 @@ if (interactive() == FALSE) {
   parser <- argparser::add_argument(parser = parser, arg = "--genome_metadata_filepath", short = "-m",
                                     help = "Genome metadata filepath", 
                                     type = "character", default = NA)
-  parser <- argparser::add_argument(parser = parser, arg = "--gene_naming_table_filepath", short = "-g",
-                                    help = "Gene naming table filepath",
+  parser <- argparser::add_argument(parser = parser, arg = "--gene_metadata_filepath", short = "-g",
+                                    help = "Gene metadata filepath",
                                     type = "character", default = NA)
   parser <- argparser::add_argument(parser = parser, arg = "--bootstrap_cutoff", short = "-b",
                                     help = "Bootstrap cutoff value",
