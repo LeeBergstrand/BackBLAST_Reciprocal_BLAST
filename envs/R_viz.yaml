@@ -18,8 +18,8 @@ dependencies:
   - r-maps=3.3.0
   - r-phytools=0.6
   - r-tidytree=0.2.5
-  - bioconductor-treeio=1.8.0
-  - bioconductor-ggtree=1.16.0
+  - bioconductor-treeio=1.6.1
+  - bioconductor-ggtree=1.14.4
   - r-gridextra=2.3
   - r-egg=0.4.5
 
