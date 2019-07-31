@@ -13,12 +13,13 @@ library(glue, warn.conflicts = FALSE)
 library(plyr, warn.conflicts = FALSE)
 library(dplyr, warn.conflicts = FALSE)
 library(tibble, warn.conflicts = FALSE)
+library(reshape2, warn.conflicts = FALSE)
+library(RColorBrewer, warn.conflicts = FALSE)
 library(ggplot2, warn.conflicts = FALSE)
 library(ggtree, quietly = TRUE, warn.conflicts = FALSE)
 library(ape, warn.conflicts = FALSE)
 library(maps, warn.conflicts = FALSE)
 library(phytools, warn.conflicts = FALSE)
-library(reshape2, warn.conflicts = FALSE)
 library(gridExtra, warn.conflicts = FALSE)
 library(egg, warn.conflicts = FALSE)
 
@@ -132,7 +133,7 @@ generate_bootstrap_labels <- function(phylo_tree, bootstrap_cutoff) {
   
   # Set bootstrap cutoff if desired
   if ( is.na(bootstrap_cutoff) == FALSE ) {
-    message(ts(), "Applying bootstrap display cutoff of ", bootstrap_cutoff)
+    futile.logger::flog.info(glue::glue("Applying bootstrap display cutoff of ", bootstrap_cutoff))
     bootstrap_label_data <- dplyr::filter(bootstrap_label_data, label >= bootstrap_cutoff)
   }
   
@@ -171,8 +172,8 @@ plot_ggtree <- function(phylo_tree, bootstrap_label_data) {
     scale_y_discrete(expand = c(0,0.6)) +
   
     ## Manually set the righthand cutoff for the tree
-    # TODO - change this to be a function of the length of text
-    xlim_tree(1.8)
+    # TODO - change this to be a function of the tree branch length?? Or is 1 always okay?
+    xlim_tree(1)
     # xlim etc.: https://guangchuangyu.github.io/2016/10/xlim_tree-set-x-axis-limits-for-only-tree-panel/ (accessed Sept 15, 2018)
   
   return(tree_plot)
@@ -380,18 +381,28 @@ overlay_gene_naming <- function(blast_tibble, gene_naming_table_filename) {
 # Return: ggplot heatmap
 plot_blast_heatmap <- function(blast_tibble) {
   
+  # Add NA values for missing grid values so that grid lines will appear in the final plot
+  # A bit hacky
+  blast_tibble <- reshape2::dcast(blast_tibble, subject_name ~ qseqid, value.var = "pident") %>%
+    reshape2::melt(na.rm = FALSE, id.vars = c("subject_name"), variable.name = "qseqid",
+                   value.name = "pident") %>%
+    tibble::as_tibble()
+  
   blast_heatmap <- ggplot2::ggplot(blast_tibble, aes(y = subject_name, x = qseqid)) +
-    geom_tile(aes(fill = pident)) +
+    geom_tile(aes(fill = pident), colour = "black") +
     theme_bw() +
     theme(panel.grid = element_blank(), axis.title = element_text(size = 12),
-          strip.text = element_text(size = 7), strip.background = element_rect(fill = "#e6e6e6"),
           panel.border = element_rect(colour = "black", size = 1),
-          axis.text = element_text(size = 10, colour = "black"), 
+          axis.text = element_text(size = 10, colour = "black"),
           axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
           axis.ticks = element_line(size = 0.5), axis.line = element_line(colour = "black", size = 0.5),
-          legend.text = element_text(size = 10, colour = "black"), legend.title = element_blank(),
-          legend.key = element_blank(), legend.key.size = unit(4.5, "mm")) +
-    xlab("Gene") +
+          legend.text = element_text(size = 10, colour = "black"),
+          legend.title = element_text(size = 10, face = "bold"),
+          legend.key = element_rect(colour = "transparent")) +
+    guides(fill = guide_legend(title = "Amino acid \nidentity (%)")) +
+    scale_fill_gradientn(colours = RColorBrewer::brewer.pal(name = "Blues", n = 5), 
+                         na.value = "transparent") +
+    xlab(NULL) +
     ylab(NULL)
   
   return(blast_heatmap)
@@ -536,7 +547,7 @@ if (interactive() == FALSE) {
   # Optional inputs (set to 'NA' to ignore)
   params$genome_metadata_filepath <- NA
   params$gene_naming_table_filepath <- NA
-  params$bootstrap_cutoff <- NA
+  params$bootstrap_cutoff <- 90
   params$root_name <- "Ignavibacterium_album_JCM_16511_NC_017464.1" # Optional; set to NA if you want to use the tree as-is.
   
   main(params)
