@@ -16,28 +16,30 @@ function add_samples_to_config_file {
     subject_faa_directory=$4
 
     # Query faa files
-    echo "query_genes:" >> ${output_config_filepath}
+    printf "query_genes:" >> ${output_config_filepath}
     local query_faa_files=($(find ${query_faa_directory} -maxdepth 1 -type f -name "*.faa" | sort -h | xargs realpath))
+    # TODO - confirm there is only one
+    printf "${query_faa_files}\n" >> ${output_config_filepath}
+    #for query_faa_file in ${query_faa_files[@]}; do
 
-    for query_faa_file in ${query_faa_files[@]}; do
+    #    query_faa_basename=${query_faa_file%gene_targets.faa}
+    #    query_faa_basename=${query_faa_basename##*/}
+    #    echo "  ${query_faa_basename}: ${query_faa_file}" >> ${output_config_filepath}
 
-        query_faa_basename=${query_faa_file%gene_targets.faa}
-        query_faa_basename=${query_faa_basename##*/}
-        echo "  ${query_faa_basename}: ${query_faa_file}" >> ${output_config_filepath}
-
-    done
+    #done
 
     # Query faa genome files (reference)
-    echo "query_genome_orfs:" >> ${output_config_filepath}
+    printf "query_genome_orfs:" >> ${output_config_filepath}
     local query_ref_faa_files=($(find ${query_reference_faa_directory} -maxdepth 1 -type f -name "*.faa" | sort -h | xargs realpath))
+    # TODO - confirm there is only one
+    printf "${query_ref_faa_files}\n" >> ${output_config_filepath}
+    #for query_ref_faa_file in ${query_ref_faa_files[@]}; do
 
-    for query_ref_faa_file in ${query_ref_faa_files[@]}; do
+    #    query_ref_faa_basename=${query_ref_faa_file%.faa}
+    #    query_ref_faa_basename=${query_ref_faa_basename##*/}
+    #    echo "  ${query_ref_faa_basename}: ${query_ref_faa_file}" >> ${output_config_filepath}
 
-        query_ref_faa_basename=${query_ref_faa_file%.faa}
-        query_ref_faa_basename=${query_ref_faa_basename##*/}
-        echo "  ${query_ref_faa_basename}: ${query_ref_faa_file}" >> ${output_config_filepath}
-
-    done
+    #done
 
     # Subject faa genome files
     echo "# Subject files for BLAST (the name you specify will be plotted)." >> ${output_config_filepath}
