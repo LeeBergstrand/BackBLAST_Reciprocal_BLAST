@@ -86,6 +86,37 @@ rule combine_blast_tables:
         "CombineBlastTables.R {input} {output} > {log} 2>&1"
 
 
+# Generate phylogenetic tree if desired by the user
+if config.get("phylogenetic_tree_newick") == "subjects":
+    # Makes a list of filepaths to the FAA genome files for use by GToTree
+    rule generate_phylogenetic_tree_input:
+        input:
+            lambda wildcards: config["subjects"][wildcards.subject]
+        output:
+            temp("input_genomes_faa.list")
+        threads: 1
+        shell:
+            "echo {input} >> {output}"
+
+    # Run GToTree
+    # TODO - expose more params to the user
+    rule generate_phylogenetic_tree:
+        input:
+            "input_genomes_faa.list"
+        output:
+            "phylogeny/iqtree_out/iqtree_out.treefile"
+        log:
+            "logs/phylogeny/gtotree.log"
+        benchmark:
+            "benchmarks/gtotree.txt"
+        threads: config.get("threads", 1)
+        params:
+            phylogenetic_model = "Universal_Hug_et_al.hmm"
+        shell:
+            "GToTree -A {input} -H {params.phylogenetic_model} -o phylogeny -T IQ-TREE -c 0.2 -G 0.5 "
+                "-n {threads} -j {threads} > {log} 2>&1"
+
+
 # Generate the final heatmap
 rule generate_heatmap:
     input:
@@ -99,11 +130,11 @@ rule generate_heatmap:
     benchmark:
         "benchmarks/generate_heatmap.txt"
     params:
-        tree_file=config.get("phylogenetic_tree_newick"),
-        genome_metadata=config.get("genome_metadata_tsv"),
-        gene_metadata=config.get("gene_metadata_tsv"),
-        bootstrap_cutoff=config.get("bootstrap_cutoff"),
-        root_name=config.get("root_name")
+        tree_file = "phylogeny/iqtree_out/iqtree_out.treefile" if config.get("phylogenetic_tree_newick") == "subjects" else config.get("phylogenetic_tree_newick"),
+        genome_metadata = config.get("genome_metadata_tsv", NA),
+        gene_metadata = config.get("gene_metadata_tsv", NA),
+        bootstrap_cutoff = config.get("bootstrap_cutoff", NA),
+        root_name = config.get("root_name", NA)
     shell:
         "generate_BackBLAST_heatmap.R -m {params.genome_metadata} -g {params.gene_metadata} "
             "-b {params.bootstrap_cutoff} -r {params.root_name} {params.tree_file} {input} {output} 2> {log}"
