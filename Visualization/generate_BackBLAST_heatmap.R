@@ -36,18 +36,6 @@ read_tibble <- function(file, sep = "\t", header = TRUE, stringsAsFactors = FALS
   return(data_table)
 }
 
-#' Writes a data table to a file with several default parameters. All params below are the same as in write.table()
-#' 
-#' @param x Data frame or tibble
-#' @param file Output filepath
-#' @param sep Field separator character
-#' @param row.names Logical; display row names in the output table?
-#' @param col.names Logical; display column names in the output table?
-#' @param quote Logical; add quotation marks around fields?
-#' @export
-write_table <- function(x, file, sep = "\t", row.names = FALSE, col.names = TRUE, quote = FALSE) {
-  write.table(x = x, file = file, sep = sep, row.names = row.names, col.names = col.names, quote = quote)
-}
 
 #' Chooses a nice discrete colour scale of the desired length
 #' 
@@ -74,6 +62,7 @@ choose_discrete_colour_scale <- function(length) {
   return(colour_palette)
   
 }
+
 
 #' Re-root a ggtree
 #' 
@@ -108,6 +97,7 @@ reroot_ggtree <- function(phylo_tree, root_name) {
   
   return(tree_rooted)
 }
+
 
 #' Extracts tree label (bootstrap) data and applies bootstrap cutoff if desired
 #' 
@@ -145,6 +135,7 @@ generate_bootstrap_labels <- function(phylo_tree, bootstrap_cutoff) {
   return(bootstrap_label_data)
   
 }
+
 
 #' Makes an initial plot of the tree with overlaid bootstrap labels
 #' 
