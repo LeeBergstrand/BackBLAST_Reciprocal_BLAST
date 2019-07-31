@@ -94,19 +94,19 @@ reroot_ggtree <- function(phylo_tree, root_name) {
     quit(status = 1, save = "no")
   }
   
-  # Get the ggtree ID # of the parent node of the to-be root
-  root_node_num <- as.numeric(dplyr::filter(tree_data, label == root_name)$parent)
+  # Get the ggtree ID # of the to-be root
+  tip_label_index <- match(x = root_name, table = phylo_tree$tip.label)
   
   # Check that only one matching parent node exists
-  if (length(root_node_num) != 1) {
+  if (length(tip_label_index) != 1) {
     futile.logger::flog.error(glue::glue("The provided root_name '", root_name, 
-                          "' appears to have more than one parent node. Cannot re-root. Exiting..."))
+                          "' appears to have more than one associated node. Cannot re-root. Exiting..."))
     quit(status = 1, save = "no")
   }
   
   # Re-root
   # TODO - consider suppressMessages()
-  tree_rooted <- ggtree::reroot(phylo_tree, root_node_num)
+  tree_rooted <- ggtree::reroot(phylo_tree, node = tip_label_index)
   
   return(tree_rooted)
 }
@@ -526,7 +526,7 @@ if (interactive() == FALSE) {
   
   # Manually set when running in RStudio for development
   params <- list()
-  setwd("/home/jmtsuji/Research_General/Bioinformatics/02_git/BackBLAST_Reciprocal_BLAST/test/")
+  setwd("/home/jmtsuji/Research_General/Bioinformatics/02_git/BackBLAST_Reciprocal_BLAST/test")
   
   # Required inputs
   params$input_phylogenetic_tree_filepath <- "GSB_riboproteins_tree_vs3.treefile"
@@ -537,7 +537,7 @@ if (interactive() == FALSE) {
   params$genome_metadata_filepath <- NA
   params$gene_naming_table_filepath <- NA
   params$bootstrap_cutoff <- NA
-  params$root_name <- NA #"Ignavibacterium_album_JCM_16511_NC_017464.1" # Optional; set to NA if you want to use the tree as-is.
+  params$root_name <- "Ignavibacterium_album_JCM_16511_NC_017464.1" # Optional; set to NA if you want to use the tree as-is.
   
   main(params)
   
