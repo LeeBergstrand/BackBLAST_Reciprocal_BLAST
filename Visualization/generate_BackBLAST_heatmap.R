@@ -208,7 +208,7 @@ load_and_plot_phylogenetic_tree <- function(input_phylogenetic_tree_filepath, ro
   
   # Set cutoff for bootstraps externally, to be overlaid onto the tree figure later
   # No cutoff is applied if bootstrap_cutoff is set to 'NA'
-  futile.logger::flog.info("Generating bootstrap labels")
+  futile.logger::flog.debug("Generating bootstrap labels")
   bootstrap_label_data <- generate_bootstrap_labels(phylo_tree, bootstrap_cutoff)
   
   # Generate tree plot
@@ -450,7 +450,7 @@ load_and_plot_blast_tibble <- function(input_blast_table_filepath, tip_order, ge
   blast_tibble <- read_blast_tibble(input_blast_table_filepath)
   
   # Order the BLAST table subject names to match the ggtree
-  futile.logger::flog.info("Aligning BLAST table's subject names to match order of the ggtree")
+  futile.logger::flog.debug("Aligning BLAST table's subject names to match order of the ggtree")
   blast_tibble <- order_blast_tibble_subjects(blast_tibble, tip_order)
   
   # Overlay gene names and gene naming order, if provided
@@ -481,6 +481,7 @@ load_and_plot_blast_tibble <- function(input_blast_table_filepath, tip_order, ge
 main <- function(params) {
   # Startup messages
   futile.logger::flog.info("Running generate_BackBLAST_heatmap.R")
+  futile.logger::flog.info("######### Settings #########")
   futile.logger::flog.info(glue::glue("Input phylogenetic tree filepath: ", params$input_phylogenetic_tree_filepath))
   futile.logger::flog.info(glue::glue("Input BLAST table filepath: ", params$input_blast_table_filepath))
   futile.logger::flog.info(glue::glue("Output PDF filepath: ", params$output_pdf_filepath))
@@ -489,15 +490,15 @@ main <- function(params) {
   futile.logger::flog.info(glue::glue("Genome metadata filepath (ignored if 'NA'): ", params$genome_metadata_filepath))
   futile.logger::flog.info(glue::glue("Input gene naming table filepath (ignored if 'NA'): ", 
                                       params$gene_metadata_filepath))
+  futile.logger::flog.info("############################")
   
   # Load and plot the tree
-  # TODO - after reading metadata table, CHECK that the first column names correspond to the tree tip labels
   phylo_tree_list <- load_and_plot_phylogenetic_tree(params$input_phylogenetic_tree_filepath, 
                                                      params$root_name, params$bootstrap_cutoff)
   
   # Get tip order of the tree, to match with heatmap later
   # Based on https://groups.google.com/forum/#!topic/bioc-ggtree/LqRDK78m3U4 (accessed Sept. 15, 2018)
-  futile.logger::flog.info("Exporting tip order of tree to correspond with heatmap")
+  futile.logger::flog.debug("Exporting tip order of tree to correspond with heatmap")
   tip_order <- dplyr::filter(ggtree::ggtree(phylo_tree_list[[1]])$data, isTip == TRUE)
   tip_order <- tip_order[order(tip_order$y, decreasing = TRUE),]$label # plotting_name
 
