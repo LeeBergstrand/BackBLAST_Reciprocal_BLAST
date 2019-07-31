@@ -2,10 +2,7 @@
 
 ## Execution settings
 # Total threads to be used for all processes
-threads: 4
-# Max. memory, in Gigabytes
-memory: 8
-
+threads: 1
 
 ## Plot input files
 # Newick file of phylogenetic tree for the input genomes. Should already be in the orientation that you want it to be plotted in.
