@@ -4,203 +4,94 @@
 # Plots a newick treefile and BLAST table together as a phylogenetic tree and heatmap
 # See required R packages below.
 
-#####################################################
-## User variables: #################################
-RUN_COMMAND_LINE <- TRUE # If selected, all user input here is ignored, and terminal-based input is expected instead.
+# Load libraries
+library(argparser, quietly = TRUE)
+library(futile.logger)
+library(roxygen2)
+library(tools)
+library(glue, warn.conflicts = FALSE)
+library(plyr, warn.conflicts = FALSE)
+library(dplyr, warn.conflicts = FALSE)
+library(tibble, warn.conflicts = FALSE)
+library(ggplot2, warn.conflicts = FALSE)
+library(ggtree, quietly = TRUE, warn.conflicts = FALSE)
+library(ape, warn.conflicts = FALSE)
+library(maps, warn.conflicts = FALSE)
+library(phytools, warn.conflicts = FALSE)
+library(reshape2, warn.conflicts = FALSE)
+library(gridExtra, warn.conflicts = FALSE)
+library(egg, warn.conflicts = FALSE)
 
-# Set other user variables here
-if (RUN_COMMAND_LINE == FALSE) {
-  # See proper descriptions of variables under parse_command_line_input
+#' Reads a data table as a tibble with several default parameters. All parameters below are the same as read.table()
+#' 
+#' @param file Filepath to data table
+#' @param sep Field separator character
+#' @param header Logical; does the table have headers as the first row?
+#' @param stringsAsFactors Logical; should character vectors be converted to factors?
+#' @return Tibble of the data table
+#' @export
+read_tibble <- function(file, sep = "\t", header = TRUE, stringsAsFactors = FALSE) {
+  data_table <- read.table(file, sep = sep, header = header, stringsAsFactors = stringsAsFactors) %>%
+    tibble::as_tibble()
   
-  # Required inputs
-  setwd("/home/jmtsuji/Research_General/Bioinformatics/02_git/BackBLAST_Reciprocal_BLAST/test/")
-  input_phylogenetic_tree_filepath <- "GSB_riboproteins_tree_vs3.treefile"
-  input_blast_table_filename <- "GSB_pathway_vs7_e40_best_hits_MOD3.csv"
-  output_pdf_name <- "test.pdf"
-  
-  # Optional inputs (set to 'NA' to ignore)
-  tree_metadata_filename <- NA
-  tree_decorator_colname <- NA
-  map_genome_names <- NA
-  gene_naming_table_filename <- NA
-  bootstrap_cutoff <- NA
-  root_name <- NA #"Ignavibacterium_album_JCM_16511_NC_017464.1" # Optional; set to NA if you want to use the tree as-is.
-    
-  # To add...
-  # tree_naming_mapping <- ""
-  
+  return(data_table)
 }
-#####################################################
 
-#####################################################
-## Load required packages: ##########################
-library(getopt)
-library(plyr)
-suppressMessages(library(tidyverse))
-suppressMessages(library(ggtree))
-suppressMessages(library(glue))
-suppressMessages(library(egg))
-# library(RColorBrewer) # Loaded as part of tidyverse?
-# library(phytools) # for re-rooting; optional
-#####################################################
+#' Writes a data table to a file with several default parameters. All params below are the same as in write.table()
+#' 
+#' @param x Data frame or tibble
+#' @param file Output filepath
+#' @param sep Field separator character
+#' @param row.names Logical; display row names in the output table?
+#' @param col.names Logical; display column names in the output table?
+#' @param quote Logical; add quotation marks around fields?
+#' @export
+write_table <- function(x, file, sep = "\t", row.names = FALSE, col.names = TRUE, quote = FALSE) {
+  write.table(x = x, file = file, sep = sep, row.names = row.names, col.names = col.names, quote = quote)
+}
 
-# Function: assign command line input to variables, or throw help message
-parse_command_line_input <- function() {
+#' Chooses a nice discrete colour scale of the desired length
+#' 
+#' @param length Numeric; length of the desired colour scale vector
+#' @return Character vector of HTML colour codes
+#' @export
+choose_discrete_colour_scale <- function(length) {
   
-  # Define flags
-  params <- matrix(c('tree_filepath', 'i', 1, "character",
-                     'blast_table_filepath', 'j', 1, "character",
-                     'output_filepath', 'o', 1, "character",
-                     'tree_metadata_filename', 'm', 2, "character",
-                     'tree_decorator_colname', 'd', 2, "character",
-                     'genome_plotting_names', 'n', 2, "logical",
-                     'gene_naming_table_filename', 'g', 2, "character",
-                     'bootstrap_cutoff', 'b', 2, "character",
-                     'root_name', 'r', 2, "character",
-                     'help', 'h', 2, "character"), byrow=TRUE, ncol=4)
-  
-  opt <- getopt(params)
-  
-  # If help was called, print help message and exit
-  if ( !is.null(opt$help) ) {
-    
-    cat("generate_BackBLAST_heatmap.R: Binds a phylogenetic tree to a BLAST table heatmap.\n")
-    cat("Copyright Lee Bergstrand and Jackson M. Tsuji, 2018\n\n")
-    
-    cat(getopt(params, usage = TRUE))
-    
-    cat("\n")
-    
-    message(glue::glue("
-              Required inputs:
-                --tree_filepath               Filepath for newick-format phylogenetic tree of the BLAST subject organisms
-                --blast_table_filepath        Filepath for CSV-format BLAST hit table from CombineBlastTables.R
-                --output_filepath             Output filepath for the PDF
-
-              Optional inputs:
-                --tree_metadata_filename      Filepath for TSV-format metadata file for the phylogenetic tree. Details below.
-                --tree_decorator_colname      Column name from the metadata to map onto the tree as fill colours.
-                                                Requires that --tree_metadata_filename is set. Details below.
-                --genome_plotting_names       Set this flag to include a vector of genome names to plot in the tree_metadata_filename
-                                                called 'plotting_name'. Details below.
-                --gene_naming_table_filename  Filepath for TSV-format table linking query gene IDs in the BLAST table to proper
-                                                gene names. Details below.
-                --bootstrap_cutoff            A percentage at or above which to display the bootstrap values on the tree (e.g., 80)
-                --root_name                   Exact name of the tip you wish to use as the root of the tree, if your tree is not 
-                                                already rooted
-
-              Tree vs. the BLAST table
-                  Note that the subject organism names MUST be EXACTLY the same between the tree tips and the BLAST table 
-                  'subject_name' column. Otherwise, the script will fail.
-
-              Tree metadata:
-                  You can optionally provide a tree_metadata table to overlay additional information onto the phylogenetic tree.
-                  
-                  The first column of this TSV (tab-separated) table MUST be called 'subject_name' and include the EXACT names
-                  of all genomes in the phylogenetic tree. You can then optionally include the following:
-
-                  1. genome_plotting_names: add a column called 'plotting_name' to include the names of the organisms that you 
-                      want to appear on the final plot. You can use spaces, most special characters, and so on.
-
-                  2. tree_decorator_colname: you can overlay characteristics of the organisms/genomes as fill colours on the tips
-                      of the tree. Add a column to the metadata table with any name you'd like, e.g., 'GC_content', 
-                      'predicted_metabolism', 'pathogenicity', and so on. Fill with meaningful data to you. Then, specify the
-                      'tree_decorator_colname' to EXACTLY match the name of ONE of the additional columns. That info will then
-                      be plotted on the tree. Enjoy! (We might expand this in the future to allow for font colours and so on to 
-                      be varied.)
-
-              Gene naming for BLAST table:
-                  You can provide a gene_naming_table to provide custom names and ordering for query genes in your BLAST search, 
-                  in place of the qseqid from NCBI, which may not be very human-readable.
-
-                  The gene naming table must meet the following criteria:
-                    - First column: 'qseqid' - the EXACT ID of ALL of the unique query proteins in the BLAST table must be included.
-                          You can include additional qseqid's here if you'd like, they just won't be used.
-                    - Second column: 'gene_name' - a corresponding name of your choice (e.g., rpoB, dsrA, and so on)
-                  
-                  The order of the rows in this table will dictate the order of the genes in the heatmap.
-
-              "))
-    
-    quit(status = 1)
+  # Choose the best colour scale based on the number of entries to be plotted
+  if ( length == 2 ) {
+    colour_palette <- RColorBrewer::brewer.pal(n = 3, name = "Dark2")[c(1,2)]
+  } else if ( length <= 8 ) {
+    colour_palette <- RColorBrewer::brewer.pal(n = length, name = "Dark2")
+  } else if ( length <= 12 ) {
+    colour_palette <- RColorBrewer::brewer.pal(n = length, name = "Set3")
+  } else if ( length > 12 ) {
+    colour_palette <- scales::hue_pal(h = c(20,290))(length)
+  } else {
+    futile.logger::flog.error(glue::glue("Something is wrong with the provided length ('", length, 
+                          "'). Is it non-numeric? Exiting..."))
+    quit(status = 1, save = "no")
   }
   
-  # Exit if required inputs are not provided
-  if ( is.null(opt$tree_filepath) ) {
-    stop("Filepath to phylogenetic tree required (-i). Try -h for help message.")
-  } else if ( is.null(opt$blast_table_filepath) ) {
-    stop("Filepath to BLAST hit table required (-j). Try -h for help message.")
-  } else if ( is.null(opt$output_filepath) ) {
-    stop("Output filepath required (-o). Try -h for help message.")
-  }
-  
-  # Check on the tree_metadata_filename and tree_decorator_colname were provided, as needed
-  if ( is.null(opt$tree_metadata_filename) ) {
-    # Annul everything
-    # TODO - throw a warning if some of the other flags were set
-    opt$tree_metadata_filename <- NA
-    opt$tree_decorator_colname <- NA
-    opt$genome_plotting_names <- NA
-  } else if ( is.null(opt$tree_metadata_filename) == FALSE && is.null(opt$genome_plotting_names) == FALSE
-              && is.null(opt$tree_decorator_colname) == FALSE ) {
-    # All are present
-    opt$genome_plotting_names <- TRUE
-  } else if ( is.null(opt$tree_metadata_filename) == FALSE && is.null(opt$genome_plotting_names) == FALSE ) {
-    # tree_decorator_colname must not be set
-    opt$tree_decorator_colname <- NA
-    opt$genome_plotting_names <- TRUE
-  } else if ( is.null(opt$tree_metadata_filename) == FALSE && is.null(opt$tree_decorator_colname) == FALSE ) {
-    # genome_plotting_names must not be set
-    opt$genome_plotting_names <- NA
-  }
-  
-  # Set defaults
-  if ( is.null(opt$gene_naming_table_filename) == TRUE ) {
-    opt$gene_naming_table_filename <- NA
-  }
-  if ( is.null(opt$bootstrap_cutoff) == TRUE ) {
-    opt$bootstrap_cutoff <- NA
-  }
-  if ( is.null(opt$root_name) == TRUE ) {
-    opt$root_name <- NA
-  }
-  
-  # Make variables from provided input and save as global variables (<<-)
-  input_phylogenetic_tree_filepath <<- opt$tree_filepath
-  input_blast_table_filename <<- opt$blast_table_filepath
-  output_pdf_name <<- opt$output_filepath
-  tree_metadata_filename <<- opt$tree_metadata_filename
-  tree_decorator_colname <<- opt$tree_decorator_colname
-  map_genome_names <<- opt$genome_plotting_names
-  gene_naming_table_filename <<- opt$gene_naming_table_filename
-  bootstrap_cutoff <<- opt$bootstrap_cutoff
-  root_name <<- opt$root_name
+  return(colour_palette)
   
 }
 
-
-# Function: helper function for timestamps. Returns a length 1 character vector.
-ts <- function() {
-  
-  datetime_utc <- format(as.POSIXlt(Sys.time(), tz = "UTC"), "%a %d %b %Y %H:%M:%S %Z")
-  
-  date_message <- paste("[ ", datetime_utc, " ]: ", sep = "")
-  
-  return(date_message)
-}
-
-
-# Function: re-roots tree to terminal node name matching 'root_name'
-# Input: 'phylo_tree' - ggtree-format tree; 'root_name' - character vector (length 1) with exact name of the to-be root
-# Return: ggtree-format re-rooted tree
-reroot_tree <- function(phylo_tree, root_name) {
+#' Re-root a ggtree
+#' 
+#' @param phylo_tree ggtree-format tree
+#' @param root_name Character; the exact name of the to-be root
+#' @return ggtree-format tree, rooted
+#' @export
+reroot_ggtree <- function(phylo_tree, root_name) {
   
   # Extract the data from the tree in tabular format
-  tree_data <- ggtree(phylo_tree)$data
+  tree_data <- ggtree::ggtree(phylo_tree)$data
   
   # Check that the root_name exists
   if ( (root_name %in% tree_data$label) == FALSE ) {
-    stop(ts(), "Could not find the root_name '", root_name, "' in the provided tree. Cannot re-root. Exiting...")
+    futile.logger::flog.error(glue::glue("Could not find the root_name '", root_name, 
+                          "' in the provided tree. Cannot re-root. Exiting..."))
+    quit(status = 1, save = "no")
   }
   
   # Get the ggtree ID # of the parent node of the to-be root
@@ -208,11 +99,14 @@ reroot_tree <- function(phylo_tree, root_name) {
   
   # Check that only one matching parent node exists
   if (length(root_node_num) != 1) {
-    stop(ts(), "The provided root_name '", root_name, "' appears to have more than one parent node. Cannot re-root. Exiting...")
+    futile.logger::flog.error(glue::glue("The provided root_name '", root_name, 
+                          "' appears to have more than one parent node. Cannot re-root. Exiting..."))
+    quit(status = 1, save = "no")
   }
   
   # Re-root
-  tree_rooted <- suppressMessages(reroot(phylo_tree, root_node_num))
+  # TODO - consider suppressMessages()
+  tree_rooted <- ggtree::reroot(phylo_tree, root_node_num)
   
   return(tree_rooted)
 }
@@ -227,7 +121,7 @@ generate_bootstrap_labels <- function(phylo_tree, bootstrap_cutoff) {
   # Note that 'labels' encompasses tip labels and node labels. You can to extract the tip labels alone.
   
   # Extract info from the tree into data frame format
-  bootstrap_label_data <- ggtree(phylo_tree)$data
+  bootstrap_label_data <- ggtree::ggtree(phylo_tree)$data
   
   # Set the labels to numeric (instead of character; will make non character go 'NA', like perhaps tip labels)
   bootstrap_label_data$label <- as.numeric(bootstrap_label_data$label)
@@ -248,37 +142,25 @@ generate_bootstrap_labels <- function(phylo_tree, bootstrap_cutoff) {
 }
 
 
-# Function: chooses which discrete colour scale would work best for a plot based on the number of entries to be plotted
-choose_discrete_colour_scale <- function(number_of_entries, data_type) {
-  
-  # Choose the best colour scale based on the number of entries to be plotted
-  if ( number_of_entries == 2 ) {
-    colour_palette <- RColorBrewer::brewer.pal(n = 3, name = "Dark2")[c(1,2)]
-  } else if ( number_of_entries <= 8 ) {
-    colour_palette <- RColorBrewer::brewer.pal(n = number_of_entries, name = "Dark2")
-  } else if ( number_of_entries <= 12 ) {
-    colour_palette <- RColorBrewer::brewer.pal(n = number_of_entries, name = "Set3")
-  } else if ( number_of_entries > 12 ) {
-    colour_palette <- hue_pal(h = c(20,290))(number_of_entries)
-  } else {
-    stop("Something is wrong with the number_of_entries ('", number_of_entries, "'). Is it non-numeric? Exiting...")
-  }
-  
-  return(colour_palette)
-  
-}
-
-
 # Function: makes an initial plot of the tree with overlaid bootstrap labels
 # Inputs: 'phylo_tree' - ggtree-format tree; 'bootstrap_label_data' - data frame extracted from tree and possibly modified, generated in 'generate_bootstrap_labels'
 # Return: ggtree plot
-make_tree_plot <- function(phylo_tree, bootstrap_label_data) {
+make_ggtree_plot <- function(phylo_tree, bootstrap_label_data) {
   
-  tree_plot <- ggtree(phylo_tree, size = 1.5, colour = "black", ladderize = TRUE) +
+  tree_plot <- ggtree::ggtree(phylo_tree, size = 1, colour = "black", ladderize = TRUE,
+                      branch.length = 0.1) +
     
     # Add the bootstrap labels from the external file
     # TODO - fine-tune the 'nudge' value so that it works more generically
     geom_text(data = bootstrap_label_data, aes(label = label), nudge_x = -0.035, nudge_y = 0.35, size = 3) +
+    # TODO - ALT CODE
+    # geom_text2(aes(subset = (grepl(pattern = "^[0-9]+$", x = label) & !(isTip) & as.numeric(label) > bootstrap_cutoff), 
+    #                label = as.numeric(label)),
+    #            nudge_x = -0.03, nudge_y = 0.4, size = 2.5) +
+
+    # Add the dotted lines from the tree tips
+    # TODO - check if 'size' is okay
+    geom_tiplab(align = TRUE, linetype = "dotted", size = 0.1, offset = 0.1) +
     
     # Add scale bar
     # TODO - set y based on tree topography?
@@ -305,21 +187,29 @@ make_tree_plot <- function(phylo_tree, bootstrap_label_data) {
 load_tree_metadata <- function(tree_metadata_filename, phylo_tree) {
   
   # Load metadata to decorate the tree
-  message(ts(), "Loading tree metadata")
-  metadata <- read.table(tree_metadata_filename, sep = "\t", header = TRUE, stringsAsFactors = FALSE)
+  futile.logger::flog.info("Loading tree metadata")
+  metadata <- read_tibble(tree_metadata_filename)
   
   # Check first column of metadata matches expected
   if ( colnames(metadata)[1] != "subject_name" ) {
-    stop(ts(), "First column of the tree metadata file must be 'subject_name'; yours is '", colnames(metadata)[1], "'. Exiting...")
+    futile.logger::flog.error(glue::glue("First column of the tree metadata file must be 'subject_name'; yours is '", 
+                          colnames(metadata)[1], "'. Exiting..."))
+    quit(save = "no", status = 1)
   }
+  
+  ggtree_subject_names <- dplyr::filter(ggtree(phylo_tree)$data, isTip == TRUE)$label
+  
   if ( identical(sort(unique(metadata$subject_name)), 
-                 sort(dplyr::filter(ggtree(phylo_tree)$data, isTip == TRUE)$label)) == FALSE ) {
+                 sort(ggtree_subject_names)) == FALSE ) {
     
     # Determine which entries differ
-    missing_entries <- !(unique(metadata$subject_name) %in% dplyr::filter(ggtree(phylo_tree)$data, isTip == TRUE)$label)
+    missing_entries <- !(unique(metadata$subject_name) %in% ggtree_subject_names)
     missing_entries <- unique(metadata$subject_name)[missing_entries]
     
-    stop(ts(), "Entries in 'subject_name' of the provided metadata file do not exactly match the tip labels on the tree. The following tip labels don't match: '", glue::glue_collapse(missing_entries, sep = "; "),  "'. Exiting...")
+    futile.logger::flog.error(glue::glue("Entries in 'subject_name' of the provided metadata file do not exactly match the tip labels on the tree. The following tip labels don't match: '", 
+                          glue::glue_collapse(missing_entries, sep = "; "),  "'. Exiting..."))
+    quit(save = "no", status = 1)
+    
   }
   
   return(metadata)
@@ -334,7 +224,7 @@ load_tree_metadata <- function(tree_metadata_filename, phylo_tree) {
 add_tip_labels_to_tree_plot <- function(tree_plot, metadata_with_plotting_name = NULL) {
   
   if ( is.null(metadata_with_plotting_name) ) {
-    message(ts(), "Adding standard tip labels to tree")
+    futile.logger::flog.info("Adding standard tip labels to tree")
     
     tree_plot <- tree_plot +
       # Align tips to far right
@@ -442,24 +332,23 @@ decorate_tree_plot <- function(tree_plot, metadata, tree_decorator_colname) {
 load_and_plot_phylogenetic_tree <- function(input_phylogenetic_tree_filepath, root_name, bootstrap_cutoff, 
                                    tree_metadata_filename, tree_decorator_colname) {
   # Read tree
-  message(ts(), "Reading input phylogenetic tree")
-  phylo_tree <- read.tree(input_phylogenetic_tree_filepath)
+  futile.logger::flog.info("Reading input phylogenetic tree")
+  phylo_tree <- ape::read.tree(input_phylogenetic_tree_filepath)
   
   # Optionally re-root tree
   if ( is.na(root_name) == FALSE && root_name != "NA" ) {
-    message(ts(), "Re-rooting tree to '", root_name, "'")
-    phylo_tree <- reroot_tree(phylo_tree, root_name)
+    futile.logger::flog.info(glue::glue("Re-rooting tree to '", root_name, "'"))
+    phylo_tree <- reroot_ggtree(phylo_tree, root_name)
   }
   
   # Set cutoff for bootstraps externally, to be overlaid onto the tree figure later
   # No cutoff is applied if bootstrap_cutoff is set to 'NA'
-  message(ts(), "Generating bootstrap labels")
+  futile.logger::flog.info("Generating bootstrap labels")
   bootstrap_label_data <- generate_bootstrap_labels(phylo_tree, bootstrap_cutoff)
   
-  
   # Generate tree plot
-  message(ts(), "Generating ggtree plot")
-  phylo_tree_fig <- make_tree_plot(phylo_tree, bootstrap_label_data)
+  futile.logger::flog.info("Generating ggtree plot")
+  phylo_tree_fig <- make_ggtree_plot(phylo_tree, bootstrap_label_data)
   
   # Add tip labels (either defaults or based on plotting_name)
   if ( is.na(tree_metadata_filename) == FALSE && is.na(map_genome_names) == FALSE ) {
@@ -477,7 +366,7 @@ load_and_plot_phylogenetic_tree <- function(input_phylogenetic_tree_filepath, ro
     metadata <- load_tree_metadata(tree_metadata_filename, phylo_tree)
     
     # Decorate
-    message(ts(), "Decorating ggtree plot with metadata column '", tree_decorator_colname, "'")
+    futile.logger::flog.info(glue::glue("Decorating ggtree plot with metadata column '", tree_decorator_colname, "'"))
     phylo_tree_fig <- decorate_tree_plot(phylo_tree_fig, metadata, tree_decorator_colname)
   }
   
@@ -495,7 +384,7 @@ load_and_plot_phylogenetic_tree <- function(input_phylogenetic_tree_filepath, ro
 read_blast_table <- function(input_blast_table_filename) {
   
   # Load the data
-  blast_table <- read.table(input_blast_table_filename, sep = ",", header = TRUE, stringsAsFactors = FALSE)
+  blast_table <- read_tibble(input_blast_table_filename, sep = ",")
   
   # HARD-CODED expected header names
   expected_header_names <- c("subject_name", "qseqid", "sseqid", "pident", "evalue", "qcovhsp", "bitscore")
@@ -503,8 +392,11 @@ read_blast_table <- function(input_blast_table_filename) {
   # Confirm the columns look okay
   if ( identical(colnames(blast_table), expected_header_names) == FALSE ) {
     
-    stop("BLAST data table did not have expected column names ('", glue::glue_collapse(expected_header_names, sep = "; "),
-         "'). Instead, had: '", glue::glue_collapse(colnames(blast_table), sep = "; "), "'. Exiting...")
+    futile.logger::flog.error(glue::glue("BLAST data table did not have expected column names ('", 
+                          glue::glue_collapse(expected_header_names, sep = "; "), 
+                          "'). Instead, had: '", glue::glue_collapse(colnames(blast_table), sep = "; "), 
+                          "'. Exiting..."))
+    quit(save = "no", status = 1)
     
   }
   
@@ -516,10 +408,12 @@ read_blast_table <- function(input_blast_table_filename) {
 # Function: changes the order of the subject_name in the BLAST table to match that of the ggtree tips. Checks for perfect match.
 # Inputs: 'blast_table' data frame; 'tip_order' - character vector of the ggtree tips in order
 # Return: blast_table (data frame) with subject_name as an ordered factor
+# TODO - reduce to match tree names if needed
 order_blast_table_subjects <- function(blast_table, tip_order) {
   # Check that the tip_order labels match the blast table's subject_name labels
   if ( identical(sort(tip_order), sort(unique(blast_table$subject_name))) == FALSE) {
-    stop(ts(), "Tree tip labels do not perfectly match the subject_name entries in the BLAST table. Exiting...")
+    futile.logger::flog.error("Tree tip labels do not perfectly match the subject_name entries in the BLAST table. Exiting...")
+    quit(save = "no", status = 1)
   }
   
   # Make subjects the same order as in the tree
@@ -535,15 +429,18 @@ order_blast_table_subjects <- function(blast_table, tip_order) {
 overlay_gene_naming <- function(blast_table, gene_naming_table_filename) {
   
   # Load gene naming table
-  gene_naming_table <- read.table(gene_naming_table_filename, sep = "\t", header = TRUE, stringsAsFactors = FALSE)
+  gene_naming_tibble <- read_tibble(gene_naming_table_filename)
   
   # Check that the column names match expected (for the first two columns; doesn't matter after that)
   # HARD-CODED
-  gene_table_expected_headers <- c("qseqid", "gene_name")
+  gene_tibble_expected_headers <- c("qseqid", "gene_name")
   
-  if ( identical(colnames(gene_naming_table)[1:2], gene_table_expected_headers) == FALSE ) {
-    stop(ts(), "The first two columns of the gene table should be: ", glue::glue_collapse(gene_table_expected_headers, sep = ", "),
-         ". However, you provided something else: ",  glue::glue_collapse(colnames(gene_naming_table)[1:2], sep = ", "), ". Exiting...")
+  if ( identical(colnames(gene_naming_tibble)[1:2], gene_tibble_expected_headers) == FALSE ) {
+    futile.logger::flog.error(glue::glue("The first two columns of the gene table should be: ", 
+                          glue::glue_collapse(gene_tibble_expected_headers, sep = ", "), 
+                          ". However, you provided something else: ", 
+                          glue::glue_collapse(colnames(gene_naming_tibble)[1:2], sep = ", "), ". Exiting..."))
+    quit(save = "no", status = 1)
   }
   
   # Check that the query seq IDs in the gene table include those provided as queries for BLAST (can contain extra - that's fine)
@@ -556,19 +453,22 @@ overlay_gene_naming <- function(blast_table, gene_naming_table_filename) {
     good_entries <- blast_table_queries[(blast_table_queries %in% gene_table_queries)]
     
     # Warn user
-    warning(ts(), "Some query sequence IDs from the BLAST table are not contained in the gene naming table provided.
-            These will be REMOVED from the heatmap plot! The following will be removed: '", 
-            glue::glue_collapse(missing_entries, sep = "; "), "'. Exiting...")
+    futile.logger::flog.warn(glue::glue("Some query sequence IDs from the BLAST table are not contained ",
+                                        "in the gene naming table provided. These will be REMOVED from the ",
+                                        "heatmap plot! The following will be removed: '", 
+                                        glue::glue_collapse(missing_entries, sep = "; "), "'."))
     
     # Remove entries from BLAST table and proceed
     blast_table <- dplyr::filter(blast_table, qseqid %in% good_entries)
     
   } else if ( unique(blast_table_queries %in% gene_table_queries) == FALSE ) {
-    stop(ts(), "None of the query sequence IDs from the BLAST table match the gene naming table provided. Exiting...")
+    flog.error("None of the query sequence IDs from the BLAST table match the gene naming table provided. Exiting...")
+    quit(save = "no", status = 1)
   }
   
   # Change qseqid to gene_name and order according to the gene_naming_table
-  blast_table$qseqid <- plyr::mapvalues(x = blast_table$qseqid, from = gene_naming_table$qseqid, to = gene_naming_table$gene_name)
+  blast_table$qseqid <- plyr::mapvalues(x = blast_table$qseqid, from = gene_naming_table$qseqid, 
+                                        to = gene_naming_table$gene_name)
   blast_table$qseqid <- factor(blast_table$qseqid, levels = gene_naming_table$gene_name, ordered = TRUE)
   
   return(blast_table)
@@ -581,7 +481,7 @@ overlay_gene_naming <- function(blast_table, gene_naming_table_filename) {
 # Return: ggplot heatmap
 plot_blast_heatmap <- function(blast_table) {
   
-  blast_heatmap <- ggplot(blast_table, aes(y = subject_name, x = qseqid)) +
+  blast_heatmap <- ggplot2::ggplot(blast_table, aes(y = subject_name, x = qseqid)) +
     geom_tile(aes(fill = pident)) +
     theme_bw() +
     theme(panel.grid = element_blank(), axis.title = element_text(size = 12),
@@ -606,21 +506,21 @@ plot_blast_heatmap <- function(blast_table) {
 load_and_plot_blast_table <- function(input_blast_table_filename, tip_order, gene_naming_table_filename) {
   
   # Load the blast table
-  message(ts(), "Loading the BLAST table")
+  futile.logger::flog.info("Loading the BLAST table")
   blast_table <- read_blast_table(input_blast_table_filename)
   
   # Order the BLAST table subject names to match the ggtree
-  message(ts(), "Aligning BLAST table's subject names to match order of the ggtree")
+  futile.logger::flog.info("Aligning BLAST table's subject names to match order of the ggtree")
   blast_table <- order_blast_table_subjects(blast_table, tip_order)
   
   # Overlay gene names and gene naming order, if provided
   if ( is.na(gene_naming_table_filename) == FALSE ) {
-    message(ts(), "Overlaying gene naming and ordering onto the BLAST table")
+    futile.logger::flog.info("Overlaying gene naming and ordering onto the BLAST table")
     blast_table <- overlay_gene_naming(blast_table, gene_naming_table_filename)
   }
   
   # Create the heatmap
-  message(ts(), "Plotting BLAST heatmap")
+  futile.logger::flog.info("Plotting BLAST heatmap")
   blast_heatmap <- plot_blast_heatmap(blast_table)
   
   # Make output list
@@ -632,55 +532,195 @@ load_and_plot_blast_table <- function(input_blast_table_filename, tip_order, gen
 }
 
 
-main <- function() {
-  # Run command line version if requested
-  if (RUN_COMMAND_LINE == TRUE) {
-    parse_command_line_input()
-  }
-  
+main <- function(params) {
   # Startup messages
-  message(ts(), "Running generate_BackBLAST_heatmap.R")
-  message(ts(), "Input phylogenetic tree filepath: ", input_phylogenetic_tree_filepath)
-  message(ts(), "Input BLAST table filename: ", input_blast_table_filename)
-  message(ts(), "Output PDF filename: ", output_pdf_name)
-  message(ts(), "Bootstrap display cutoff (%; ignored if 'NA'): ", bootstrap_cutoff)
-  message(ts(), "Root name (ignored if 'NA'): ", root_name)
-  message(ts(), "Tree metadata filename (ignored if 'NA'): ", tree_metadata_filename)
-  message(ts(), "Decorator column name in tree metadata (ignored if 'NA'): ", tree_decorator_colname)
-  message(ts(), "Input gene naming table filename (ignored if 'NA'): ", gene_naming_table_filename)
+  futile.logger::flog.info("Running generate_BackBLAST_heatmap.R")
+  futile.logger::flog.info(glue::glue("Input phylogenetic tree filepath: ", params$input_phylogenetic_tree_filepath))
+  futile.logger::flog.info(glue::glue("Input BLAST table filename: ", params$input_blast_table_filepath))
+  futile.logger::flog.info(glue::glue("Output PDF filename: ", params$output_pdf_filepath))
+  futile.logger::flog.info(glue::glue("Bootstrap display cutoff (%; ignored if 'NA'): ", params$bootstrap_cutoff))
+  futile.logger::flog.info(glue::glue("Root name (ignored if 'NA'): ", params$root_name))
+  futile.logger::flog.info(glue::glue("Tree metadata filename (ignored if 'NA'): ", params$tree_metadata_filepath))
+  futile.logger::flog.info(glue::glue("Decorator column name in tree metadata (ignored if 'NA'): ", 
+                                      params$tree_decorator_colname))
+  futile.logger::flog.info(glue::glue("Input gene naming table filename (ignored if 'NA'): ", 
+                                      params$gene_naming_table_filepath))
   
   # Load and plot the tree
   # TODO - after reading metadata table, CHECK that the first column names correspond to the tree tip labels
-  phylo_tree_list <- load_and_plot_phylogenetic_tree(input_phylogenetic_tree_filepath, root_name, bootstrap_cutoff, 
-                                     tree_metadata_filename, tree_decorator_colname)
+  phylo_tree_list <- load_and_plot_phylogenetic_tree(params$input_phylogenetic_tree_filepath, 
+                                                     params$root_name, params$bootstrap_cutoff, 
+                                                     params$tree_metadata_filepath, params$tree_decorator_colname)
   
   # Get tip order of the tree, to match with heatmap later
   # Based on https://groups.google.com/forum/#!topic/bioc-ggtree/LqRDK78m3U4 (accessed Sept. 15, 2018)
-  message(ts(), "Exporting tip order of tree to correspond with heatmap")
-  tip_order <- dplyr::filter(ggtree(phylo_tree_list[[1]])$data, isTip == TRUE)
+  futile.logger::flog.info("Exporting tip order of tree to correspond with heatmap")
+  tip_order <- dplyr::filter(ggtree::ggtree(phylo_tree_list[[1]])$data, isTip == TRUE)
   tip_order <- tip_order[order(tip_order$y, decreasing = TRUE),]$label # plotting_name
 
   
   # Load and plot the BLAST table as a heatmap
-  blast_table_list <- load_and_plot_blast_table(input_blast_table_filename, tip_order, gene_naming_table_filename)
+  blast_table_list <- load_and_plot_blast_table(params$input_blast_table_filepath, 
+                                                tip_order, params$gene_naming_table_filepath)
   
   # Combine the tree and heatmap
   # Got ggarrange ideas from https://cran.r-project.org/web/packages/egg/vignettes/Ecosystem.html (accessed Sept. 15, 2018)
   # TODO - make the dimensions a function of the gene number and the subject number
-  message(ts(), "Combining the ggtree and the heatmap")
-  combined_plot <- ggarrange(phylo_tree_list[[2]], blast_table_list[[2]], nrow = 1, widths = c(5, 8), heights = c(5), padding = unit(0, "mm"))
+  futile.logger::flog.info("Combining the ggtree and the heatmap")
+  combined_plot <- egg::ggarrange(phylo_tree_list[[2]], blast_table_list[[2]], 
+                                  nrow = 1, widths = c(5, 8), heights = c(5), padding = unit(0, "mm"))
   # N.B., set debug = TRUE to see grid lines
   
   # Print a PDF of the combined plot
   # TODO - set dimensions as a function of the gene number and the subject number
-  message(ts(), "Saving to PDF")
-  pdf(file = output_pdf_name, width = 17, height = 7)
+  futile.logger::flog.info("Saving to PDF")
+  pdf(file = params$output_pdf_filepath, width = 17, height = 7)
   print(combined_plot)
   dev.off()
   
-  message(ts(), "generate_BackBLAST_heatmap.R: done.")
+  futile.logger::flog.info("generate_BackBLAST_heatmap.R: done.")
   
 }
 
-main()
+if (interactive() == FALSE) {
+  
+  parser <- argparser::arg_parser("generate_BackBLAST_heatmap.R: Binds a phylogenetic tree to a BLAST table heatmap.")
+  parser <- argparser::arg_parser("Copyright Lee Bergstrand and Jackson M. Tsuji, 2019.")
+  
+  # Add required args
+  parser <- argparser::add_argument(parser = parser, arg = "input_phylogenetic_tree_filepath", 
+                                    help = "Input phylogenetic tree filepath", 
+                                    type = "character", default = NULL)
+  parser <- argparser::add_argument(parser = parser, arg = "input_blast_table_filepath", 
+                                    help = "Input BLAST table filepath", 
+                                    type = "character", default = NULL)
+  parser <- argparser::add_argument(parser = parser, arg = "output_pdf_filepath", 
+                                    help = "Output PDF filepath", 
+                                    type = "character", default = NULL)
+  parser <- argparser::add_argument(parser = parser, arg = "input_phylogenetic_tree_filepath", 
+                                    help = "Input phylogenetic tree filepath", 
+                                    type = "character", default = NULL)
+  
+  # Add optional args (set to 'NA' to ignore)
+  parser <- argparser::add_argument(parser = parser, arg = "--tree_metadata_filepath", short = "m",
+                                    help = "Tree metadata filepath", 
+                                    type = "character", default = NA)
+  parser <- argparser::add_argument(parser = parser, arg = "--tree_decorator_colname", short = "d",
+                                    help = "Tree decorator colname filepath",
+                                    type = "character", default = NA)
+  parser <- argparser::add_argument(parser = parser, arg = "--map_genome_names", short = "n",
+                                    help = "Map genome names", flag = TRUE, default = NA)
+  parser <- argparser::add_argument(parser = parser, arg = "--gene_naming_table_filepath", short = "g",
+                                    help = "Gene naming table filepath",
+                                    type = "character", default = NA)
+  parser <- argparser::add_argument(parser = parser, arg = "--bootstrap_cutoff", short = "b",
+                                    help = "Bootstrap cutoff value",
+                                    type = "numeric", default = NA)
+  parser <- argparser::add_argument(parser = parser, arg = "--root_name", short = "r",
+                                    help = "Root name",
+                                    type = "character", default = NA)
+  
+  params <- argparser::parse_args(parser)
+  
+  main(params)
+  
+} else {
+  
+  # Manually set when running in RStudio for development
+  params <- list()
+  setwd("/home/jmtsuji/Research_General/Bioinformatics/02_git/BackBLAST_Reciprocal_BLAST/test/")
+  
+  # Required inputs
+  params$input_phylogenetic_tree_filepath <- "GSB_riboproteins_tree_vs3.treefile"
+  params$input_blast_table_filepath <- "GSB_pathway_vs7_e40_best_hits_MOD3.csv"
+  params$output_pdf_filepath <- "test4.pdf"
+  
+  # Optional inputs (set to 'NA' to ignore)
+  params$tree_metadata_filepath <- NA
+  params$tree_decorator_colname <- NA
+  params$map_genome_names <- NA
+  params$gene_naming_table_filepath <- NA
+  params$bootstrap_cutoff <- NA
+  params$root_name <- NA #"Ignavibacterium_album_JCM_16511_NC_017464.1" # Optional; set to NA if you want to use the tree as-is.
+  
+  # To add...
+  # params$tree_naming_mapping <- ""
+  
+  main(params)
+  
+}
 
+
+# message(glue::glue("
+#               Required inputs:
+#                    --tree_filepath               Filepath for newick-format phylogenetic tree of the BLAST subject organisms
+#                    --blast_table_filepath        Filepath for CSV-format BLAST hit table from CombineBlastTables.R
+#                    --output_filepath             Output filepath for the PDF
+#                    
+#                    Optional inputs:
+#                    --tree_metadata_filename      Filepath for TSV-format metadata file for the phylogenetic tree. Details below.
+#                    --tree_decorator_colname      Column name from the metadata to map onto the tree as fill colours.
+#                    Requires that --tree_metadata_filename is set. Details below.
+#                    --genome_plotting_names       Set this flag to include a vector of genome names to plot in the tree_metadata_filename
+#                    called 'plotting_name'. Details below.
+#                    --gene_naming_table_filename  Filepath for TSV-format table linking query gene IDs in the BLAST table to proper
+#                    gene names. Details below.
+#                    --bootstrap_cutoff            A percentage at or above which to display the bootstrap values on the tree (e.g., 80)
+#                    --root_name                   Exact name of the tip you wish to use as the root of the tree, if your tree is not 
+#                    already rooted
+#                    
+#                    Tree vs. the BLAST table
+#                    Note that the subject organism names MUST be EXACTLY the same between the tree tips and the BLAST table 
+#                    'subject_name' column. Otherwise, the script will fail.
+#                    
+#                    Tree metadata:
+#                    You can optionally provide a tree_metadata table to overlay additional information onto the phylogenetic tree.
+#                    
+#                    The first column of this TSV (tab-separated) table MUST be called 'subject_name' and include the EXACT names
+#                    of all genomes in the phylogenetic tree. You can then optionally include the following:
+#                    
+#                    1. genome_plotting_names: add a column called 'plotting_name' to include the names of the organisms that you 
+#                    want to appear on the final plot. You can use spaces, most special characters, and so on.
+#                    
+#                    2. tree_decorator_colname: you can overlay characteristics of the organisms/genomes as fill colours on the tips
+#                    of the tree. Add a column to the metadata table with any name you'd like, e.g., 'GC_content', 
+#                       'predicted_metabolism', 'pathogenicity', and so on. Fill with meaningful data to you. Then, specify the
+#                       'tree_decorator_colname' to EXACTLY match the name of ONE of the additional columns. That info will then
+#                       be plotted on the tree. Enjoy! (We might expand this in the future to allow for font colours and so on to 
+#                       be varied.)
+# 
+#               Gene naming for BLAST table:
+#                   You can provide a gene_naming_table to provide custom names and ordering for query genes in your BLAST search, 
+#                   in place of the qseqid from NCBI, which may not be very human-readable.
+# 
+#                   The gene naming table must meet the following criteria:
+#                     - First column: 'qseqid' - the EXACT ID of ALL of the unique query proteins in the BLAST table must be included.
+#                           You can include additional qseqid's here if you'd like, they just won't be used.
+#                    - Second column: 'gene_name' - a corresponding name of your choice (e.g., rpoB, dsrA, and so on)
+#                    
+#                    The order of the rows in this table will dictate the order of the genes in the heatmap.
+#                    
+#                    "))
+
+
+
+# # Check on the tree_metadata_filename and tree_decorator_colname were provided, as needed
+# if ( is.null(opt$tree_metadata_filename) ) {
+#   # Annul everything
+#   # TODO - throw a warning if some of the other flags were set
+#   opt$tree_metadata_filename <- NA
+#   opt$tree_decorator_colname <- NA
+#   opt$genome_plotting_names <- NA
+# } else if ( is.null(opt$tree_metadata_filename) == FALSE && is.null(opt$genome_plotting_names) == FALSE
+#             && is.null(opt$tree_decorator_colname) == FALSE ) {
+#   # All are present
+#   opt$genome_plotting_names <- TRUE
+# } else if ( is.null(opt$tree_metadata_filename) == FALSE && is.null(opt$genome_plotting_names) == FALSE ) {
+#   # tree_decorator_colname must not be set
+#   opt$tree_decorator_colname <- NA
+#   opt$genome_plotting_names <- TRUE
+# } else if ( is.null(opt$tree_metadata_filename) == FALSE && is.null(opt$tree_decorator_colname) == FALSE ) {
+#   # genome_plotting_names must not be set
+#   opt$genome_plotting_names <- NA
+# }
+# 
