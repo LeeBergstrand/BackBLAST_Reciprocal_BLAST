@@ -67,7 +67,7 @@ rule create_blank_results:
     params:
         query_genes=config.get("query_genes")
     shell:
-        "CreateBlankResults.py {input} {params.query_genes} {output} > {log} 2>&1"
+        "CreateBlankResults.py -i {input} -q {params.query_genes} -o {output} > {log} 2>&1"
 
 
 # Combine the BLAST tables into a single table, and add a column for sample ID
@@ -100,14 +100,11 @@ rule generate_heatmap:
         "benchmarks/generate_heatmap.txt"
     params:
         tree_file=config.get("phylogenetic_tree_newick"),
-        tree_metadata=config.get("tree_metadata_tsv"),
-        tree_decorator_colname=config.get("tree_colouring_column_name"),
-        plot_custom_names=config.get("plotting_name_column"),
-        gene_naming=config.get("gene_naming_tsv"),
+        genome_metadata=config.get("genome_metadata_tsv"),
+        gene_metadata=config.get("gene_metadata_tsv"),
         bootstrap_cutoff=config.get("bootstrap_cutoff"),
         root_name=config.get("root_name")
     shell:
-        "generate_BackBLAST_heatmap.R -i {params.tree_file} -j {input} -o {output} -m {params.tree_metadata} "
-            "-d {params.tree_decorator_colname} -n {params.plot_custom_names} -g {params.gene_naming} "
-            "-b {params.bootstrap_cutoff} -r {params.root_name} 2> {log}"
+        "generate_BackBLAST_heatmap.R -m {params.genome_metadata} -g {params.gene_metadata} "
+            "-b {params.bootstrap_cutoff} -r {params.root_name} {params.tree_file} {input} {output} 2> {log}"
 
