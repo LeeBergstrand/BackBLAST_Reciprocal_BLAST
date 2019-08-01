@@ -106,6 +106,8 @@ if config.get("phylogenetic_tree_newick") == "subjects":
             "input_genomes_faa.list"
         output:
             "phylogeny/iqtree_out/iqtree_out.treefile"
+        conda:
+            "envs/gtotree.yaml"
         log:
             "logs/phylogeny/gtotree.log"
         benchmark:
