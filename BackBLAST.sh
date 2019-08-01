@@ -19,6 +19,7 @@ SNAKEFILE=Snakefile
 #' @param subject_faa_directory: the path to the directory containing the subject .faa (whole-genome protein prediction, FastA format) files
 #' @return writes to output_config_filepath
 function add_subjects_to_config_file {
+
     # User-provided inputs
     local output_config_filepath=$1
     local subject_faa_directory=$2
@@ -196,7 +197,7 @@ function perform_setup {
         printf "Optional arguments:\n"
         printf "   -t phylogenetic_tree_newick: path to the pre-calculated phylogenetic tree [default: 'subjects' - auto-calculate tree]\n"
         printf "   -b bootstrap_cutoff: numerical value (e.g., 80) under which bootstrap values will not be displayed [default: NA]\n"
-        printf "   -r root_name: Exact name of the tree tip label at the desired root of the tree [default: NA; will midpoint root]\n"
+        printf "   -r root_name: Exact name of the tree tip label at the desired root of the tree [default: NA; will skip rooting]\n"
         printf "   -e evalue: e-value cutoff for reciprocal BLASTP [default: 1e-40]\n"
         printf "   -p pident: percent identity cutoff for reciprocal BLASTP [default: 25]\n"
         printf "   -@ threads: maximum threads to use for any process [default: 1]\n\n"
@@ -328,7 +329,7 @@ function perform_auto {
         printf "Optional arguments:\n"
         printf "   -t phylogenetic_tree_newick: path to the pre-calculated phylogenetic tree [default: 'subjects' - auto-calculate tree]\n"
         printf "   -b bootstrap_cutoff: numerical value (e.g., 80) under which bootstrap values will not be displayed [default: NA]\n"
-        printf "   -r root_name: Exact name of the tree tip label at the desired root of the tree [default: NA; will midpoint root]\n"
+        printf "   -r root_name: Exact name of the tree tip label at the desired root of the tree [default: NA; will skip rooting]\n"
         printf "   -e evalue: e-value cutoff for reciprocal BLASTP [default: 1e-40]\n"
         printf "   -p pident: percent identity cutoff for reciprocal BLASTP [default: 25]\n"
         printf "   -@ threads: maximum threads to use for any process [default: 1]\n"
@@ -410,6 +411,7 @@ function perform_auto {
 }
 
 function main {
+
     # If no input is provided, provide help and exit
     if [ $# -eq 0 ]; then
 
@@ -450,6 +452,7 @@ function main {
     fi
 
     echo "[ $(date -u) ]: BackBLAST finished."
+
 }
 
 main $@

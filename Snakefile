@@ -89,6 +89,7 @@ rule combine_blast_tables:
 # Generate phylogenetic tree if desired by the user
 if config.get("phylogenetic_tree_newick") == "subjects":
     # Makes a list of filepaths to the FAA genome files for use by GToTree
+    # TODO - check {output} does not already exist before run start?
     rule generate_phylogenetic_tree_input:
         input:
             lambda wildcards: config["subjects"][wildcards.subject]
