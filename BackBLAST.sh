@@ -138,13 +138,18 @@ function make_run_templates {
     # Add subject info
     add_subjects_to_config_file ${output_config_filepath} ${subject_faa_directory}
 
+    # Special check for the phylogenetic tree - if the entry is 'subjects', then do not run realpath
+    if [ ${phylogenetic_tree_newick} != "subjects" ]; then
+        local phylogenetic_tree_newick=$(realpath ${phylogenetic_tree_newick})
+    fi
+
     # Add other variables to config file
     # NOTE: I'm using the '|' symbol as the sed separator because some of the variables contain forward slashes (which is the normal separator)
     # TODO - is there a more elegant way of doing this?
     sed -i "s|^query_genes: .*|query_genes: $(realpath ${query_faa_filepath})|" ${output_config_filepath}
     sed -i "s|^query_genome_orfs: .*|query_genome_orfs: $(realpath ${query_faa_genome_filepath})|" ${output_config_filepath}
     sed -i "s|^threads: .*|threads: ${threads}|" ${output_config_filepath}
-    sed -i "s|^phylogenetic_tree_newick: .*|phylogenetic_tree_newick: $(realpath ${phylogenetic_tree_newick})|" ${output_config_filepath}
+    sed -i "s|^phylogenetic_tree_newick: .*|phylogenetic_tree_newick: ${phylogenetic_tree_newick}|" ${output_config_filepath}
     sed -i "s|^genome_metadata_tsv: .*|genome_metadata_tsv: $(realpath ${genome_metadata_tsv})|" ${output_config_filepath}
     sed -i "s|^gene_metadata_tsv: .*|gene_metadata_tsv: $(realpath ${gene_metadata_tsv})|" ${output_config_filepath}
     sed -i "s|^bootstrap_cutoff: .*|bootstrap_cutoff: ${bootstrap_cutoff}|" ${output_config_filepath}
