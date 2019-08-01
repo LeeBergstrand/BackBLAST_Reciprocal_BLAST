@@ -131,11 +131,11 @@ rule generate_heatmap:
         "benchmarks/generate_heatmap.txt"
     params:
         tree_file = "phylogeny/iqtree_out/iqtree_out.treefile" if config.get("phylogenetic_tree_newick") == "subjects" else config.get("phylogenetic_tree_newick"),
-        genome_metadata = config.get("genome_metadata_tsv", NA),
-        gene_metadata = config.get("gene_metadata_tsv", NA),
-        bootstrap_cutoff = config.get("bootstrap_cutoff", NA),
-        root_name = config.get("root_name", NA)
+        genome_metadata = config.get("genome_metadata_tsv", "NA"),
+        gene_metadata = config.get("gene_metadata_tsv", "NA"),
+        bootstrap_cutoff = config.get("bootstrap_cutoff", "NA"),
+        root_name = config.get("root_name", "NA")
     shell:
         "generate_BackBLAST_heatmap.R -m {params.genome_metadata} -g {params.gene_metadata} "
-            "-b {params.bootstrap_cutoff} -r {params.root_name} {params.tree_file} {input} {output} 2> {log}"
+            "-b {params.bootstrap_cutoff} -r {params.root_name} {params.tree_file} {input} {output} 2>&1 | tee {log}"
 
