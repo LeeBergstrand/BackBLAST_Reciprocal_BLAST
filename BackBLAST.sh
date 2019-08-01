@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 # BackBLAST.sh
+# The entry script for running BackBLAST via command line
 # Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2019
-# This is the entry script for running BackBLAST
+
 
 # HARD-CODED variables
 VERSION=1.9.9-alpha
@@ -12,7 +13,11 @@ TEMPLATE_CONFIG="template_config.yaml"
 SNAKEFILE=Snakefile
 
 
-# Function to add the user-provided samples to the end of the template config file
+#' Adds the user-provided subject files to the end of the template config file
+#'
+#' @param output_config_filepath: the path to the config.yaml file to which the subject names will be added
+#' @param subject_faa_directory: the path to the directory containing the subject .faa (whole-genome protein prediction, FastA format) files
+#' @return writes to output_config_filepath
 function add_subjects_to_config_file {
     # User-provided inputs
     local output_config_filepath=$1
@@ -34,7 +39,13 @@ function add_subjects_to_config_file {
 }
 
 
-# Function to generate the genome and gene metadata file templates
+#' Generate the genome and gene metadata file templates
+#' 
+#' @param genome_metadata_tsv: the path to which the genome metadata TSV file is to be written
+#' @param gene_metadata_tsv: the path to which the gene metadata TSV file is to be written
+#' @param subject_faa_directory: the path to the directory containing the subject .faa (whole-genome protein prediction, FastA format) files
+#' @param query_faa_filepath: the path to the query protein sequences (FastA format)
+#' @return writes to genome_metadata_tsv and gene_metadata_tsv
 function generate_metadata_templates {
 
     # Assign variables from input
@@ -72,7 +83,19 @@ function generate_metadata_templates {
 }
 
 
-# Function to make template files for the BackBLAST run 
+#' Makes template files for the BackBLAST run 
+#' 
+#' @param query_faa_filepath: the path to the query protein sequences (FastA format)
+#' @param query_faa_genome_filepath: the path to the predicted protein sequences of the entire genome corresponding to the query protein sequences (FastA format)
+#' @param subject_faa_directory: the path to the directory containing the subject .faa (whole-genome protein prediction, FastA format) files
+#' @param output_directory: path to the directory where output files should be written
+#' @param threads: maximum number of threads that any given task within the snakemake pipeline ought to use
+#' @param phylogenetic_tree_newick: path to the phylogenetic tree file corresponding to the subject genomes (or type 'subjects' to have the tree auto-generated)
+#' @param bootstrap_cutoff: numeric value; only bootstrap numbers above this value (e.g., 80) will be shown on the plot (or 'NA' to skip)
+#' @param root_name: string; the exact label of the phylogenetic tree tip corresponding to the root (or 'NA' to skip)
+#' @param evalue: numeric/scientific; e-value cutoff for reciprocal BLASTP
+#' @param pident: numeric; percent identity cutoff for reciprocal BLASTP
+#' @return writes three template files to the output_directory: 'config.yaml', 'genome_metadata.tsv', and 'gene_metadata.tsv'
 function make_run_templates {
 
     # Assign input variables
@@ -130,7 +153,13 @@ function make_run_templates {
 
 }
 
-# Function to run snakemake
+
+#' Runs snakemake
+#' 
+#' @param config_file: path to the config.yaml file containing settings for the run
+#' @param run_directory: path to the directory where output files should be written
+#' @param jobs: maximum number of parallel jobs for the snakemake scheduler to run
+#' @return output files from the BackBLAST pipeline, in the run_directory
 function run_snakemake {
 
     # Get input variables
@@ -142,7 +171,11 @@ function run_snakemake {
 
 }
 
-# Function to perform the 'setup' command
+
+#' Perform the 'setup' command
+#' 
+#' @param all command line inputs for the module - see help statement below
+#' @return runs the 'setup' command end-to-end
 function perform_setup {
 
     if [ $# -eq 0 ]; then
@@ -232,7 +265,11 @@ function perform_setup {
 
 }
 
-# Function to perform the 'run' command
+
+#' Perform the 'run' command
+#' 
+#' @param all command line inputs for the module - see help statement below
+#' @return runs the 'run' command end-to-end
 function perform_run {
 
     if [ $# -eq 0 ]; then
@@ -265,7 +302,11 @@ function perform_run {
 
 }
 
-# Function to perform the 'auto' command
+
+#' Perform the 'auto' command
+#' 
+#' @param all command line inputs for the module - see help statement below
+#' @return runs the 'auto' command end-to-end (like running 'setup', then 'run')
 # TODO - consider allowing the user to specify pre-made genome and gene metadata files
 function perform_auto {
 
