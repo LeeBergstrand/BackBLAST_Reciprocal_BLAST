@@ -33,3 +33,10 @@ minimum_percent_identity: 25
 # Query files
   # query_genes contains the genes you want to do a reciprocal BLAST search with.
   # query_genome_orfs contains all predicted ORFs from the query genome (for reciprocal BLAST purposes)
+query_genes: /path/to/query_gene_targets.faa
+query_genome_orfs: /path/to/query.faa
+# Subject files for BLAST (the name you specify will be plotted).
+  # These should be ORF predictions from the genomes of the organisms of interest.
+  # If you want to plot the query genome as well, then include it here.
+subjects:
+
