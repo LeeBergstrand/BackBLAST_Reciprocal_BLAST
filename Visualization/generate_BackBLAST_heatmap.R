@@ -21,6 +21,7 @@ suppressMessages(library(ggtree))
 library(gridExtra, warn.conflicts = FALSE)
 library(egg, warn.conflicts = FALSE)
 
+
 #' Reads a data table as a tibble with several default parameters. All parameters below are the same as read.table()
 #' 
 #' @param file Filepath to data table
@@ -61,6 +62,28 @@ choose_discrete_colour_scale <- function(length) {
   
   return(colour_palette)
   
+}
+
+
+#' Convert character "NA" (from command line) into true NA
+#' 
+#' @param entry single-length vector of any type
+#' @return single-length vector; if it was "NA", it will now be NA; otherwise it will be the same as input
+#' @export
+convert_to_true_NA <- function(entry) {
+  
+  if (is.na(entry) == TRUE) {
+    
+    return(entry)
+    
+  } else if (entry == "NA") {
+    
+    flog.debug("Converting to true NA")
+    return(NA)
+    
+  } else {
+    return(entry)
+  }
 }
 
 
@@ -511,6 +534,9 @@ main <- function(params) {
   futile.logger::flog.info(glue::glue("Plot width (mm): ", params$plot_width))
   futile.logger::flog.info(glue::glue("Plot height (mm): ", params$plot_height))
   futile.logger::flog.info("############################")
+  
+  # Convert character "NA" (from command line) into true NA
+  params <- lapply(params, convert_to_true_NA)
   
   # Load and plot the tree
   phylo_tree_list <- load_and_plot_phylogenetic_tree(params$input_phylogenetic_tree_filepath, 
