@@ -6,9 +6,10 @@ set -euo pipefail
 
 # GLOBAL variables
 readonly VERSION="0.8.0"
-readonly SCRIPT_NAME=${0##*/}
-readonly TEMPLATE_CONFIG="template_config.yaml"
-readonly SNAKEFILE="Snakefile"
+readonly SCRIPT_NAME="${0##*/}"
+readonly SCRIPT_DIR="$(realpath ${0%/*})"
+readonly TEMPLATE_CONFIG="${SCRIPT_DIR}/template_config.yaml"
+readonly SNAKEFILE="${SCRIPT_DIR}/Snakefile"
 
 #######################################
 # Add the user-provided subject files to the end of the template config file
@@ -95,8 +96,8 @@ function generate_metadata_templates() {
 #######################################
 # Generate template files for the BackBLAST run 
 # Globals: (none)
-#   TEMPLATE_CONFIG: the path to the template Snakemake configuration file (YAML format)
 # Arguments:
+#   template_config: the path to the template Snakemake configuration file (YAML format)
 #   query_faa_filepath: the path to the query protein sequences (FastA format)
 #   query_faa_genome_filepath: the path to the predicted protein sequences of the entire genome corresponding to the query protein sequences (FastA format)
 #   subject_faa_directory: the path to the directory containing the subject .faa (whole-genome protein prediction, FastA format) files
@@ -113,26 +114,28 @@ function generate_metadata_templates() {
 function make_run_templates() {
   # Assign input variables
   # TODO - is there a more elegant way of doing this? This is a ton of input variables to have to bring in one at a time
+  local template_config
+  template_config=$1
   local query_faa_filepath
-  query_faa_filepath=$1
+  query_faa_filepath=$2
   local query_faa_genome_filepath
-  query_faa_genome_filepath=$2
+  query_faa_genome_filepath=$3
   local subject_faa_directory
-  subject_faa_directory=$3
+  subject_faa_directory=$4
   local output_directory
-  output_directory=$4
+  output_directory=$5
   local threads
-  threads=$5
+  threads=$6
   local phylogenetic_tree_newick
-  phylogenetic_tree_newick=$6
+  phylogenetic_tree_newick=$7
   local bootstrap_cutoff
-  bootstrap_cutoff=$7
+  bootstrap_cutoff=$8
   local root_name
-  root_name=$8
+  root_name=$9
   local evalue
-  evalue=$9
+  evalue=${10}
   local pident
-  pident=${10}
+  pident=${11}
 
   # Check if desired output files already exist
   local output_config_filepath
@@ -158,7 +161,7 @@ function make_run_templates() {
 
   ### Generate config file and add variables
   echo "[ $(date -u) ]: Writing config info to '${output_config_filepath}'" >&2
-  cp ${TEMPLATE_CONFIG} ${output_config_filepath}
+  cp ${template_config} ${output_config_filepath}
 
   # Add subject info
   add_subjects_to_config_file ${output_config_filepath} ${subject_faa_directory}
@@ -186,9 +189,9 @@ function make_run_templates() {
 
 #######################################
 # Run snakemake
-# Globals:
-#   SNAKEFILE: the path to the Snakefile used to run the BackBLAST pipeline
+# Globals: (none)
 # Arguments:
+#   snakefile: the path to the Snakefile used to run BackBLAST
 #   config_file: path to the config.yaml file containing settings for the run
 #   run_directory: path to the directory where output files should be written
 #   jobs: maximum number of parallel jobs for the snakemake scheduler to run
@@ -197,14 +200,16 @@ function make_run_templates() {
 #######################################
 function run_snakemake() {
   # Get input variables
+  local snakefile
+  snakefile=$1
   local config_file
-  config_file=$1
+  config_file=$2
   local run_directory
-  run_directory=$2
+  run_directory=$3
   local jobs
-  jobs=$3
+  jobs=$4
 
-  snakemake --snakefile ${SNAKEFILE} --configfile ${config_file} --directory ${run_directory} --jobs ${jobs} --use-conda --reason
+  snakemake --snakefile ${snakefile} --configfile ${config_file} --directory ${run_directory} --jobs ${jobs} --use-conda --reason
 }
 
 #######################################
@@ -212,6 +217,7 @@ function run_snakemake() {
 # Globals:
 #   SCRIPT_NAME: the name of this script
 #   VERSION: the script version
+#   TEMPLATE_CONFIG: the path to the template config file used in setup (YAML format)
 #   OPTIND and OPTARG: used in command line parsing as part of 'getopts'
 # Arguments:
 #   all command line inputs for the 'setup' module - see help statement below
@@ -241,6 +247,8 @@ function perform_setup() {
     printf "   -e evalue: e-value cutoff for reciprocal BLASTP [default: 1e-40]\n"
     printf "   -p pident: percent identity cutoff for reciprocal BLASTP [default: 25]\n"
     printf "   -@ threads: maximum threads to use for any process [default: 1]\n\n"
+    printf "Advanced parameters:\n"
+    printf "   -T template_config: Path to the template config file used in setup [default: ${TEMPLATE_CONFIG}]\n\n"
     printf "Note: Currently does NOT support whitespaces in any input variables.\n\n"
 
     # Exit
@@ -260,10 +268,12 @@ function perform_setup() {
   evalue=1e-40
   local pident
   pident=25
+  local template_config
+  template_config=${TEMPLATE_CONFIG}
 
   # Set options (help from https://wiki.bash-hackers.org/howto/getopts_tutorial; accessed March 8th, 2019)
   OPTIND=1 # reset the OPTIND counter just in case
-  while getopts ":@:t:b:r:e:p:" opt; do
+  while getopts ":@:t:b:r:e:p:T:" opt; do
     case ${opt} in
       \@)
         threads=${OPTARG}
@@ -282,6 +292,9 @@ function perform_setup() {
         ;;
       p)
         pident=${OPTARG}
+        ;;
+      T)
+        template_config=${OPTARG}
         ;;
       \?)
         echo "[ $(date -u) ]: ERROR: Invalid option: '-${OPTARG}'. Exiting..." >&2
@@ -307,13 +320,14 @@ function perform_setup() {
   local output_directory
   output_directory=$4
 
-  echo "[ $(date -u) ]: Running BackBLAST in setup mode" >&2
+  echo "[ $(date -u) ]: Running ${SCRIPT_NAME} in setup mode" >&2
   echo "[ $(date -u) ]: Command run: ${SCRIPT_NAME} setup ${original_arguments}" >&2
 
   # Make the template files for the run
-  make_run_templates ${query_faa_filepath} ${query_faa_genome_filepath} ${subject_faa_directory} ${output_directory} ${threads} ${phylogenetic_tree_newick} ${bootstrap_cutoff} ${root_name} ${evalue} ${pident}
+  make_run_templates ${template_config} ${query_faa_filepath} ${query_faa_genome_filepath} ${subject_faa_directory} \
+    ${output_directory} ${threads} ${phylogenetic_tree_newick} ${bootstrap_cutoff} ${root_name} ${evalue} ${pident}
 
-  echo "[ $(date -u) ]: Setup complete. After modifying the config.yaml file to your liking, run BackBLAST using 'run' mode." >&2
+  echo "[ $(date -u) ]: Setup complete. After modifying the config.yaml file to your liking, run ${SCRIPT_NAME} using 'run' mode." >&2
 }
 
 #######################################
@@ -321,6 +335,7 @@ function perform_setup() {
 # Globals:
 #   SCRIPT_NAME: the name of this script
 #   VERSION: the script version
+#   SNAKEFILE: the path to the Snakefile used to run BackBLAST
 # Arguments:
 #   all command line inputs for the 'run' module - see help statement below
 # Returns:
@@ -340,24 +355,52 @@ function perform_run() {
     printf "Usage: ${SCRIPT_NAME} run config_filepath run_directory jobs\n\n"
     printf "Positional arguments (required):\n"
     printf "   config_filepath: path to the config file generated using the 'setup' module\n"
-    printf "   run_directory: the directory where BackBLAST results out to be output\n"
-    printf "   jobs: Number of processing threads available for the run\n\n"
+    printf "   run_directory: the directory where BackBLAST results out to be output\n\n"
+    printf "Optional arguments:\n"
+    printf "   -j jobs: Number of processing threads available for the run [default: 1]\n\n"
+    printf "Advanced parameters:\n"
+    printf "   -S snakefile: Path to the Snakefile used to run BackBLAST [default: ${SNAKEFILE}]\n\n"
     printf "Note: Currently does NOT support whitespaces in any input variables.\n\n"
 
     # Exit
     exit 0
   fi
 
-  # User-provided variables
-  local config_file
-  config_file=$1 # config.yaml
+  # Set defaults for options
+  local jobs
+  jobs=1
+  local snakefile
+  snakefile=${SNAKEFILE}
+
+  # Set options (help from https://wiki.bash-hackers.org/howto/getopts_tutorial; accessed March 8th, 2019)
+  OPTIND=1 # reset the OPTIND counter just in case
+  while getopts ":j:S:" opt; do
+    case ${opt} in
+      j)
+        jobs=${OPTARG}
+        ;;
+      S)
+        snakefile=${OPTARG}
+        ;;
+      \?)
+        echo "[ $(date -u) ]: ERROR: Invalid option: '-${OPTARG}'. Exiting..." >&2
+        exit 1
+        ;;
+      :)
+        echo "[ $(date -u) ]: ERROR: argument needed following '-${OPTARG}'. Exiting..." >&2
+        exit 1
+        ;;
+    esac
+  done
+
+  # Set positional arguments
+  local config_filepath
+  config_filepath=$1 # config.yaml
   local run_directory
   run_directory=$2
-  local jobs
-  jobs=$3
 
   # Start the run
-  run_snakemake ${config_file} ${run_directory} ${jobs}
+  run_snakemake ${snakefile} ${config_filepath} ${run_directory} ${jobs}
 }
 
 #######################################
@@ -365,6 +408,8 @@ function perform_run() {
 # Globals:
 #   SCRIPT_NAME: the name of this script
 #   VERSION: the script version
+#   TEMPLATE_CONFIG: the path to the template config file used in setup (YAML format)
+#   SNAKEFILE: the path to the Snakefile used to run BackBLAST
 #   OPTIND and OPTARG: used in command line parsing as part of 'getopts'
 # Arguments:
 #   all command line inputs for the 'auto' module - see help statement below
@@ -396,6 +441,9 @@ function perform_auto() {
     printf "   -p pident: percent identity cutoff for reciprocal BLASTP [default: 25]\n"
     printf "   -@ threads: maximum threads to use for any process [default: 1]\n"
     printf "   -j jobs: Number of processing threads available for the run [default: 1]\n\n"
+    printf "Advanced parameters:\n"
+    printf "   -T template_config: Path to the template config file used in setup [default: ${TEMPLATE_CONFIG}]\n"
+    printf "   -S snakefile: Path to the Snakefile used to run BackBLAST [default: ${SNAKEFILE}]\n\n"
     printf "Note: Currently does NOT support whitespaces in any input variables.\n\n"
 
     # Exit
@@ -417,10 +465,14 @@ function perform_auto() {
   evalue=1e-40
   local pident
   pident=25
+  local template_config
+  template_config=${TEMPLATE_CONFIG}
+  local snakefile
+  snakefile=${SNAKEFILE}
 
   # Set options (help from https://wiki.bash-hackers.org/howto/getopts_tutorial; accessed March 8th, 2019)
   OPTIND=1 # reset the OPTIND counter just in case
-  while getopts ":j:@:t:b:r:e:p:" opt; do
+  while getopts ":j:@:t:b:r:e:p:T:S:" opt; do
     case ${opt} in
       j)
         jobs=${OPTARG}
@@ -443,14 +495,20 @@ function perform_auto() {
       p)
         pident=${OPTARG}
         ;;
-	    \?)
-		    echo "[ $(date -u) ]: ERROR: Invalid option: '-${OPTARG}'. Exiting..." >&2
-		    exit 1
-		    ;;
-	    :)
-		    echo "[ $(date -u) ]: ERROR: argument needed following '-${OPTARG}'. Exiting..." >&2
-		    exit 1
-		    ;;
+      T)
+        template_config=${OPTARG}
+        ;;
+      S)
+        snakefile=${OPTARG}
+        ;;
+      \?)
+        echo "[ $(date -u) ]: ERROR: Invalid option: '-${OPTARG}'. Exiting..." >&2
+        exit 1
+        ;;
+      :)
+        echo "[ $(date -u) ]: ERROR: argument needed following '-${OPTARG}'. Exiting..." >&2
+        exit 1
+        ;;
     esac
   done
 
@@ -467,11 +525,12 @@ function perform_auto() {
   local output_directory
   output_directory=$4
 
-  echo "[ $(date -u) ]: Running BackBLAST in 'auto' mode" >&2
+  echo "[ $(date -u) ]: Running ${SCRIPT_NAME} in 'auto' mode" >&2
   echo "[ $(date -u) ]: Command run: ${SCRIPT_NAME} setup ${original_arguments}" >&2
 
   # Make the template files for the run
-  make_run_templates ${query_faa_filepath} ${query_faa_genome_filepath} ${subject_faa_directory} ${output_directory} ${threads} ${phylogenetic_tree_newick} ${bootstrap_cutoff} ${root_name} ${evalue} ${pident}
+  make_run_templates ${template_config} ${query_faa_filepath} ${query_faa_genome_filepath} ${subject_faa_directory} \
+    ${output_directory} ${threads} ${phylogenetic_tree_newick} ${bootstrap_cutoff} ${root_name} ${evalue} ${pident}
 
   # Change metadata files to NA for default run
   local output_config_filepath
@@ -481,7 +540,7 @@ function perform_auto() {
 
   # Start the run
   echo "[ $(date -u) ]: Default setup finished; starting pipeline" >&2
-  run_snakemake ${output_config_filepath} ${output_directory} ${jobs}
+  run_snakemake ${snakefile} ${output_config_filepath} ${output_directory} ${jobs}
 }
 
 function main() {
