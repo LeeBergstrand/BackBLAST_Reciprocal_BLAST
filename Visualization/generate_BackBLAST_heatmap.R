@@ -4,7 +4,7 @@
 # Plots a newick treefile and BLAST table together as a phylogenetic tree and heatmap
 
 # Load libraries
-library(argparser, quietly = TRUE)
+library(argparser)
 library(futile.logger)
 library(glue, warn.conflicts = FALSE)
 library(plyr, warn.conflicts = FALSE)
@@ -12,12 +12,12 @@ library(dplyr, warn.conflicts = FALSE)
 library(tibble, warn.conflicts = FALSE)
 library(reshape2, warn.conflicts = FALSE)
 library(RColorBrewer, warn.conflicts = FALSE)
-suppressMessages(library(ggplot2, warn.conflicts = FALSE))
+library(ggplot2, warn.conflicts = FALSE)
 library(ape, warn.conflicts = FALSE)
 library(maps, warn.conflicts = FALSE)
 library(phytools, warn.conflicts = FALSE)
 library(tidytree, warn.conflicts = FALSE)
-suppressMessages(library(ggtree))
+suppressPackageStartupMessages(library(ggtree))
 library(gridExtra, warn.conflicts = FALSE)
 library(egg, warn.conflicts = FALSE)
 
