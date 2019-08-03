@@ -70,20 +70,13 @@ choose_discrete_colour_scale <- function(length) {
 #' @param entry single-length vector of any type
 #' @return single-length vector; if it was "NA", it will now be NA; otherwise it will be the same as input
 #' @export
-convert_to_true_NA <- function(entry) {
-  
-  if (is.na(entry) == TRUE) {
-    
-    return(entry)
-    
-  } else if (entry == "NA") {
-    
-    flog.debug("Converting to true NA")
-    return(NA)
-    
-  } else {
-    return(entry)
+convert_to_constant_NA <- function(entry) {
+  conversion <- entry
+  if (entry == "NA") {
+    futile.logger::flog.debug("Converting 'NA' input to constant NA value")
+    conversion <- NA
   }
+  return(conversion)
 }
 
 
@@ -234,112 +227,112 @@ load_and_plot_phylogenetic_tree <- function(input_phylogenetic_tree_filepath, ro
 #' @param input_blast_table_filepath Character (length 1 vector); the filepath to the BLAST table (comma-separated)
 #' @return tibble of BLAST data
 #' @export
-read_blast_tibble <- function(input_blast_table_filepath) {
+read_blast_results <- function(input_blast_table_filepath) {
   
   # Load the data
-  blast_tibble <- read_tibble(input_blast_table_filepath, sep = ",")
+  blast_results <- read_tibble(input_blast_table_filepath, sep = ",")
   
   # HARD-CODED expected header names
   expected_header_names <- c("subject_name", "qseqid", "sseqid", "pident", "evalue", "qcovhsp", "bitscore")
   
   # Confirm the columns look okay
-  if ( identical(colnames(blast_tibble), expected_header_names) == FALSE ) {
+  if ( identical(colnames(blast_results), expected_header_names) == FALSE ) {
     
     futile.logger::flog.error(glue::glue("BLAST data table did not have expected column names ('", 
                           glue::glue_collapse(expected_header_names, sep = "; "), 
-                          "'). Instead, had: '", glue::glue_collapse(colnames(blast_tibble), sep = "; "), 
+                          "'). Instead, had: '", glue::glue_collapse(colnames(blast_results), sep = "; "), 
                           "'. Exiting..."))
     quit(save = "no", status = 1)
     
   }
   
-  return(blast_tibble)
+  return(blast_results)
   
 }
 
 
 #' Changes the order of the subject_name in the BLAST table to match that of the ggtree tips
 #' 
-#' @param blast_tibble Tibble output of read_blast_tibble
+#' @param blast_results Tibble output of read_blast_results
 #' @param tip_order Character vector of the exact order of the tip labels in the phylogenetic tree
 #' @return tibble of BLAST data with subject_name as an ordered factor and reduced to match phylogenetic tree names (if needed)
 #' @export
-order_blast_tibble_subjects <- function(blast_tibble, tip_order) {
+order_blast_subjects <- function(blast_results, tip_order) {
   
   # If entries are not identical, try filtering down to just what is in the phylogenetic tree
-  if ( identical(sort(unique(blast_tibble$subject_name)), 
+  if ( identical(sort(unique(blast_results$subject_name)), 
                  sort(tip_order)) == FALSE ) {
     
-    # Make sure that the tree tips are contained in the blast tibble; if so, everything is okay
-    # The length should be zero if all tree tips are contained in the blast tibble
-    if(length(setdiff(tip_order, unique(blast_tibble$subject_name))) > 0) {
+    # Make sure that the tree tips are contained in the blast table; if so, everything is okay
+    # The length should be zero if all tree tips are contained in the blast table
+    if(length(setdiff(tip_order, unique(blast_results$subject_name))) > 0) {
       
-      # But if the length is > 0, it means some entries in the tree are MISSING in the blast tibble, a major issue
-      missing_blast_tibble_entries <- setdiff(tip_order, unique(blast_tibble$subject_name))
-      flog.error(glue::glue("The provided BLAST tibble is missing some entries in the phylogenetic tree: '",
-                            glue::glue_collapse(missing_blast_tibble_entries, sep = ", "),
+      # But if the length is > 0, it means some entries in the tree are MISSING in the blast table, a major issue
+      missing_blast_table_entries <- setdiff(tip_order, unique(blast_results$subject_name))
+      flog.error(glue::glue("The provided BLAST table is missing some entries in the phylogenetic tree: '",
+                            glue::glue_collapse(missing_blast_table_entries, sep = ", "),
                             "'. Cannot continue -- exiting..."))
       quit(save = "no", status = 1)
       
     }
     
-    # Report to the user which entries in the BLAST tibble are to be ignored
-    extra_blast_tibble_entries <- setdiff(unique(blast_tibble$subject_name), tip_order)
+    # Report to the user which entries in the BLAST table are to be ignored
+    extra_blast_table_entries <- setdiff(unique(blast_results$subject_name), tip_order)
     
     futile.logger::flog.info(glue::glue("Some entries in the BLAST table are missing in the phylogenetic tree ",
                                         "and will be removed in plotting: '", 
-                                        glue::glue_collapse(extra_blast_tibble_entries, sep = ", "),  "'."))
+                                        glue::glue_collapse(extra_blast_table_entries, sep = ", "),  "'."))
     
-    # Filter down the BLAST tibble to have the same subject_name's as the tree
-    blast_tibble <- dplyr::filter(blast_tibble, subject_name %in% tip_order)
+    # Filter down the BLAST table to have the same subject_name's as the tree
+    blast_results <- dplyr::filter(blast_results, subject_name %in% tip_order)
     
   }
   
   # Make subjects the same order as in the tree
-  blast_tibble$subject_name <- factor(blast_tibble$subject_name, levels = rev(tip_order), ordered = TRUE)
+  blast_results$subject_name <- factor(blast_results$subject_name, levels = rev(tip_order), ordered = TRUE)
   
-  return(blast_tibble)
+  return(blast_results)
 }
 
 
 #' Overlays user-given genome names for the heatmap y-axis
 #' 
-#' @param blast_tibble Tibble output of read_blast_tibble
+#' @param blast_results Tibble output of read_blast_results
 #' @param genome_metadata_filepath Character (length 1 vector); the filepath of the tab-separated genome metadata file.
 #' Must at least have the columns 'subject_name' and 'plotting_name' as the first and second columns, respectively.
 #' @return tibble of BLAST data with subject_name renamed with the user-desired values
 #' @export
-overlay_genome_naming <- function(blast_tibble, genome_metadata_filepath) {
+overlay_genome_naming <- function(blast_results, genome_metadata_filepath) {
   
-  # Load the metadata tibble
+  # Load the metadata table
   futile.logger::flog.info("Loading genome metadata")
-  genome_metadata_tibble <- read_tibble(genome_metadata_filepath)
+  genome_metadata_table <- read_tibble(genome_metadata_filepath)
   
   # Check that the column names match expected (for the first two columns; doesn't matter after that)
   # HARD-CODED
-  genome_metadata_expected_headers <- c("subject_name", "plotting_name")
+  genome_metadata_table_expected_headers <- c("subject_name", "plotting_name")
   
-  if ( identical(colnames(genome_metadata_tibble)[1:2], genome_metadata_expected_headers) == FALSE ) {
+  if ( identical(colnames(genome_metadata_table)[1:2], genome_metadata_table_expected_headers) == FALSE ) {
     futile.logger::flog.error(glue::glue("The first two columns of the genome metadata table should be: ", 
-                                         glue::glue_collapse(genome_metadata_expected_headers, sep = ", "), 
+                                         glue::glue_collapse(genome_metadata_table_expected_headers, sep = ", "), 
                                          ". However, you provided something else: ", 
-                                         glue::glue_collapse(colnames(genome_metadata_tibble)[1:2], sep = ", "), ". Exiting..."))
+                                         glue::glue_collapse(colnames(genome_metadata_table)[1:2], sep = ", "), ". Exiting..."))
     quit(save = "no", status = 1)
   }
   
   # Reduce the metadata down to just the expected headers
-  genome_metadata_tibble <- dplyr::select(genome_metadata_tibble, genome_metadata_expected_headers)
+  genome_metadata_table <- dplyr::select(genome_metadata_table, genome_metadata_table_expected_headers)
   
-  # If entries are not identical, try filtering down to just what is in the BLAST tibble
-  if (identical(sort(unique(blast_tibble$subject_name)), 
-                sort(genome_metadata_tibble$subject_name)) == FALSE ) {
+  # If entries are not identical, try filtering down to just what is in the BLAST table
+  if (identical(sort(unique(blast_results$subject_name)), 
+                sort(genome_metadata_table$subject_name)) == FALSE ) {
     
     # Make sure that the subject_name's are contained in the metadata; if so, everything is okay
-    # The length should be zero if all tree tips are contained in the metadata tibble
-    if(length(setdiff(unique(blast_tibble$subject_name), genome_metadata_tibble$subject_name)) > 0) {
+    # The length should be zero if all tree tips are contained in the metadata table
+    if(length(setdiff(unique(blast_results$subject_name), genome_metadata_table$subject_name)) > 0) {
       
       # But if the length is > 0, it means some entries are MISSING in the metadata, a major issue
-      missing_metadata_entries <- setdiff(unique(blast_tibble$subject_name), genome_metadata_tibble$subject_name)
+      missing_metadata_entries <- setdiff(unique(blast_results$subject_name), genome_metadata_table$subject_name)
       flog.error(glue::glue("The provided gene metadata file is missing some entries in the BLAST table: '",
                             glue::glue_collapse(missing_metadata_entries, sep = ", "),
                             "'. Cannot continue -- exiting..."))
@@ -348,60 +341,60 @@ overlay_genome_naming <- function(blast_tibble, genome_metadata_filepath) {
     }
     
     # Report to the user which entries in the metadata are extra and will be ignored
-    extra_metadata_entries <- setdiff(genome_metadata_tibble$subject_name, unique(blast_tibble$subject_name))
+    extra_metadata_entries <- setdiff(genome_metadata_table$subject_name, unique(blast_results$subject_name))
     
     futile.logger::flog.info(glue::glue("Some entries in the genome metadata are missing in the BLAST table ",
                                         "and will be removed in plotting: '", 
                                         glue::glue_collapse(extra_metadata_entries, sep = ", "),  "'."))
     
-    # Filter down the metadata to match the BLAST tibble entries
-    genome_metadata_tibble <- dplyr::filter(genome_metadata_tibble, subject_name %in% unique(blast_tibble$subject_name))
+    # Filter down the metadata to match the BLAST table entries
+    genome_metadata_table <- dplyr::filter(genome_metadata_table, subject_name %in% unique(blast_results$subject_name))
     
   }
   
   # Change the subject_name to be the plotting_name in the BLAST table
-  blast_tibble$subject_name <- plyr::mapvalues(blast_tibble$subject_name, from = genome_metadata_tibble$subject_name, 
-                                               to = genome_metadata_tibble$plotting_name, warn_missing = TRUE)
+  blast_results$subject_name <- plyr::mapvalues(blast_results$subject_name, from = genome_metadata_table$subject_name, 
+                                               to = genome_metadata_table$plotting_name, warn_missing = TRUE)
   
-  return(blast_tibble)
+  return(blast_results)
   
 }
 
 
 #' Overlays user-given gene names for the heatmap x-axis
 #' 
-#' @param blast_tibble Tibble output of read_blast_tibble
+#' @param blast_results Tibble output of read_blast_results
 #' @param gene_metadata_filepath Character (length 1 vector); the filepath of the tab-separated gene metadata file.
 #' Must at least have the columns 'qseqid' and 'gene_name' as the first and second columns, respectively.
 #' @return tibble of BLAST data with qseqid renamed with the user-desired values
 #' @export
-overlay_gene_naming <- function(blast_tibble, gene_metadata_filepath) {
+overlay_gene_naming <- function(blast_results, gene_metadata_filepath) {
   
   # Load gene naming table
-  gene_metadata_tibble <- read_tibble(gene_metadata_filepath)
+  gene_metadata_table <- read_tibble(gene_metadata_filepath)
   
   # Check that the column names match expected (for the first two columns; doesn't matter after that)
   # HARD-CODED
-  gene_tibble_expected_headers <- c("qseqid", "gene_name")
+  gene_metadata_table_expected_headers <- c("qseqid", "gene_name")
   
-  if ( identical(colnames(gene_metadata_tibble)[1:2], gene_tibble_expected_headers) == FALSE ) {
+  if ( identical(colnames(gene_metadata_table)[1:2], gene_metadata_table_expected_headers) == FALSE ) {
     futile.logger::flog.error(glue::glue("The first two columns of the gene table should be: ", 
-                          glue::glue_collapse(gene_tibble_expected_headers, sep = ", "), 
+                          glue::glue_collapse(gene_metadata_table_expected_headers, sep = ", "), 
                           ". However, you provided something else: ", 
-                          glue::glue_collapse(colnames(gene_metadata_tibble)[1:2], sep = ", "), ". Exiting..."))
+                          glue::glue_collapse(colnames(gene_metadata_table)[1:2], sep = ", "), ". Exiting..."))
     quit(save = "no", status = 1)
   }
   
-  # If entries are not identical, try filtering down to just what is in the BLAST tibble
-  if (identical(sort(unique(blast_tibble$qseqid)), 
-                 sort(gene_metadata_tibble$qseqid)) == FALSE ) {
+  # If entries are not identical, try filtering down to just what is in the BLAST table
+  if (identical(sort(unique(blast_results$qseqid)), 
+                 sort(gene_metadata_table$qseqid)) == FALSE ) {
     
     # Make sure that the qseqid's are contained in the metadata; if so, everything is okay
-    # The length should be zero if all tree tips are contained in the metadata tibble
-    if(length(setdiff(unique(blast_tibble$qseqid), gene_metadata_tibble$qseqid)) > 0) {
+    # The length should be zero if all tree tips are contained in the metadata table
+    if(length(setdiff(unique(blast_results$qseqid), gene_metadata_table$qseqid)) > 0) {
       
       # But if the length is > 0, it means some entries are MISSING in the metadata, a major issue
-      missing_metadata_entries <- setdiff(unique(blast_tibble$qseqid), gene_metadata_tibble$qseqid)
+      missing_metadata_entries <- setdiff(unique(blast_results$qseqid), gene_metadata_table$qseqid)
       flog.error(glue::glue("The provided gene metadata file is missing some entries in the BLAST table: '",
                             glue::glue_collapse(missing_metadata_entries, sep = ", "),
                             "'. Cannot continue -- exiting..."))
@@ -410,9 +403,9 @@ overlay_gene_naming <- function(blast_tibble, gene_metadata_filepath) {
     }
     
     # Report to the user which entries in the metadata are extra and will be ignored
-    extra_metadata_entries <- dplyr::filter(gene_metadata_tibble,
-                                            qseqid %in% setdiff(gene_metadata_tibble$qseqid, 
-                                                                unique(blast_tibble$qseqid)))
+    extra_metadata_entries <- dplyr::filter(gene_metadata_table,
+                                            qseqid %in% setdiff(gene_metadata_table$qseqid, 
+                                                                unique(blast_results$qseqid)))
     extra_metadata_entries$user_reporting <- paste(extra_metadata_entries$qseqid, " (",
                                                    extra_metadata_entries$gene_name, ")",
                                                    sep = "")
@@ -422,36 +415,36 @@ overlay_gene_naming <- function(blast_tibble, gene_metadata_filepath) {
                                         glue::glue_collapse(extra_metadata_entries$user_reporting, 
                                                             sep = ", "),  "'."))
     
-    # Filter down the metadata to match the BLAST tibble entries
-    gene_metadata_tibble <- dplyr::filter(gene_metadata_tibble, qseqid %in% unique(blast_tibble$qseqid))
+    # Filter down the metadata to match the BLAST table entries
+    gene_metadata_table <- dplyr::filter(gene_metadata_table, qseqid %in% unique(blast_results$qseqid))
     
   }
   
-  # Change qseqid to gene_name and order according to the gene_metadata_tibble
-  blast_tibble$qseqid <- plyr::mapvalues(x = blast_tibble$qseqid, from = gene_metadata_tibble$qseqid, 
-                                        to = gene_metadata_tibble$gene_name)
-  blast_tibble$qseqid <- factor(blast_tibble$qseqid, levels = gene_metadata_tibble$gene_name, ordered = TRUE)
+  # Change qseqid to gene_name and order according to the gene_metadata_table
+  blast_results$qseqid <- plyr::mapvalues(x = blast_results$qseqid, from = gene_metadata_table$qseqid, 
+                                        to = gene_metadata_table$gene_name)
+  blast_results$qseqid <- factor(blast_results$qseqid, levels = gene_metadata_table$gene_name, ordered = TRUE)
   
-  return(blast_tibble)
+  return(blast_results)
   
 }
 
 
 #' Plots the BLAST table as a heatmap in ggplot
 #' 
-#' @param blast_tibble Tibble output of read_blast_tibble
+#' @param blast_results Tibble output of read_blast_results
 #' @return ggplot heatmap
 #' @export
-plot_blast_heatmap <- function(blast_tibble) {
+plot_blast_heatmap <- function(blast_results) {
   
   # Add NA values for missing grid values so that grid lines will appear in the final plot
   # A bit hacky
-  blast_tibble <- reshape2::dcast(blast_tibble, subject_name ~ qseqid, value.var = "pident") %>%
+  blast_results <- reshape2::dcast(blast_results, subject_name ~ qseqid, value.var = "pident") %>%
     reshape2::melt(na.rm = FALSE, id.vars = c("subject_name"), variable.name = "qseqid",
                    value.name = "pident") %>%
     tibble::as_tibble()
   
-  blast_heatmap <- ggplot2::ggplot(blast_tibble, aes(y = subject_name, x = qseqid)) +
+  blast_heatmap <- ggplot2::ggplot(blast_results, aes(y = subject_name, x = qseqid)) +
     geom_tile(aes(fill = pident), colour = "black") +
     theme_bw() +
     theme(panel.grid = element_blank(), axis.title = element_text(size = 12),
@@ -480,40 +473,40 @@ plot_blast_heatmap <- function(blast_tibble) {
 #' Must at least have the columns 'subject_name' and 'plotting_name' as the first and second columns, respectively.
 #' @param gene_metadata_filepath Character (length 1 vector); the filepath of the tab-separated gene metadata file. 
 #' Must at least have the columns 'qseqid' and 'gene_name' as the first and second columns, respectively.
-#' @return list of two: 'blast_tibble' data frame; 'blast_heatmap' ggplot object
+#' @return list of two: 'blast_results' data frame; 'blast_heatmap' ggplot object
 #' @export
-load_and_plot_blast_tibble <- function(input_blast_table_filepath, tip_order, gene_metadata_filepath,
+load_and_plot_blast_results <- function(input_blast_table_filepath, tip_order, gene_metadata_filepath,
                                        genome_metadata_filepath) {
   
   # Load the blast table
   futile.logger::flog.info("Loading the BLAST table")
-  blast_tibble <- read_blast_tibble(input_blast_table_filepath)
+  blast_results <- read_blast_results(input_blast_table_filepath)
   
   # Order the BLAST table subject names to match the ggtree
   futile.logger::flog.debug("Aligning BLAST table's subject names to match order of the ggtree")
-  blast_tibble <- order_blast_tibble_subjects(blast_tibble, tip_order)
+  blast_results <- order_blast_subjects(blast_results, tip_order)
   
   # Overlay gene names and gene naming order, if provided
   if ( is.na(genome_metadata_filepath) == FALSE ) {
     futile.logger::flog.info("Overlaying genome naming and ordering onto the BLAST table")
-    blast_tibble <- overlay_genome_naming(blast_tibble, genome_metadata_filepath)
+    blast_results <- overlay_genome_naming(blast_results, genome_metadata_filepath)
   }
   
   # Overlay gene names and gene naming order, if provided
   if ( is.na(gene_metadata_filepath) == FALSE ) {
     futile.logger::flog.info("Overlaying gene naming and ordering onto the BLAST table")
-    blast_tibble <- overlay_gene_naming(blast_tibble, gene_metadata_filepath)
+    blast_results <- overlay_gene_naming(blast_results, gene_metadata_filepath)
   }
   
   # Create the heatmap
   futile.logger::flog.info("Plotting BLAST heatmap")
-  blast_heatmap <- plot_blast_heatmap(blast_tibble)
+  blast_heatmap <- plot_blast_heatmap(blast_results)
   
   # Make output list
-  blast_tibble_list <- list(blast_tibble, blast_heatmap)
-  names(blast_tibble_list) <- c("blast_tibble", "blast_heatmap")
+  blast_results_list <- list(blast_results, blast_heatmap)
+  names(blast_results_list) <- c("blast_results", "blast_heatmap")
   
-  return(blast_tibble_list)
+  return(blast_results_list)
   
 }
 
@@ -536,7 +529,7 @@ main <- function(params) {
   futile.logger::flog.info("############################")
   
   # Convert character "NA" (from command line) into true NA
-  params <- lapply(params, convert_to_true_NA)
+  params <- lapply(params, convert_to_constant_NA)
   
   # Load and plot the tree
   phylo_tree_list <- load_and_plot_phylogenetic_tree(params$input_phylogenetic_tree_filepath, 
@@ -550,14 +543,14 @@ main <- function(params) {
 
   
   # Load and plot the BLAST table as a heatmap
-  blast_tibble_list <- load_and_plot_blast_tibble(params$input_blast_table_filepath, 
+  blast_results_list <- load_and_plot_blast_results(params$input_blast_table_filepath, 
                                                 tip_order, params$gene_metadata_filepath,
                                                 params$genome_metadata_filepath)
   
   # Combine the tree and heatmap
   # Got ggarrange ideas from https://cran.r-project.org/web/packages/egg/vignettes/Ecosystem.html (accessed Sept. 15, 2018)
   futile.logger::flog.info("Combining the ggtree and the heatmap")
-  combined_plot <- egg::ggarrange(phylo_tree_list[[2]], blast_tibble_list[[2]], 
+  combined_plot <- egg::ggarrange(phylo_tree_list[[2]], blast_results_list[[2]], 
                                   nrow = 1, widths = c(4, 8), heights = c(5), padding = unit(0, "mm"))
   # N.B., set debug = TRUE to see grid lines
   
