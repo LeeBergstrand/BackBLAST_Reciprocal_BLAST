@@ -21,7 +21,6 @@ suppressPackageStartupMessages(library(ggtree))
 library(gridExtra, warn.conflicts = FALSE)
 library(egg, warn.conflicts = FALSE)
 
-
 #' Reads a data table as a tibble with several default parameters. All parameters below are the same as read.table()
 #' 
 #' @param file Filepath to data table
@@ -33,10 +32,8 @@ library(egg, warn.conflicts = FALSE)
 read_tibble <- function(file, sep = "\t", header = TRUE, stringsAsFactors = FALSE) {
   data_table <- read.table(file, sep = sep, header = header, stringsAsFactors = stringsAsFactors) %>%
     tibble::as_tibble()
-  
   return(data_table)
 }
-
 
 #' Chooses a nice discrete colour scale of the desired length
 #' 
@@ -46,24 +43,22 @@ read_tibble <- function(file, sep = "\t", header = TRUE, stringsAsFactors = FALS
 choose_discrete_colour_scale <- function(length) {
   
   # Choose the best colour scale based on the number of entries to be plotted
-  if ( length == 2 ) {
-    colour_palette <- RColorBrewer::brewer.pal(n = 3, name = "Dark2")[c(1,2)]
-  } else if ( length <= 8 ) {
+  if (length == 2) {
+    colour_palette <- RColorBrewer::brewer.pal(n = 3, name = "Dark2")[c(1, 2)]
+  } else if (length <= 8) {
     colour_palette <- RColorBrewer::brewer.pal(n = length, name = "Dark2")
-  } else if ( length <= 12 ) {
+  } else if (length <= 12) {
     colour_palette <- RColorBrewer::brewer.pal(n = length, name = "Set3")
-  } else if ( length > 12 ) {
-    colour_palette <- scales::hue_pal(h = c(20,290))(length)
+  } else if (length > 12) {
+    colour_palette <- scales::hue_pal(h = c(20, 290))(length)
   } else {
     futile.logger::flog.error(glue::glue("Something is wrong with the provided length ('", length, 
                           "'). Is it non-numeric? Exiting..."))
-    quit(status = 1, save = "no")
+    quit(save = "no", status = 1)
   }
   
   return(colour_palette)
-  
 }
-
 
 #' Convert character "NA" (from command line) into true NA
 #' 
@@ -79,7 +74,6 @@ convert_to_constant_NA <- function(entry) {
   return(conversion)
 }
 
-
 #' Re-root a ggtree
 #' 
 #' @param phylo_tree ggtree-format tree
@@ -92,10 +86,10 @@ reroot_ggtree <- function(phylo_tree, root_name) {
   tree_data <- ggtree::ggtree(phylo_tree)$data
   
   # Check that the root_name exists
-  if ( (root_name %in% tree_data$label) == FALSE ) {
+  if ( !(root_name %in% tree_data$label) ) {
     futile.logger::flog.error(glue::glue("Could not find the root_name '", root_name, 
                           "' in the provided tree. Cannot re-root. Exiting..."))
-    quit(status = 1, save = "no")
+    quit(save = "no", status = 1)
   }
   
   # Get the ggtree ID # of the to-be root
@@ -105,7 +99,7 @@ reroot_ggtree <- function(phylo_tree, root_name) {
   if (length(tip_label_index) != 1) {
     futile.logger::flog.error(glue::glue("The provided root_name '", root_name, 
                           "' appears to have more than one associated node. Cannot re-root. Exiting..."))
-    quit(status = 1, save = "no")
+    quit(save = "no", status = 1)
   }
   
   # Re-root
@@ -113,7 +107,6 @@ reroot_ggtree <- function(phylo_tree, root_name) {
   
   return(tree_rooted)
 }
-
 
 #' Extracts tree label (bootstrap) data and applies bootstrap cutoff if desired
 #' 
@@ -131,27 +124,25 @@ generate_bootstrap_labels <- function(phylo_tree, bootstrap_cutoff) {
   
   # Set the labels to numeric (instead of character; will make non character go 'NA', like perhaps tip labels)
   # This longer lapply function tries to avoid warnings from coersion while still allowing for transparent error reporting otherwise
-  bootstrap_label_data$label <- unlist(lapply(bootstrap_label_data$label, function(x) {
-    if(suppressWarnings(as.numeric(x)) %>% is.na == FALSE) {
-      return(as.numeric(x))
+  bootstrap_label_data$label <- unlist(lapply(bootstrap_label_data$label, function(label) {
+    if( !is.na(suppressWarnings(as.numeric(label))) ) {
+      return(as.numeric(label))
     } else {
       return(NA)}
   }))
   
   # Filter out tip labels and 'NA' labels
-  bootstrap_label_data <- dplyr::filter(bootstrap_label_data, is.na(label) == FALSE & isTip == FALSE)
+  bootstrap_label_data <- dplyr::filter(bootstrap_label_data, !is.na(label) & isTip == FALSE)
   
   # Set bootstrap cutoff if desired
-  if ( is.na(bootstrap_cutoff) == FALSE ) {
+  if ( !is.na(bootstrap_cutoff) ) {
     futile.logger::flog.info(glue::glue("Applying bootstrap display cutoff of ", bootstrap_cutoff))
     bootstrap_label_data <- dplyr::filter(bootstrap_label_data, label >= bootstrap_cutoff)
   }
   
   # Return whole tree data frame (helps for mapping the labels onto the existing tree later)
   return(bootstrap_label_data)
-  
 }
-
 
 #' Makes an initial plot of the tree with overlaid bootstrap labels
 #' 
@@ -182,9 +173,7 @@ plot_ggtree <- function(phylo_tree, bootstrap_label_data) {
     # xlim etc.: https://guangchuangyu.github.io/2016/10/xlim_tree-set-x-axis-limits-for-only-tree-panel/ (accessed Sept 15, 2018)
   
   return(tree_plot)
-  
 }
-
 
 #' Master function to load and plot the phylogenetic tree
 #' 
@@ -199,7 +188,7 @@ load_and_plot_phylogenetic_tree <- function(input_phylogenetic_tree_filepath, ro
   phylo_tree <- ape::read.tree(input_phylogenetic_tree_filepath)
   
   # Optionally re-root tree
-  if ( is.na(root_name) == FALSE && root_name != "NA" ) {
+  if ( !is.na(root_name) ) {
     futile.logger::flog.info(glue::glue("Re-rooting tree to '", root_name, "'"))
     phylo_tree <- reroot_ggtree(phylo_tree, root_name)
   }
@@ -218,9 +207,7 @@ load_and_plot_phylogenetic_tree <- function(input_phylogenetic_tree_filepath, ro
   names(tree_list) <- c("phylo_tree", "phylo_tree_fig")
   
   return(tree_list)
-  
 }
-
 
 #' Loads BLAST table and checks for expected column names (HARD-CODED in function)
 #' 
@@ -236,20 +223,16 @@ read_blast_results <- function(input_blast_table_filepath) {
   expected_header_names <- c("subject_name", "qseqid", "sseqid", "pident", "evalue", "qcovhsp", "bitscore")
   
   # Confirm the columns look okay
-  if ( identical(colnames(blast_results), expected_header_names) == FALSE ) {
-    
+  if ( !identical(colnames(blast_results), expected_header_names) ) {
     futile.logger::flog.error(glue::glue("BLAST data table did not have expected column names ('", 
                           glue::glue_collapse(expected_header_names, sep = "; "), 
                           "'). Instead, had: '", glue::glue_collapse(colnames(blast_results), sep = "; "), 
                           "'. Exiting..."))
     quit(save = "no", status = 1)
-    
   }
   
   return(blast_results)
-  
 }
-
 
 #' Changes the order of the subject_name in the BLAST table to match that of the ggtree tips
 #' 
@@ -260,8 +243,7 @@ read_blast_results <- function(input_blast_table_filepath) {
 order_blast_subjects <- function(blast_results, tip_order) {
   
   # If entries are not identical, try filtering down to just what is in the phylogenetic tree
-  if ( identical(sort(unique(blast_results$subject_name)), 
-                 sort(tip_order)) == FALSE ) {
+  if ( !identical(sort(unique(blast_results$subject_name)), sort(tip_order)) ) {
     
     # Make sure that the tree tips are contained in the blast table; if so, everything is okay
     # The length should be zero if all tree tips are contained in the blast table
@@ -273,7 +255,6 @@ order_blast_subjects <- function(blast_results, tip_order) {
                             glue::glue_collapse(missing_blast_table_entries, sep = ", "),
                             "'. Cannot continue -- exiting..."))
       quit(save = "no", status = 1)
-      
     }
     
     # Report to the user which entries in the BLAST table are to be ignored
@@ -285,7 +266,6 @@ order_blast_subjects <- function(blast_results, tip_order) {
     
     # Filter down the BLAST table to have the same subject_name's as the tree
     blast_results <- dplyr::filter(blast_results, subject_name %in% tip_order)
-    
   }
   
   # Make subjects the same order as in the tree
@@ -293,7 +273,6 @@ order_blast_subjects <- function(blast_results, tip_order) {
   
   return(blast_results)
 }
-
 
 #' Overlays user-given genome names for the heatmap y-axis
 #' 
@@ -312,7 +291,7 @@ overlay_genome_naming <- function(blast_results, genome_metadata_filepath) {
   # HARD-CODED
   genome_metadata_table_expected_headers <- c("subject_name", "plotting_name")
   
-  if ( identical(colnames(genome_metadata_table)[1:2], genome_metadata_table_expected_headers) == FALSE ) {
+  if ( !identical(colnames(genome_metadata_table)[1:2], genome_metadata_table_expected_headers) ) {
     futile.logger::flog.error(glue::glue("The first two columns of the genome metadata table should be: ", 
                                          glue::glue_collapse(genome_metadata_table_expected_headers, sep = ", "), 
                                          ". However, you provided something else: ", 
@@ -324,20 +303,17 @@ overlay_genome_naming <- function(blast_results, genome_metadata_filepath) {
   genome_metadata_table <- dplyr::select(genome_metadata_table, genome_metadata_table_expected_headers)
   
   # If entries are not identical, try filtering down to just what is in the BLAST table
-  if (identical(sort(unique(blast_results$subject_name)), 
-                sort(genome_metadata_table$subject_name)) == FALSE ) {
+  if ( !identical(sort(unique(blast_results$subject_name)), sort(genome_metadata_table$subject_name)) ) {
     
     # Make sure that the subject_name's are contained in the metadata; if so, everything is okay
     # The length should be zero if all tree tips are contained in the metadata table
     if(length(setdiff(unique(blast_results$subject_name), genome_metadata_table$subject_name)) > 0) {
-      
       # But if the length is > 0, it means some entries are MISSING in the metadata, a major issue
       missing_metadata_entries <- setdiff(unique(blast_results$subject_name), genome_metadata_table$subject_name)
       flog.error(glue::glue("The provided gene metadata file is missing some entries in the BLAST table: '",
                             glue::glue_collapse(missing_metadata_entries, sep = ", "),
                             "'. Cannot continue -- exiting..."))
       quit(save = "no", status = 1)
-      
     }
     
     # Report to the user which entries in the metadata are extra and will be ignored
@@ -349,7 +325,6 @@ overlay_genome_naming <- function(blast_results, genome_metadata_filepath) {
     
     # Filter down the metadata to match the BLAST table entries
     genome_metadata_table <- dplyr::filter(genome_metadata_table, subject_name %in% unique(blast_results$subject_name))
-    
   }
   
   # Change the subject_name to be the plotting_name in the BLAST table
@@ -357,9 +332,7 @@ overlay_genome_naming <- function(blast_results, genome_metadata_filepath) {
                                                to = genome_metadata_table$plotting_name, warn_missing = TRUE)
   
   return(blast_results)
-  
 }
-
 
 #' Overlays user-given gene names for the heatmap x-axis
 #' 
@@ -377,7 +350,7 @@ overlay_gene_naming <- function(blast_results, gene_metadata_filepath) {
   # HARD-CODED
   gene_metadata_table_expected_headers <- c("qseqid", "gene_name")
   
-  if ( identical(colnames(gene_metadata_table)[1:2], gene_metadata_table_expected_headers) == FALSE ) {
+  if ( !identical(colnames(gene_metadata_table)[1:2], gene_metadata_table_expected_headers) ) {
     futile.logger::flog.error(glue::glue("The first two columns of the gene table should be: ", 
                           glue::glue_collapse(gene_metadata_table_expected_headers, sep = ", "), 
                           ". However, you provided something else: ", 
@@ -386,8 +359,7 @@ overlay_gene_naming <- function(blast_results, gene_metadata_filepath) {
   }
   
   # If entries are not identical, try filtering down to just what is in the BLAST table
-  if (identical(sort(unique(blast_results$qseqid)), 
-                 sort(gene_metadata_table$qseqid)) == FALSE ) {
+  if ( !identical(sort(unique(blast_results$qseqid)), sort(gene_metadata_table$qseqid)) ) {
     
     # Make sure that the qseqid's are contained in the metadata; if so, everything is okay
     # The length should be zero if all tree tips are contained in the metadata table
@@ -399,7 +371,6 @@ overlay_gene_naming <- function(blast_results, gene_metadata_filepath) {
                             glue::glue_collapse(missing_metadata_entries, sep = ", "),
                             "'. Cannot continue -- exiting..."))
       quit(save = "no", status = 1)
-      
     }
     
     # Report to the user which entries in the metadata are extra and will be ignored
@@ -417,7 +388,6 @@ overlay_gene_naming <- function(blast_results, gene_metadata_filepath) {
     
     # Filter down the metadata to match the BLAST table entries
     gene_metadata_table <- dplyr::filter(gene_metadata_table, qseqid %in% unique(blast_results$qseqid))
-    
   }
   
   # Change qseqid to gene_name and order according to the gene_metadata_table
@@ -426,9 +396,7 @@ overlay_gene_naming <- function(blast_results, gene_metadata_filepath) {
   blast_results$qseqid <- factor(blast_results$qseqid, levels = gene_metadata_table$gene_name, ordered = TRUE)
   
   return(blast_results)
-  
 }
-
 
 #' Plots the BLAST table as a heatmap in ggplot
 #' 
@@ -438,7 +406,7 @@ overlay_gene_naming <- function(blast_results, gene_metadata_filepath) {
 plot_blast_heatmap <- function(blast_results) {
   
   # Add NA values for missing grid values so that grid lines will appear in the final plot
-  # A bit hacky
+  # TODO - A bit hacky
   blast_results <- reshape2::dcast(blast_results, subject_name ~ qseqid, value.var = "pident") %>%
     reshape2::melt(na.rm = FALSE, id.vars = c("subject_name"), variable.name = "qseqid",
                    value.name = "pident") %>%
@@ -464,7 +432,6 @@ plot_blast_heatmap <- function(blast_results) {
   return(blast_heatmap)
 }
 
-
 #' Master function to load and plot the BLAST table metadata to produce a heatmap
 #' 
 #' @param input_blast_table_filepath Character (length 1 vector); the filepath to the BLAST table (comma-separated)
@@ -477,7 +444,6 @@ plot_blast_heatmap <- function(blast_results) {
 #' @export
 load_and_plot_blast_results <- function(input_blast_table_filepath, tip_order, gene_metadata_filepath,
                                        genome_metadata_filepath) {
-  
   # Load the blast table
   futile.logger::flog.info("Loading the BLAST table")
   blast_results <- read_blast_results(input_blast_table_filepath)
@@ -487,13 +453,13 @@ load_and_plot_blast_results <- function(input_blast_table_filepath, tip_order, g
   blast_results <- order_blast_subjects(blast_results, tip_order)
   
   # Overlay gene names and gene naming order, if provided
-  if ( is.na(genome_metadata_filepath) == FALSE ) {
+  if ( !is.na(genome_metadata_filepath) ) {
     futile.logger::flog.info("Overlaying genome naming and ordering onto the BLAST table")
     blast_results <- overlay_genome_naming(blast_results, genome_metadata_filepath)
   }
   
   # Overlay gene names and gene naming order, if provided
-  if ( is.na(gene_metadata_filepath) == FALSE ) {
+  if ( !is.na(gene_metadata_filepath) ) {
     futile.logger::flog.info("Overlaying gene naming and ordering onto the BLAST table")
     blast_results <- overlay_gene_naming(blast_results, gene_metadata_filepath)
   }
@@ -507,9 +473,7 @@ load_and_plot_blast_results <- function(input_blast_table_filepath, tip_order, g
   names(blast_results_list) <- c("blast_results", "blast_heatmap")
   
   return(blast_results_list)
-  
 }
-
 
 main <- function(params) {
   # Startup messages
@@ -541,7 +505,6 @@ main <- function(params) {
   tip_order <- dplyr::filter(ggtree::ggtree(phylo_tree_list[[1]])$data, isTip == TRUE)
   tip_order <- tip_order[order(tip_order$y, decreasing = TRUE),]$label # plotting_name
 
-  
   # Load and plot the BLAST table as a heatmap
   blast_results_list <- load_and_plot_blast_results(params$input_blast_table_filepath, 
                                                 tip_order, params$gene_metadata_filepath,
@@ -552,7 +515,6 @@ main <- function(params) {
   futile.logger::flog.info("Combining the ggtree and the heatmap")
   combined_plot <- egg::ggarrange(phylo_tree_list[[2]], blast_results_list[[2]], 
                                   nrow = 1, widths = c(4, 8), heights = c(5), padding = unit(0, "mm"))
-  # N.B., set debug = TRUE to see grid lines
   
   # Print a PDF of the combined plot
   # N.B., dimensions need to be input in inches (25.4 mm per inch)
@@ -563,11 +525,9 @@ main <- function(params) {
   dev.off()
   
   futile.logger::flog.info("generate_BackBLAST_heatmap.R: done.")
-  
 }
 
-if (interactive() == FALSE) {
-  
+if ( !interactive() ) {
   parser <- argparser::arg_parser(
       description = glue::glue("generate_BackBLAST_heatmap.R: Binds a phylogenetic tree to a BLAST table heatmap.
                                 Copyright Lee Bergstrand and Jackson M. Tsuji, 2019."))
@@ -606,6 +566,4 @@ if (interactive() == FALSE) {
   params <- argparser::parse_args(parser)
   
   main(params)
-  
 }
-
