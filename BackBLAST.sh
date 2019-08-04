@@ -209,6 +209,7 @@ function run_snakemake() {
   local jobs
   jobs=$4
 
+  echo "[ $(date -u) ]: Command: snakemake --snakefile ${snakefile} --configfile ${config_file} --directory ${run_directory} --jobs ${jobs} --use-conda --reason"
   snakemake --snakefile ${snakefile} --configfile ${config_file} --directory ${run_directory} --jobs ${jobs} --use-conda --reason
 }
 
@@ -228,7 +229,7 @@ function perform_setup() {
   if [[ $# -eq 0 ]]; then
     echo "setup: No arguments provided. Please run 'setup -h' or 'setup --help' for help. Exiting..." >&2
     exit 1
-  elif [[ $1 = "-h" -o $1 = "--help" ]]; then
+  elif [[ $1 = "-h" ]] || [[ $1 = "--help" ]]; then
 
     # Print help statement
     printf "${SCRIPT_NAME} setup: module for setting up a BackBLAST run.\n"
@@ -346,7 +347,7 @@ function perform_run() {
   if [[ $# -eq 0 ]]; then
     echo "run: No arguments provided. Please run 'setup -h' or 'setup --help' for help. Exiting..." >&2
     exit 1
-  elif [[ $1 = "-h" -o $1 = "--help" ]]; then
+  elif [[ $1 = "-h" ]] || [[ $1 = "--help" ]]; then
 
     # Print help statement
     printf "${SCRIPT_NAME} run: module for initializing a BackBLAST run.\n"
@@ -394,10 +395,16 @@ function perform_run() {
   done
 
   # Set positional arguments
+  local original_arguments
+  original_arguments=${@} # save for reporting later
+  shift $((OPTIND - 1)) # shift to avoid flags when assigning positional arguments
   local config_filepath
   config_filepath=$1 # config.yaml
   local run_directory
   run_directory=$2
+
+  echo "[ $(date -u) ]: Running ${SCRIPT_NAME} in run mode" >&2
+  echo "[ $(date -u) ]: Command run: ${SCRIPT_NAME} run ${original_arguments}" >&2
 
   # Start the run
   run_snakemake ${snakefile} ${config_filepath} ${run_directory} ${jobs}
@@ -421,7 +428,7 @@ function perform_auto() {
   if [[ $# -eq 0 ]]; then
     echo "auto: No arguments provided. Please run 'auto -h' or 'auto --help' for help. Exiting..." >&2
     exit 1
-  elif [[ $1 = "-h" -o $1 = "--help" ]]; then
+  elif [[ $1 = "-h" ]] || [[ $1 = "--help" ]]; then
 
     # Print help statement
     printf "${SCRIPT_NAME} auto: module for setting up a BackBLAST run AND starting with some defaults.\n"
@@ -548,7 +555,7 @@ function main() {
   if [[ $# -eq 0 ]]; then
     echo "No arguments provided. Please run '-h' or '--help' to see help. Exiting..." >&2
     exit 1
-  elif [[ $1 = "-h" -o $1 = "--help" ]]; then
+  elif [[ $1 = "-h" ]] || [[ $1 = "--help" ]]; then
 
     # Help statement
     printf "${SCRIPT_NAME}: pipeline to search for and visualize gene homologs across multiple genomes.\n"

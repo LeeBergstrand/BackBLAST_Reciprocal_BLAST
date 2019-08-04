@@ -39,4 +39,3 @@ query_genome_orfs: /path/to/query.faa
   # These should be ORF predictions from the genomes of the organisms of interest.
   # If you want to plot the query genome as well, then include it here.
 subjects:
-
