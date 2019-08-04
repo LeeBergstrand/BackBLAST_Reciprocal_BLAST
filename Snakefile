@@ -67,7 +67,7 @@ rule create_blank_results:
     params:
         query_genes=config.get("query_genes")
     shell:
-        "CreateBlankResults.py {input} {params.query_genes} {output} > {log} 2>&1"
+        "CreateBlankResults.py -i {input} -q {params.query_genes} -o {output} > {log} 2>&1"
 
 
 # Combine the BLAST tables into a single table, and add a column for sample ID
@@ -86,10 +86,59 @@ rule combine_blast_tables:
         "CombineBlastTables.R {input} {output} > {log} 2>&1"
 
 
+# Generate phylogenetic tree if desired by the user
+if config.get("phylogenetic_tree_newick") == "subjects":
+
+    # Makes a list of filepaths to the FAA genome files for use by GToTree
+    # Part 1 - generate for each sample
+    rule generate_phylogenetic_tree_input_individual:
+        input:
+            lambda wildcards: config["subjects"][wildcards.subject]
+        output:
+            temp("phylogeny/input/{subject}.list")
+        threads: 1
+        shell:
+            "echo {input} > {output}"
+
+    # Part 2 of the above rule
+    # TODO - check {output} does not already exist before run start?
+    # TODO - how to merge parts 1 and 2 together?
+    rule generate_phylogenetic_tree_input_grouped:
+        input:
+            blast_tables=expand("phylogeny/input/{subject}.list", subject=config.get("subjects"))
+        output:
+            "phylogeny/input/input_genomes_faa.list"
+        threads: 1
+        shell:
+            "cat {input} >> {output}"
+
+    # Run GToTree
+    # TODO - expose more params to the user
+    rule generate_phylogenetic_tree:
+        input:
+            "phylogeny/input/input_genomes_faa.list"
+        output:
+            "phylogeny/iqtree_out.treefile"
+        conda:
+            "envs/gtotree.yaml"
+        log:
+            "logs/phylogeny/gtotree.log"
+        benchmark:
+            "benchmarks/gtotree.txt"
+        threads: config.get("threads", 1)
+        params:
+            phylogenetic_model = "Universal_Hug_et_al.hmm"
+        shell:
+            "GToTree -A {input} -H {params.phylogenetic_model} -o phylogeny/gtotree -T IQ-TREE -c 0.2 -G 0.5 "
+                "-n {threads} -j {threads} > {log} 2>&1 && "
+            "ln phylogeny/gtotree/iqtree_out/iqtree_out.treefile phylogeny/iqtree_out.treefile"
+
+
 # Generate the final heatmap
 rule generate_heatmap:
     input:
-        "combine_blast_tables/blast_tables_combined.csv"
+        blast_table = "combine_blast_tables/blast_tables_combined.csv",
+        tree_file = "phylogeny/iqtree_out.treefile" if config.get("phylogenetic_tree_newick") == "subjects" else config.get("phylogenetic_tree_newick")
     output:
         "generate_heatmap/BackBLAST_heatmap.pdf"
     conda:
@@ -99,15 +148,11 @@ rule generate_heatmap:
     benchmark:
         "benchmarks/generate_heatmap.txt"
     params:
-        tree_file=config.get("phylogenetic_tree_newick"),
-        tree_metadata=config.get("tree_metadata_tsv"),
-        tree_decorator_colname=config.get("tree_colouring_column_name"),
-        plot_custom_names=config.get("plotting_name_column"),
-        gene_naming=config.get("gene_naming_tsv"),
-        bootstrap_cutoff=config.get("bootstrap_cutoff"),
-        root_name=config.get("root_name")
+        genome_metadata = config.get("genome_metadata_tsv", "NA"),
+        gene_metadata = config.get("gene_metadata_tsv", "NA"),
+        bootstrap_cutoff = config.get("bootstrap_cutoff", "NA"),
+        root_name = config.get("root_name", "NA")
     shell:
-        "generate_BackBLAST_heatmap.R -i {params.tree_file} -j {input} -o {output} -m {params.tree_metadata} "
-            "-d {params.tree_decorator_colname} -n {params.plot_custom_names} -g {params.gene_naming} "
-            "-b {params.bootstrap_cutoff} -r {params.root_name} 2> {log}"
+        "generate_BackBLAST_heatmap.R -m {params.genome_metadata} -g {params.gene_metadata} "
+            "-b {params.bootstrap_cutoff} -r {params.root_name} {input.tree_file} {input.blast_table} {output} 2>&1 | tee {log}"
 
