@@ -4,6 +4,11 @@
 # Plots a newick treefile and BLAST table together as a phylogenetic tree and heatmap
 
 # Load libraries
+# Note: warn.conflicts: Normally, when a library is loaded that has a function with identical 
+  # name to another function (e.g., setdiff() in dplyr), a warning is given during package 
+  # load. The warnings are disabled here to prevent excessive messages when the script is run.
+  # Long-term, once possible to switch to R 3.6.0, options(conflicts.policy(list(warn = FALSE)))
+  # can be used.
 library(argparser)
 library(futile.logger)
 library(glue, warn.conflicts = FALSE)
