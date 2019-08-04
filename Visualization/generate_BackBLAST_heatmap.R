@@ -72,9 +72,11 @@ choose_discrete_colour_scale <- function(length) {
 #' @export
 convert_to_constant_NA <- function(entry) {
   conversion <- entry
-  if (entry == "NA") {
-    futile.logger::flog.debug("Converting 'NA' input to constant NA value")
-    conversion <- NA
+  if (!is.na(entry)) {
+    if (entry == "NA") {
+      futile.logger::flog.debug("Converting 'NA' input to constant NA value")
+      conversion <- NA
+    }
   }
   return(conversion)
 }
