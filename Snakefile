@@ -32,7 +32,8 @@ rule run_reciprocal_blast:
         pident = config.get("minimum_percent_identity")
     shell:
         "BackBLAST.py --gene_cluster {params.query_genes} --query_proteome {params.query_genome_orfs} --subject_proteome {input} "
-            "--e_value {params.eval} --min_ident {params.pident} --output_file {output} > {log} 2>&1"
+            "--e_value {params.eval} --min_ident {params.pident} --output_file {output} > {log} 2>&1 && "
+        "rm tempQuery.faa"
 
 # Remove duplicate BLAST hits for each BLAST table
 rule remove_duplicates:
@@ -160,5 +161,6 @@ rule generate_heatmap:
     shell:
         "generate_BackBLAST_heatmap.R -m {params.genome_metadata} -g {params.gene_metadata} "
             "-b {params.bootstrap_cutoff} -r {params.root_name} -w {params.plot_width} -z {params.plot_height} "
-            "{input.tree_file} {input.blast_table} {output} 2>&1 | tee {log}"
+            "{input.tree_file} {input.blast_table} {output} 2>&1 | tee {log} && "
+        "rm Rplots.pdf"
 
