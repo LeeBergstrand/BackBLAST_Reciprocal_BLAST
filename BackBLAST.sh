@@ -37,7 +37,7 @@ function add_subjects_to_config_file() {
 
     subject_faa_basename=${subject_faa_file%.faa}
     subject_faa_basename=${subject_faa_basename##*/}
-    echo "  ${subject_faa_basename}: ${subject_faa_file}" >> ${output_config_filepath}
+    echo "  ${subject_faa_basename}: '${subject_faa_file}'" >> ${output_config_filepath}
 
   done
 }
@@ -175,14 +175,14 @@ function make_run_templates() {
   # Add other variables to config file
   # NOTE: I'm using the '|' symbol as the sed separator because some of the variables contain forward slashes (which is the normal separator)
   # TODO - is there a more elegant way of doing this?
-  sed -i "s|^query_genes: .*|query_genes: $(realpath ${query_faa_filepath})|" ${output_config_filepath}
-  sed -i "s|^query_genome_orfs: .*|query_genome_orfs: $(realpath ${query_faa_genome_filepath})|" ${output_config_filepath}
+  sed -i "s|^query_genes: .*|query_genes: '$(realpath ${query_faa_filepath})'|" ${output_config_filepath}
+  sed -i "s|^query_genome_orfs: .*|query_genome_orfs: '$(realpath ${query_faa_genome_filepath})'|" ${output_config_filepath}
   sed -i "s|^threads: .*|threads: ${threads}|" ${output_config_filepath}
-  sed -i "s|^phylogenetic_tree_newick: .*|phylogenetic_tree_newick: ${phylogenetic_tree_newick}|" ${output_config_filepath}
-  sed -i "s|^genome_metadata_tsv: .*|genome_metadata_tsv: $(realpath ${genome_metadata_tsv})|" ${output_config_filepath}
-  sed -i "s|^gene_metadata_tsv: .*|gene_metadata_tsv: $(realpath ${gene_metadata_tsv})|" ${output_config_filepath}
+  sed -i "s|^phylogenetic_tree_newick: .*|phylogenetic_tree_newick: '${phylogenetic_tree_newick}'|" ${output_config_filepath}
+  sed -i "s|^genome_metadata_tsv: .*|genome_metadata_tsv: '$(realpath ${genome_metadata_tsv})'|" ${output_config_filepath}
+  sed -i "s|^gene_metadata_tsv: .*|gene_metadata_tsv: '$(realpath ${gene_metadata_tsv})'|" ${output_config_filepath}
   sed -i "s|^bootstrap_cutoff: .*|bootstrap_cutoff: ${bootstrap_cutoff}|" ${output_config_filepath}
-  sed -i "s|^root_name: .*|root_name: ${root_name}|" ${output_config_filepath}
+  sed -i "s|^root_name: .*|root_name: '${root_name}'|" ${output_config_filepath}
   sed -i "s|^e_value_cutoff: .*|e_value_cutoff: ${evalue}|" ${output_config_filepath}
   sed -i "s|^minimum_percent_identity: .*|minimum_percent_identity: ${pident}|" ${output_config_filepath}
 }
@@ -209,8 +209,8 @@ function run_snakemake() {
   local jobs
   jobs=$4
 
-  echo "[ $(date -u) ]: Command: snakemake --snakefile ${snakefile} --configfile ${config_file} --directory ${run_directory} --jobs ${jobs} --use-conda --reason"
-  snakemake --snakefile ${snakefile} --configfile ${config_file} --directory ${run_directory} --jobs ${jobs} --use-conda --reason
+  echo "[ $(date -u) ]: Command: snakemake --snakefile ${snakefile} --configfile ${config_file} --directory ${run_directory} --jobs ${jobs} --use-conda --reason --printshellcmds"
+  snakemake --snakefile ${snakefile} --configfile ${config_file} --directory ${run_directory} --jobs ${jobs} --use-conda --reason --printshellcmds
 }
 
 #######################################

@@ -120,8 +120,8 @@ if config.get("phylogenetic_tree_newick") == "subjects":
             "benchmarks/gtotree.txt"
         threads: config.get("threads", 1)
         params:
-            phylogenetic_model = config.get("gtotree_phylogenetic_model", "Universal_Hug_et_al.hmm")
-            sequence_length_threshold = config.get("gtotree_sequence_length_threshold", "0.2")
+            phylogenetic_model = config.get("gtotree_phylogenetic_model", "Universal_Hug_et_al.hmm"),
+            sequence_length_threshold = config.get("gtotree_sequence_length_threshold", "0.2"),
             minimum_hit_fraction = config.get("gtotree_minimum_hit_fraction", "0.5")
         shell:
             "GToTree -A {input} -H {params.phylogenetic_model} -o phylogeny/gtotree -T IQ-TREE "
@@ -146,8 +146,8 @@ rule generate_heatmap:
         genome_metadata = config.get("genome_metadata_tsv", "NA"),
         gene_metadata = config.get("gene_metadata_tsv", "NA"),
         bootstrap_cutoff = config.get("bootstrap_cutoff", "NA"),
-        root_name = config.get("root_name", "NA")
-        plot_width = config.get("plot_width_mm", 400)
+        root_name = config.get("root_name", "NA"),
+        plot_width = config.get("plot_width_mm", 400),
         plot_height = config.get("plot_height_mm", 200)
     shell:
         "generate_BackBLAST_heatmap.R -m {params.genome_metadata} -g {params.gene_metadata} "
