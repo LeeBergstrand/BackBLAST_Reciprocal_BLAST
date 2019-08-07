@@ -1,29 +1,30 @@
 Warning message:
 package ‘dplyr’ was built under R version 3.5.2 
-INFO [2019-08-07 03:29:27] Running generate_BackBLAST_heatmap.R
-INFO [2019-08-07 03:29:27] ######### Settings #########
-INFO [2019-08-07 03:29:27] Input phylogenetic tree filepath (ignored if 'NA'): ../Example_inputs/riboprotein_tree.treefile
-INFO [2019-08-07 03:29:27] Input BLAST table filepath: combine_blast_tables/blast_tables_combined.csv
-INFO [2019-08-07 03:29:27] Output PDF filepath: generate_heatmap/BackBLAST_heatmap.pdf
-INFO [2019-08-07 03:29:27] Bootstrap display cutoff (%; ignored if 'NA'): 50
-INFO [2019-08-07 03:29:27] Root name (ignored if 'NA'): Ignavibacterium_album_JCM_16511_outgroup
-INFO [2019-08-07 03:29:27] Input genome metadata filepath (ignored if 'NA'): ../Example_inputs/genome_metadata.tsv
-INFO [2019-08-07 03:29:27] Input gene metadata filepath (ignored if 'NA'): ../Example_inputs/gene_metadata.tsv
-INFO [2019-08-07 03:29:27] Plot width (mm): 250
-INFO [2019-08-07 03:29:27] Plot height (mm): 100
-INFO [2019-08-07 03:29:27] ############################
-INFO [2019-08-07 03:29:27] Reading input phylogenetic tree
-INFO [2019-08-07 03:29:27] Re-rooting tree to 'Ignavibacterium_album_JCM_16511_outgroup'
-INFO [2019-08-07 03:29:27] Applying bootstrap display cutoff of 50
-INFO [2019-08-07 03:29:27] Generating ggtree plot
-INFO [2019-08-07 03:29:27] Loading the BLAST table
-INFO [2019-08-07 03:29:27] Overlaying genome naming and ordering onto the BLAST table
-INFO [2019-08-07 03:29:27] Loading genome metadata
-INFO [2019-08-07 03:29:27] Some entries in the genome metadata are missing in the BLAST table and will be removed in plotting: 'Cba_parvum_NCIB_8327, Che_thalassium_ATCC_35110, Chl_chlorochromatii_CaD3, Chl_clathratiforme_BU_1, Chl_limicola_DSM_245, Chl_phaeobacteroides_BS1, Chl_phaeobacteroides_DSM_266, Chl_phaeovibrioides_DSM_265, Chl_tepidum_TLS, L227_2013_bin22, L227_2013_bin55, L227_2013_bin56, L442_2011_2014_bin64, Ptc_aestuarii_DSM_271'.
-INFO [2019-08-07 03:29:27] Overlaying gene naming and ordering onto the BLAST table
-INFO [2019-08-07 03:29:27] Plotting BLAST heatmap
-INFO [2019-08-07 03:29:27] Combining the ggtree and the heatmap
-INFO [2019-08-07 03:29:28] Saving to PDF
-INFO [2019-08-07 03:29:28] generate_BackBLAST_heatmap.R: done.
+INFO [2019-08-07 03:41:05] Running generate_BackBLAST_heatmap.R
+INFO [2019-08-07 03:41:05] ######### Settings #########
+INFO [2019-08-07 03:41:05] Input phylogenetic tree filepath (ignored if 'NA'): ../Example_inputs/riboprotein_tree.treefile
+INFO [2019-08-07 03:41:05] Input BLAST table filepath: combine_blast_tables/blast_tables_combined.csv
+INFO [2019-08-07 03:41:05] Output PDF filepath: generate_heatmap/BackBLAST_heatmap.pdf
+INFO [2019-08-07 03:41:05] Bootstrap display cutoff (%; ignored if 'NA'): 50
+INFO [2019-08-07 03:41:05] Root name (ignored if 'NA'): Ignavibacterium_album_JCM_16511_outgroup
+INFO [2019-08-07 03:41:05] Input genome metadata filepath (ignored if 'NA'): ../Example_inputs/genome_metadata.tsv
+INFO [2019-08-07 03:41:05] Input gene metadata filepath (ignored if 'NA'): ../Example_inputs/gene_metadata.tsv
+INFO [2019-08-07 03:41:05] Plot width (mm): 250
+INFO [2019-08-07 03:41:05] Plot height (mm): 100
+INFO [2019-08-07 03:41:05] ############################
+INFO [2019-08-07 03:41:05] Reading input phylogenetic tree
+INFO [2019-08-07 03:41:05] Re-rooting tree to 'Ignavibacterium_album_JCM_16511_outgroup'
+INFO [2019-08-07 03:41:06] Applying bootstrap display cutoff of 50
+INFO [2019-08-07 03:41:06] Generating ggtree plot
+INFO [2019-08-07 03:41:06] Loading the BLAST table
+INFO [2019-08-07 03:41:06] Overlaying genome naming and ordering onto the BLAST table
+INFO [2019-08-07 03:41:06] Loading genome metadata
+INFO [2019-08-07 03:41:06] Some entries in the genome metadata are missing in the BLAST table and will be removed in plotting: 'Cba_parvum_NCIB_8327, Che_thalassium_ATCC_35110, Chl_chlorochromatii_CaD3, Chl_clathratiforme_BU_1, Chl_limicola_DSM_245, Chl_phaeobacteroides_BS1, Chl_phaeobacteroides_DSM_266, Chl_phaeovibrioides_DSM_265, Chl_tepidum_TLS, L227_2013_bin22, L227_2013_bin55, L227_2013_bin56, L442_2011_2014_bin64, Ptc_aestuarii_DSM_271'.
+INFO [2019-08-07 03:41:06] Overlaying gene naming and ordering onto the BLAST table
+WARN [2019-08-07 03:41:06] The provided gene metadata file is missing some entries in the BLAST table: 'WP_006367389.1'. These entries will be REMOVED from the BLAST table when plotting.
+INFO [2019-08-07 03:41:06] Plotting BLAST heatmap
+INFO [2019-08-07 03:41:06] Combining the ggtree and the heatmap
+INFO [2019-08-07 03:41:06] Saving to PDF
+INFO [2019-08-07 03:41:07] generate_BackBLAST_heatmap.R: done.
 Warning message:
 Duplicated aesthetics after name standardisation: size 
