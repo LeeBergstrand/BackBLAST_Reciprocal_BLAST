@@ -532,7 +532,7 @@ main <- function(params) {
     # Got ggarrange ideas from https://cran.r-project.org/web/packages/egg/vignettes/Ecosystem.html (accessed Sept. 15, 2018)
     futile.logger::flog.info("Combining the ggtree and the heatmap")
     combined_plot <- egg::ggarrange(phylo_tree_list[[2]], blast_results_list[[2]], 
-                                    nrow = 1, widths = c(4, 8), heights = c(5), padding = unit(0, "mm"))
+                                    nrow = 1, widths = c(1, 1.5), heights = c(1), padding = unit(0, "mm"))
     
     # Print a PDF of the combined plot
     # N.B., dimensions need to be input in inches (25.4 mm per inch)
