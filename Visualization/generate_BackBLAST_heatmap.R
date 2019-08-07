@@ -456,7 +456,7 @@ load_and_plot_blast_results <- function(input_blast_table_filepath, tip_order = 
   blast_results <- read_blast_results(input_blast_table_filepath)
   
   # Order the BLAST table subject names to match the ggtree
-  if (!is.na(tip_order)) {
+  if (!is.na(tip_order[1])) {
     futile.logger::flog.debug("Aligning BLAST table's subject names to match order of the ggtree")
     blast_results <- order_blast_subjects(blast_results, tip_order)
   } else {
