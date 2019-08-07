@@ -194,6 +194,8 @@ function make_run_templates() {
 #   config_file: path to the config.yaml file containing settings for the run
 #   run_directory: path to the directory where output files should be written
 #   jobs: maximum number of parallel jobs for the snakemake scheduler to run
+#   conda: character value of either 'use_conda' or 'no_conda' to specify whether each job should be run in its own conda environment.
+#          If 'no_conda' is specified, then all dependencies need to be installed on your machine (e.g., in a central conda env).
 # Returns:
 #   output files from the BackBLAST pipeline, in the run_directory
 #######################################
@@ -207,9 +209,19 @@ function run_snakemake() {
   run_directory=$3
   local jobs
   jobs=$4
+  local conda
+  conda=$5
 
-  echo "[ $(date -u) ]: Command: snakemake --snakefile ${snakefile} --configfile ${config_file} --directory ${run_directory} --jobs ${jobs} --use-conda --reason --printshellcmds"
-  snakemake --snakefile ${snakefile} --configfile ${config_file} --directory ${run_directory} --jobs ${jobs} --use-conda --reason --printshellcmds
+  if [[ ${conda} == "use_conda" ]]; then
+    echo "[ $(date -u) ]: Command: snakemake --snakefile ${snakefile} --configfile ${config_file} --directory ${run_directory} --jobs ${jobs} --reason --printshellcmds --use-conda"
+    snakemake --snakefile ${snakefile} --configfile ${config_file} --directory ${run_directory} --jobs ${jobs} --reason --printshellcmds --use-conda
+  elif  [[ ${conda} == "no_conda" ]]; then
+    echo "[ $(date -u) ]: Command: snakemake --snakefile ${snakefile} --configfile ${config_file} --directory ${run_directory} --jobs ${jobs} --reason --printshellcmds"
+    snakemake --snakefile ${snakefile} --configfile ${config_file} --directory ${run_directory} --jobs ${jobs} --reason --printshellcmds
+  else
+    echo "[ $(date -u) ]: 'conda' variable must be either 'use_conda' or 'no_conda'; instead, '${conda}' was specified. Exiting..."
+    exit 1
+  fi
 }
 
 #######################################
@@ -360,7 +372,11 @@ function perform_run() {
     printf "Optional arguments:\n"
     printf "   -j jobs: Number of processing threads available for the run [default: 1]\n\n"
     printf "Advanced parameters:\n"
-    printf "   -S snakefile: Path to the Snakefile used to run BackBLAST [default: ${SNAKEFILE}]\n\n"
+    printf "   -S snakefile: Path to the Snakefile used to run BackBLAST [default: ${SNAKEFILE}]\n"
+    printf "   -C conda: specify either 'use_conda' or 'no_conda' for whether or not each job should be run in \n"
+    printf "             its own conda env [default: no_conda]\n"
+    printf "             If 'no_conda' is run, then all dependencies need to be installed in the main environment\n"
+    printf "             where BackBLAST is running. This is handled for you by default when you install BackBLAST.\n\n"
     printf "Note: Currently does NOT support whitespaces in any input variables.\n\n"
 
     # Exit
@@ -372,16 +388,21 @@ function perform_run() {
   jobs=1
   local snakefile
   snakefile=${SNAKEFILE}
+  local conda
+  conda="no_conda"
 
   # Set options (help from https://wiki.bash-hackers.org/howto/getopts_tutorial; accessed March 8th, 2019)
   OPTIND=1 # reset the OPTIND counter just in case
-  while getopts ":j:S:" opt; do
+  while getopts ":j:S:C:" opt; do
     case ${opt} in
       j)
         jobs=${OPTARG}
         ;;
       S)
         snakefile=${OPTARG}
+        ;;
+      C)
+        conda=${OPTARG}
         ;;
       \?)
         echo "[ $(date -u) ]: ERROR: Invalid option: '-${OPTARG}'. Exiting..." >&2
@@ -407,7 +428,7 @@ function perform_run() {
   echo "[ $(date -u) ]: Command run: ${SCRIPT_NAME} run ${original_arguments}" >&2
 
   # Start the run
-  run_snakemake ${snakefile} ${config_filepath} ${run_directory} ${jobs}
+  run_snakemake ${snakefile} ${config_filepath} ${run_directory} ${jobs} ${conda}
 }
 
 #######################################
@@ -451,7 +472,11 @@ function perform_auto() {
     printf "   -j jobs: Number of processing threads available for the run [default: 1]\n\n"
     printf "Advanced parameters:\n"
     printf "   -T template_config: Path to the template config file used in setup [default: ${TEMPLATE_CONFIG}]\n"
-    printf "   -S snakefile: Path to the Snakefile used to run BackBLAST [default: ${SNAKEFILE}]\n\n"
+    printf "   -S snakefile: Path to the Snakefile used to run BackBLAST [default: ${SNAKEFILE}]\n"
+    printf "   -C conda: specify either 'use_conda' or 'no_conda' for whether or not each job should be run in \n"
+    printf "             its own conda env [default: no_conda]\n"
+    printf "             If 'no_conda' is run, then all dependencies need to be installed in the main environment\n"
+    printf "             where BackBLAST is running. This is handled for you by default when you install BackBLAST.\n\n"
     printf "Note: Currently does NOT support whitespaces in any input variables.\n\n"
 
     # Exit
@@ -477,10 +502,12 @@ function perform_auto() {
   template_config=${TEMPLATE_CONFIG}
   local snakefile
   snakefile=${SNAKEFILE}
+  local conda
+  conda="no_conda"
 
   # Set options (help from https://wiki.bash-hackers.org/howto/getopts_tutorial; accessed March 8th, 2019)
   OPTIND=1 # reset the OPTIND counter just in case
-  while getopts ":j:@:t:b:r:e:p:T:S:" opt; do
+  while getopts ":j:@:t:b:r:e:p:T:S:C:" opt; do
     case ${opt} in
       j)
         jobs=${OPTARG}
@@ -508,6 +535,9 @@ function perform_auto() {
         ;;
       S)
         snakefile=${OPTARG}
+        ;;
+      C)
+        conda=${OPTARG}
         ;;
       \?)
         echo "[ $(date -u) ]: ERROR: Invalid option: '-${OPTARG}'. Exiting..." >&2
@@ -548,7 +578,7 @@ function perform_auto() {
 
   # Start the run
   echo "[ $(date -u) ]: Default setup finished; starting pipeline" >&2
-  run_snakemake ${snakefile} ${output_config_filepath} ${output_directory} ${jobs}
+  run_snakemake ${snakefile} ${output_config_filepath} ${output_directory} ${jobs} ${conda}
 }
 
 function main() {
