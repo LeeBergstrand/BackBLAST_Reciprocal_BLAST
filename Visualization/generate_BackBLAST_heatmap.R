@@ -442,24 +442,28 @@ plot_blast_heatmap <- function(blast_results) {
 #' Master function to load and plot the BLAST table metadata to produce a heatmap
 #' 
 #' @param input_blast_table_filepath Character (length 1 vector); the filepath to the BLAST table (comma-separated)
-#' @param tip_order Character vector of the exact order of the tip labels in the phylogenetic tree
+#' @param tip_order Character vector of the exact order of the tip labels in the phylogenetic tree; provide 'NA' to skip alignment
 #' @param genome_metadata_filepath Character (length 1 vector); the filepath of the tab-separated genome metadata file. 
 #' Must at least have the columns 'subject_name' and 'plotting_name' as the first and second columns, respectively.
 #' @param gene_metadata_filepath Character (length 1 vector); the filepath of the tab-separated gene metadata file. 
 #' Must at least have the columns 'qseqid' and 'gene_name' as the first and second columns, respectively.
 #' @return list of two: 'blast_results' data frame; 'blast_heatmap' ggplot object
 #' @export
-load_and_plot_blast_results <- function(input_blast_table_filepath, tip_order, gene_metadata_filepath,
+load_and_plot_blast_results <- function(input_blast_table_filepath, tip_order = NA, gene_metadata_filepath,
                                        genome_metadata_filepath) {
   # Load the blast table
   futile.logger::flog.info("Loading the BLAST table")
   blast_results <- read_blast_results(input_blast_table_filepath)
   
   # Order the BLAST table subject names to match the ggtree
-  futile.logger::flog.debug("Aligning BLAST table's subject names to match order of the ggtree")
-  blast_results <- order_blast_subjects(blast_results, tip_order)
+  if (!is.na(tip_order)) {
+    futile.logger::flog.debug("Aligning BLAST table's subject names to match order of the ggtree")
+    blast_results <- order_blast_subjects(blast_results, tip_order)
+  } else {
+    futile.logger::flog.debug("Skipping alignment of BLAST table to phylogenetic tree")
+  }
   
-  # Overlay gene names and gene naming order, if provided
+  # Overlay genome names and genome naming order, if provided
   if ( !is.na(genome_metadata_filepath) ) {
     futile.logger::flog.info("Overlaying genome naming and ordering onto the BLAST table")
     blast_results <- overlay_genome_naming(blast_results, genome_metadata_filepath)
@@ -503,34 +507,48 @@ main <- function(params) {
   params <- lapply(params, convert_to_constant_NA)
   
   # Load and plot the tree
-  phylo_tree_list <- load_and_plot_phylogenetic_tree(params$input_phylogenetic_tree_filepath, 
-                                                     params$root_name, params$bootstrap_cutoff)
+  if (!is.na(params$input_phylogenetic_tree_filepath)) {
+    phylo_tree_list <- load_and_plot_phylogenetic_tree(params$input_phylogenetic_tree_filepath, 
+                                                       params$root_name, params$bootstrap_cutoff)
+    
+    # Get tip order of the tree, to match with heatmap later
+    # Based on https://groups.google.com/forum/#!topic/bioc-ggtree/LqRDK78m3U4 (accessed Sept. 15, 2018)
+    futile.logger::flog.debug("Exporting tip order of tree to correspond with heatmap")
+    tip_order <- dplyr::filter(ggtree::ggtree(phylo_tree_list[[1]])$data, isTip == TRUE)
+    tip_order <- tip_order[order(tip_order$y, decreasing = TRUE),]$label # plotting_name
+  } else {
+    flog.info("Skipping plotting phylogenetic tree")
+  }
   
-  # Get tip order of the tree, to match with heatmap later
-  # Based on https://groups.google.com/forum/#!topic/bioc-ggtree/LqRDK78m3U4 (accessed Sept. 15, 2018)
-  futile.logger::flog.debug("Exporting tip order of tree to correspond with heatmap")
-  tip_order <- dplyr::filter(ggtree::ggtree(phylo_tree_list[[1]])$data, isTip == TRUE)
-  tip_order <- tip_order[order(tip_order$y, decreasing = TRUE),]$label # plotting_name
-
   # Load and plot the BLAST table as a heatmap
   blast_results_list <- load_and_plot_blast_results(params$input_blast_table_filepath, 
                                                 tip_order, params$gene_metadata_filepath,
                                                 params$genome_metadata_filepath)
   
-  # Combine the tree and heatmap
-  # Got ggarrange ideas from https://cran.r-project.org/web/packages/egg/vignettes/Ecosystem.html (accessed Sept. 15, 2018)
-  futile.logger::flog.info("Combining the ggtree and the heatmap")
-  combined_plot <- egg::ggarrange(phylo_tree_list[[2]], blast_results_list[[2]], 
-                                  nrow = 1, widths = c(4, 8), heights = c(5), padding = unit(0, "mm"))
-  
-  # Print a PDF of the combined plot
-  # N.B., dimensions need to be input in inches (25.4 mm per inch)
-  futile.logger::flog.info("Saving to PDF")
-  pdf(file = params$output_pdf_filepath, width = params$plot_width / 25.4, 
-      height = params$plot_height / 25.4)
-  print(combined_plot)
-  dev.off()
-  
+  # Save the plot
+  if (!is.na(params$input_phylogenetic_tree_filepath)) {
+    # Combine the tree and heatmap
+    # Got ggarrange ideas from https://cran.r-project.org/web/packages/egg/vignettes/Ecosystem.html (accessed Sept. 15, 2018)
+    futile.logger::flog.info("Combining the ggtree and the heatmap")
+    combined_plot <- egg::ggarrange(phylo_tree_list[[2]], blast_results_list[[2]], 
+                                    nrow = 1, widths = c(4, 8), heights = c(5), padding = unit(0, "mm"))
+    
+    # Print a PDF of the combined plot
+    # N.B., dimensions need to be input in inches (25.4 mm per inch)
+    futile.logger::flog.info("Saving to PDF")
+    pdf(file = params$output_pdf_filepath, width = params$plot_width / 25.4, 
+        height = params$plot_height / 25.4)
+    print(combined_plot)
+    dev.off()
+  } else {
+    # Save heatmap alone
+    futile.logger::flog.info("Saving heatmap to PDF")
+    
+    pdf(file = params$output_pdf_filepath, width = params$plot_width / 25.4, 
+        height = params$plot_height / 25.4)
+    print(blast_results_list[[2]])
+    dev.off()
+  }
   futile.logger::flog.info("generate_BackBLAST_heatmap.R: done.")
 }
 
