@@ -129,11 +129,19 @@ if config.get("phylogenetic_tree_newick") == "subjects":
                 "-n {threads} -j {threads} > {log} 2>&1 && "
             "ln phylogeny/gtotree/iqtree_out/iqtree_out.treefile phylogeny/iqtree_out.treefile"
 
+# Create a fake temp file to allow plotter to run if 'NA' is selected
+# TODO - this is hacky
+if config.get("phylogenetic_tree_newick") == "NA":
+    rule generate_fake_phylogenetic_tree:
+        output: temp("NA")
+        shell:
+            "touch NA"
+
 # Generate the final heatmap
 rule generate_heatmap:
     input:
         blast_table = "combine_blast_tables/blast_tables_combined.csv",
-        tree_file = "phylogeny/iqtree_out.treefile" if config.get("phylogenetic_tree_newick") == "subjects" else config.get("phylogenetic_tree_newick")
+        tree_file = "phylogeny/iqtree_out.treefile" if config.get("phylogenetic_tree_newick") == "subjects" else config.get("phylogenetic_tree_newick", "NA")
     output:
         "generate_heatmap/BackBLAST_heatmap.pdf"
     conda:

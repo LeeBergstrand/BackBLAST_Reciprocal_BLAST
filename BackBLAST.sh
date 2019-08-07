@@ -166,9 +166,8 @@ function make_run_templates() {
   # Add subject info
   add_subjects_to_config_file ${output_config_filepath} ${subject_faa_directory}
 
-  # Special check for the phylogenetic tree - if the entry is 'subjects', then do not run realpath
-  if [[ ${phylogenetic_tree_newick} != "subjects" ]]; then
-    local phylogenetic_tree_newick
+  # Special check for the phylogenetic tree - if the entry is not a file (e.g., 'subjects' or 'NA'), then do not run realpath
+  if [[ -f ${phylogenetic_tree_newick} ]]; then
     phylogenetic_tree_newick=$(realpath ${phylogenetic_tree_newick})
   fi
 
@@ -179,8 +178,8 @@ function make_run_templates() {
   sed -i "s|^query_genome_orfs: .*|query_genome_orfs: '$(realpath ${query_faa_genome_filepath})'|" ${output_config_filepath}
   sed -i "s|^threads: .*|threads: ${threads}|" ${output_config_filepath}
   sed -i "s|^phylogenetic_tree_newick: .*|phylogenetic_tree_newick: '${phylogenetic_tree_newick}'|" ${output_config_filepath}
-  sed -i "s|^genome_metadata_tsv: .*|genome_metadata_tsv: '$(realpath ${genome_metadata_tsv})'|" ${output_config_filepath}
-  sed -i "s|^gene_metadata_tsv: .*|gene_metadata_tsv: '$(realpath ${gene_metadata_tsv})'|" ${output_config_filepath}
+  sed -i "s|^genome_metadata_tsv: .*|genome_metadata_tsv: '${genome_metadata_tsv}'|" ${output_config_filepath}
+  sed -i "s|^gene_metadata_tsv: .*|gene_metadata_tsv: '${gene_metadata_tsv}'|" ${output_config_filepath}
   sed -i "s|^bootstrap_cutoff: .*|bootstrap_cutoff: ${bootstrap_cutoff}|" ${output_config_filepath}
   sed -i "s|^root_name: .*|root_name: '${root_name}'|" ${output_config_filepath}
   sed -i "s|^e_value_cutoff: .*|e_value_cutoff: ${evalue}|" ${output_config_filepath}
@@ -354,7 +353,7 @@ function perform_run() {
     printf "${SCRIPT_NAME} run: module for initializing a BackBLAST run.\n"
     printf "Copyright Lee H. Bergstrand and Jackson M. Tsuji, Neufeld Research Group, 2019\n"
     printf "Version: ${VERSION}\n\n"
-    printf "Usage: ${SCRIPT_NAME} run config_filepath run_directory jobs\n\n"
+    printf "Usage: ${SCRIPT_NAME} run config_filepath run_directory\n\n"
     printf "Positional arguments (required):\n"
     printf "   config_filepath: path to the config file generated using the 'setup' module\n"
     printf "   run_directory: the directory where BackBLAST results out to be output\n\n"
