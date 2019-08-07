@@ -127,9 +127,12 @@ if config.get("phylogenetic_tree_newick") == "subjects":
             "benchmarks/gtotree.txt"
         threads: config.get("threads", 1)
         params:
-            phylogenetic_model = "Universal_Hug_et_al.hmm"
+            phylogenetic_model = config.get("gtotree_phylogenetic_model", "Universal_Hug_et_al.hmm")
+            sequence_length_threshold = config.get("gtotree_sequence_length_threshold", "0.2")
+            minimum_hit_fraction = config.get("gtotree_minimum_hit_fraction", "0.5")
         shell:
-            "GToTree -A {input} -H {params.phylogenetic_model} -o phylogeny/gtotree -T IQ-TREE -c 0.2 -G 0.5 "
+            "GToTree -A {input} -H {params.phylogenetic_model} -o phylogeny/gtotree -T IQ-TREE "
+                "-c {params.sequence_length_threshold} -G {params.minimum_hit_fraction} "
                 "-n {threads} -j {threads} > {log} 2>&1 && "
             "ln phylogeny/gtotree/iqtree_out/iqtree_out.treefile phylogeny/iqtree_out.treefile"
 

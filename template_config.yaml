@@ -4,6 +4,7 @@
 # Total threads to be used for all processes
 threads: 1
 
+
 ## Plot input files
 # Newick file of phylogenetic tree for the input genomes. Should already be in the orientation that you want it to be plotted in.
   # Tree must contain EXACTLY the same organisms as in the 'subjects' above, with the EXACT same names provided for the subjects
@@ -27,6 +28,15 @@ root_name: NA
 e_value_cutoff: 1e-40
 # Only hits with percent amino acid identity above this number will be kept
 minimum_percent_identity: 25
+
+
+## Options for GToTree, if you want to generate the phylogenetic tree within the BackBLAST pipeline
+# Gene marker set to use for making the tree
+gtotree_phylogenetic_model: "Universal_Hug_et_al.hmm"
+# Keeps gene hits within this proportional threshold of the median sequence length
+gtotree_sequence_length_threshold: 0.2
+# Keeps genomes with this proportion of hits from the gene marker set
+gtotree_minimum_hit_fraction: 0.5
 
 
 ## BLAST input files
