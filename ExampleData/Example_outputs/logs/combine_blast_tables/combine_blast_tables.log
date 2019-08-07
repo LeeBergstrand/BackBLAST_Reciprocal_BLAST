@@ -1,0 +1,23 @@
+Warning message:
+package ‘dplyr’ was built under R version 3.5.2 
+[ Wed 07 Aug 2019 06:44:48 UTC ]: Running CombineBlastTables.R
+[ Wed 07 Aug 2019 06:44:48 UTC ]: Input tables: 7 total
+[ Wed 07 Aug 2019 06:44:48 UTC ]: Output table: combine_blast_tables/blast_tables_combined.csv
+[ Wed 07 Aug 2019 06:44:48 UTC ]: Loading BLAST tables
+[ Wed 07 Aug 2019 06:44:48 UTC ]: Reading table 'fix_blank_results/Chl_ferrooxidans_KoFox.csv'
+[ Wed 07 Aug 2019 06:44:48 UTC ]: Adding subject_name of 'Chl_ferrooxidans_KoFox'
+[ Wed 07 Aug 2019 06:44:48 UTC ]: Reading table 'fix_blank_results/Chl_luteolum_DSM_273.csv'
+[ Wed 07 Aug 2019 06:44:48 UTC ]: Adding subject_name of 'Chl_luteolum_DSM_273'
+[ Wed 07 Aug 2019 06:44:48 UTC ]: Reading table 'fix_blank_results/Chl_phaeoferrooxidans_KB01.csv'
+[ Wed 07 Aug 2019 06:44:48 UTC ]: Adding subject_name of 'Chl_phaeoferrooxidans_KB01'
+[ Wed 07 Aug 2019 06:44:48 UTC ]: Reading table 'fix_blank_results/Chl_sp_N1.csv'
+[ Wed 07 Aug 2019 06:44:48 UTC ]: Adding subject_name of 'Chl_sp_N1'
+[ Wed 07 Aug 2019 06:44:48 UTC ]: Reading table 'fix_blank_results/Ignavibacterium_album_JCM_16511_outgroup.csv'
+[ Wed 07 Aug 2019 06:44:48 UTC ]: Adding subject_name of 'Ignavibacterium_album_JCM_16511_outgroup'
+[ Wed 07 Aug 2019 06:44:48 UTC ]: Reading table 'fix_blank_results/L227_enr_S_6D_bin01.csv'
+[ Wed 07 Aug 2019 06:44:48 UTC ]: Adding subject_name of 'L227_enr_S_6D_bin01'
+[ Wed 07 Aug 2019 06:44:48 UTC ]: Reading table 'fix_blank_results/L304_enr_S_6D_bin01.csv'
+[ Wed 07 Aug 2019 06:44:48 UTC ]: Adding subject_name of 'L304_enr_S_6D_bin01'
+[ Wed 07 Aug 2019 06:44:48 UTC ]: Combining BLAST tables
+[ Wed 07 Aug 2019 06:44:48 UTC ]: Writing combining BLAST table to file (**with headers**)
+[ Wed 07 Aug 2019 06:44:48 UTC ]: Done

@@ -1,0 +1,25 @@
+Warning message:
+package ‘dplyr’ was built under R version 3.5.2 
+INFO [2019-08-07 03:06:54] Running generate_BackBLAST_heatmap.R
+INFO [2019-08-07 03:06:54] ######### Settings #########
+INFO [2019-08-07 03:06:54] Input phylogenetic tree filepath (ignored if 'NA'): phylogeny/iqtree_out.treefile
+INFO [2019-08-07 03:06:54] Input BLAST table filepath: combine_blast_tables/blast_tables_combined.csv
+INFO [2019-08-07 03:06:54] Output PDF filepath: generate_heatmap/BackBLAST_heatmap.pdf
+INFO [2019-08-07 03:06:54] Bootstrap display cutoff (%; ignored if 'NA'): 50
+INFO [2019-08-07 03:06:54] Root name (ignored if 'NA'): Ignavibacterium_album_JCM_16511_outgroup
+INFO [2019-08-07 03:06:54] Input genome metadata filepath (ignored if 'NA'): NA
+INFO [2019-08-07 03:06:54] Input gene metadata filepath (ignored if 'NA'): NA
+INFO [2019-08-07 03:06:54] Plot width (mm): 250
+INFO [2019-08-07 03:06:54] Plot height (mm): 100
+INFO [2019-08-07 03:06:54] ############################
+INFO [2019-08-07 03:06:54] Reading input phylogenetic tree
+INFO [2019-08-07 03:06:54] Re-rooting tree to 'Ignavibacterium_album_JCM_16511_outgroup'
+INFO [2019-08-07 03:06:54] Applying bootstrap display cutoff of 50
+INFO [2019-08-07 03:06:54] Generating ggtree plot
+INFO [2019-08-07 03:06:54] Loading the BLAST table
+INFO [2019-08-07 03:06:54] Plotting BLAST heatmap
+INFO [2019-08-07 03:06:54] Combining the ggtree and the heatmap
+INFO [2019-08-07 03:06:55] Saving to PDF
+INFO [2019-08-07 03:06:55] generate_BackBLAST_heatmap.R: done.
+Warning message:
+Duplicated aesthetics after name standardisation: size 

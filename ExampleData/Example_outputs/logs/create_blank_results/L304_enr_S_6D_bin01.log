@@ -1,0 +1,6 @@
+[ 2019-08-07 06:44:45,112 UTC ]: DEBUG: CreateBlankResults: Running CreateBlankResults.py
+[ 2019-08-07 06:44:45,112 UTC ]: DEBUG: CreateBlankResults: Settings: Input BLAST CSV table: remove_duplicates/L304_enr_S_6D_bin01.csv
+[ 2019-08-07 06:44:45,112 UTC ]: DEBUG: CreateBlankResults: Settings: Query protein FastA file: /home/jmtsuji/Research_General/Bioinformatics/02_git/BackBLAST_Reciprocal_BLAST/test4/small_set/Chl_ferrooxidans_KoFox_gene_targets.faa
+[ 2019-08-07 06:44:45,112 UTC ]: DEBUG: CreateBlankResults: Settings: Output BLAST CSV table: fix_blank_results/L304_enr_S_6D_bin01.csv
+[ 2019-08-07 06:44:45,113 UTC ]: DEBUG: CreateBlankResults: Provided BLAST file has content - no need to replace. Copying to output file.
+[ 2019-08-07 06:44:45,113 UTC ]: DEBUG: CreateBlankResults: Done

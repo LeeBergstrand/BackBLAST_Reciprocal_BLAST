@@ -1,0 +1,68 @@
+# Config file for running the BackBLAST pipeline
+
+## Execution settings
+# Total threads to be used for all processes
+threads: 1
+
+
+## Phylogenetic tree
+# Path to the phylogenetic tree file (newick format) corresponding to the subject genomes
+  # Subject names in the tree must match subject names provided under 'subjects' below
+  # OR specify 'subjects' to auto-generate a phylogenetic tree using the subject genomes via GToTree (see GToTree params below)
+  # OR specify 'NA' to skip tree generation and plot the heatmap only
+phylogenetic_tree_newick: 'subjects'
+# Optional: set the cutoff for displayed bootstrap values. Anything greater than to equal to the cutoff will be shown.
+bootstrap_cutoff: 50
+# Optional: if you want to re-root your tree, then give the exact name of the tip you want to re-root by. Otherwise, 'NA'.
+root_name: 'Ignavibacterium_album_JCM_16511_outgroup'
+
+
+## Options for GToTree, if you want to generate the phylogenetic tree within the BackBLAST pipeline
+## For these options to be used, set 'phylogenetic_tree_newick' above to 'subjects'
+# Gene marker set to use for making the tree
+gtotree_phylogenetic_model: "Universal_Hug_et_al.hmm"
+# Keeps gene hits within this proportional threshold of the median sequence length
+gtotree_sequence_length_threshold: 0.2
+# Keeps genomes with this proportion of hits from the gene marker set
+gtotree_minimum_hit_fraction: 0.5
+
+
+## Plot settings
+# Optional: Tab-separated file containing the 'subject_name' of each plotted genome, plus the 'plotting_name' that you desire to appear
+  # on the final plot.
+  # See ExampleData/Example_configs/genome_naming.tsv
+genome_metadata_tsv: NA
+# Optional: Tab-separated file containing the accession of each query gene and its corresponding gene name.
+  # Should have two columns: 'qseqid' with the accession and 'gene_name' with the corresponding gene name.
+  # Genes will be plotted in the order specified in this TSV file.
+  # See ExampleData/Example_configs/gene_naming.tsv
+gene_metadata_tsv: NA
+plot_width_mm: 250
+plot_height_mm: 100
+
+
+## BLAST settings
+# Only hits with an e-value below this number will be kept
+e_value_cutoff: 1e-40
+# Only hits with percent amino acid identity above this number will be kept
+minimum_percent_identity: 25
+
+
+## BLAST input files
+# Query files
+  # query_genes contains the genes you want to do a reciprocal BLAST search with.
+  # query_genome_orfs contains all predicted ORFs from the query genome (for reciprocal BLAST purposes)
+query_genes: '/home/jmtsuji/Research_General/Bioinformatics/02_git/BackBLAST_Reciprocal_BLAST/test4/small_set/Chl_ferrooxidans_KoFox_gene_targets.faa'
+query_genome_orfs: '/home/jmtsuji/Research_General/Bioinformatics/02_git/BackBLAST_Reciprocal_BLAST/test4/small_set/Chl_ferrooxidans_KoFox.faa'
+
+# Subject files for BLAST (the name you specify will be plotted).
+  # These should be ORF predictions from the genomes of the organisms of interest.
+  # If you want to plot the query genome as well, then include it here.
+subjects:
+  Chl_ferrooxidans_KoFox: '/home/jmtsuji/Research_General/Bioinformatics/02_git/BackBLAST_Reciprocal_BLAST/test4/small_set/subject/Chl_ferrooxidans_KoFox.faa'
+  Chl_luteolum_DSM_273: '/home/jmtsuji/Research_General/Bioinformatics/02_git/BackBLAST_Reciprocal_BLAST/test4/small_set/subject/Chl_luteolum_DSM_273.faa'
+  Chl_phaeoferrooxidans_KB01: '/home/jmtsuji/Research_General/Bioinformatics/02_git/BackBLAST_Reciprocal_BLAST/test4/small_set/subject/Chl_phaeoferrooxidans_KB01.faa'
+  Chl_sp_N1: '/home/jmtsuji/Research_General/Bioinformatics/02_git/BackBLAST_Reciprocal_BLAST/test4/small_set/subject/Chl_sp_N1.faa'
+  Ignavibacterium_album_JCM_16511_outgroup: '/home/jmtsuji/Research_General/Bioinformatics/02_git/BackBLAST_Reciprocal_BLAST/test4/small_set/subject/Ignavibacterium_album_JCM_16511_outgroup.faa'
+  L227_enr_S_6D_bin01: '/home/jmtsuji/Research_General/Bioinformatics/02_git/BackBLAST_Reciprocal_BLAST/test4/small_set/subject/L227_enr_S_6D_bin01.faa'
+  L304_enr_S_6D_bin01: '/home/jmtsuji/Research_General/Bioinformatics/02_git/BackBLAST_Reciprocal_BLAST/test4/small_set/subject/L304_enr_S_6D_bin01.faa'
