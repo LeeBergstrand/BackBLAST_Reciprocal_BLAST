@@ -518,6 +518,7 @@ main <- function(params) {
     tip_order <- tip_order[order(tip_order$y, decreasing = TRUE),]$label # plotting_name
   } else {
     flog.info("Skipping plotting phylogenetic tree")
+    tip_order <- NA
   }
   
   # Load and plot the BLAST table as a heatmap
