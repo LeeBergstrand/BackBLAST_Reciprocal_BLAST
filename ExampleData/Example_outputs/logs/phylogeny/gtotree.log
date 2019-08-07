@@ -1,877 +1,0 @@
-
-
-               GToTree v1.4.3 (github.com/AstrobioMike/GToTree)
-
-
- ---------------------------------  RUN INFO  --------------------------------- 
-
-
-    Input genome sources include:
-      - Amino acid files listed in phylogeny/input/input_genomes_faa.list (7 genomes)
-
-                             [0;32mTotal input genomes: 7[0m
-
-    HMM source to be used:
-      - Universal_Hug_et_al.hmm (15 targets)
-
-
-    Options set:
-      - The output directory has been set to "phylogeny/gtotree/".
-      - Tree generation program ("-T") has been set to IQ-TREE.
-      - Number of cpus to use during hmm search ("-n") has been set to 1.
-
-
-  [0;31m********************************** [0mNOTICE [0;31m**********************************[0m  
-    Filtering by gene-length using the median length of a gene set (set with
-    the "-c" flag) becomes less reliable with fewer genomes. With 7 total
-    input genomes, if a lot of sequences are dropped, consider increasing
-    the parameter and/or visually inspecting some alignments.
-
-    More info can be found here:
-      github.com/AstrobioMike/GToTree/wiki/Things-to-consider
-
-	        Moving forward with "-c" set to 0.2 this run.
-  [0;31m****************************************************************************[0m  
-
-
- ############################################################################## 
- ####         Working on the genomes provided as amino acid files          ####
- ############################################################################## 
-
-           It is currently 02:44 AM; the process started at 02:44 AM.
-               Current process runtime: 0 hours and 0 minutes.
-
-   --------------------------------------------------------------------------   
-	On assembly [0;32mChl_ferrooxidans_KoFox[0m; Number 1 of 7 total.
-   --------------------------------------------------------------------------   
-
-      Performing HMM search...
-        Found 9 of the targeted 15 genes.
-        Est. % comp: 60.00; Est. % redund: 0.00
-
-   --------------------------------------------------------------------------   
-	On assembly [0;32mChl_luteolum_DSM_273[0m; Number 2 of 7 total.
-   --------------------------------------------------------------------------   
-
-      Performing HMM search...
-        Found 13 of the targeted 15 genes.
-        Est. % comp: 86.67; Est. % redund: 0.00
-
-   --------------------------------------------------------------------------   
-	On assembly [0;32mChl_phaeoferrooxidans_KB01[0m; Number 3 of 7 total.
-   --------------------------------------------------------------------------   
-
-      Performing HMM search...
-        Found 14 of the targeted 15 genes.
-        Est. % comp: 93.33; Est. % redund: 0.00
-
-   --------------------------------------------------------------------------   
-	On assembly [0;32mChl_sp_N1[0m; Number 4 of 7 total.
-   --------------------------------------------------------------------------   
-
-      Performing HMM search...
-        Found 14 of the targeted 15 genes.
-        Est. % comp: 93.33; Est. % redund: 0.00
-
-   --------------------------------------------------------------------------   
-	On assembly [0;32mIgnavibacterium_album_JCM_16511_outgroup[0m; Number 5 of 7 total.
-   --------------------------------------------------------------------------   
-
-      Performing HMM search...
-        Found 14 of the targeted 15 genes.
-        Est. % comp: 93.33; Est. % redund: 0.00
-
-   --------------------------------------------------------------------------   
-	On assembly [0;32mL227_enr_S_6D_bin01[0m; Number 6 of 7 total.
-   --------------------------------------------------------------------------   
-
-      Performing HMM search...
-        Found 14 of the targeted 15 genes.
-        Est. % comp: 93.33; Est. % redund: 0.00
-
-   --------------------------------------------------------------------------   
-	On assembly [0;32mL304_enr_S_6D_bin01[0m; Number 7 of 7 total.
-   --------------------------------------------------------------------------   
-
-      Performing HMM search...
-        Found 14 of the targeted 15 genes.
-        Est. % comp: 93.33; Est. % redund: 0.00
-
-_______________________________________________________________________________
-
-
- ############################################################################## 
- ####                     Filtering genes by length                        ####
- ############################################################################## 
-
-     Keeping those with lengths within 20% of the median for the gene set.
-
-           It is currently 02:44 AM; the process started at 02:44 AM.
-               Current process runtime: 0 hours and 0 minutes.
-
-
-  [0;31m********************************** [0mNOTICE [0;31m**********************************[0m  
-    1 gene(s) either had no hits in any genome, or only multiple hits per
-    genome... Just so ya know!!
-
-	  These included:
-
-                     Ribosomal_L18
-
-        Reported in "phylogeny/gtotree/run_files/Genes_with_no_hits_to_any_genomes.txt".
-
-   You can figure out which of those two scenarios was the cause by checking out
-   "phylogeny/gtotree/SCG_hit_counts.tsv".
-  [0;31m****************************************************************************[0m  
-
-   --------------------------------------------------------------------------   
-
-    Filtering [0;32mRibosomal_L14[0m sequences by length...
-
-	Retained 7 sequences of the initial 7 (100.0%).
-
-   --------------------------------------------------------------------------   
-
-    Filtering [0;32mRibosomal_L16[0m sequences by length...
-
-	Retained 7 sequences of the initial 7 (100.0%).
-
-   --------------------------------------------------------------------------   
-
-    Filtering [0;32mRibosomal_L2[0m sequences by length...
-
-	Retained 5 sequences of the initial 5 (100.0%).
-
-   --------------------------------------------------------------------------   
-
-    Filtering [0;32mRibosomal_L22[0m sequences by length...
-
-	Retained 6 sequences of the initial 7 (85.71%).
-
-   --------------------------------------------------------------------------   
-
-    Filtering [0;32mribosomal_L24[0m sequences by length...
-
-	Retained 6 sequences of the initial 7 (85.71%).
-
-   --------------------------------------------------------------------------   
-
-    Filtering [0;32mRibosomal_L3[0m sequences by length...
-
-	Retained 6 sequences of the initial 6 (100.0%).
-
-   --------------------------------------------------------------------------   
-
-    Filtering [0;32mRibosomal_L4[0m sequences by length...
-
-	Retained 6 sequences of the initial 6 (100.0%).
-
-   --------------------------------------------------------------------------   
-
-    Filtering [0;32mRibosomal_L5[0m sequences by length...
-
-	Retained 7 sequences of the initial 7 (100.0%).
-
-   --------------------------------------------------------------------------   
-
-    Filtering [0;32mRibosomal_L6[0m sequences by length...
-
-	Retained 7 sequences of the initial 7 (100.0%).
-
-   --------------------------------------------------------------------------   
-
-    Filtering [0;32mRibosomal_S10[0m sequences by length...
-
-	Retained 6 sequences of the initial 6 (100.0%).
-
-   --------------------------------------------------------------------------   
-
-    Filtering [0;32mRibosomal_S17[0m sequences by length...
-
-	Retained 7 sequences of the initial 7 (100.0%).
-
-   --------------------------------------------------------------------------   
-
-    Filtering [0;32mRibosomal_S19[0m sequences by length...
-
-	Retained 6 sequences of the initial 6 (100.0%).
-
-   --------------------------------------------------------------------------   
-
-    Filtering [0;32mRibosomal_S3_C[0m sequences by length...
-
-	Retained 7 sequences of the initial 7 (100.0%).
-
-   --------------------------------------------------------------------------   
-
-    Filtering [0;32mRibosomal_S8[0m sequences by length...
-
-	Retained 7 sequences of the initial 7 (100.0%).
-
-________________________________________________________________________________ 
-
-
-
- ############################################################################## 
- ####                Filtering genomes with too few hits                   ####
- ############################################################################## 
-
-     Removing those with fewer than 50% of the total SCGs targeted.
-
-           It is currently 02:44 AM; the process started at 02:44 AM.
-               Current process runtime: 0 hours and 0 minutes.
-
-             [0;32mNo genomes were removed for having too few hits :)[0m
-
-________________________________________________________________________________
-
-
-
- ############################################################################## 
- ####          Aligning, trimming, and inserting gap-sequences             ####
- ############################################################################## 
-
-           It is currently 02:44 AM; the process started at 02:44 AM.
-               Current process runtime: 0 hours and 0 minutes.
-
-
-
-   --------------------------------------------------------------------------   
-	    Aligning and cleaning gene [0;32mRibosomal_L14[0m; Number 1 of 14.
-   --------------------------------------------------------------------------   
-
-MUSCLE v3.8.1551 by Robert C. Edgar
-
-http://www.drive5.com/muscle
-This software is donated to the public domain.
-Please cite: Edgar, R.C. Nucleic Acids Res 32(5), 1792-97.
-
-
-*** WARNING *** Invalid character '*' in FASTA sequence data, ignored
-
-*** WARNING *** Invalid character '*' in FASTA sequence data, ignored
-Ribosomal_L14_hits_filtered 7 seqs, lengths min 122, max 122, avg 122
-00:00:00    19 MB(-4%)  Iter   1    3.57%  K-mer dist pass 100:00:00    19 MB(-4%)  Iter   1  100.00%  K-mer dist pass 1
-00:00:00    19 MB(-4%)  Iter   1    3.57%  K-mer dist pass 200:00:00    19 MB(-4%)  Iter   1  100.00%  K-mer dist pass 2
-00:00:00    20 MB(-4%)  Iter   1   16.67%  Align node       00:00:00    21 MB(-4%)  Iter   1   33.33%  Align node00:00:00    21 MB(-4%)  Iter   1   50.00%  Align node00:00:00    21 MB(-4%)  Iter   1   66.67%  Align node00:00:00    21 MB(-4%)  Iter   1   83.33%  Align node00:00:00    21 MB(-4%)  Iter   1  100.00%  Align node00:00:00    21 MB(-4%)  Iter   1  100.00%  Align node
-00:00:00    21 MB(-4%)  Iter   1   14.29%  Root alignment00:00:00    21 MB(-4%)  Iter   1   28.57%  Root alignment00:00:00    21 MB(-4%)  Iter   1   42.86%  Root alignment00:00:00    21 MB(-4%)  Iter   1   57.14%  Root alignment00:00:00    21 MB(-4%)  Iter   1   71.43%  Root alignment00:00:00    21 MB(-4%)  Iter   1   85.71%  Root alignment00:00:00    21 MB(-4%)  Iter   1  100.00%  Root alignment00:00:00    21 MB(-4%)  Iter   1  100.00%  Root alignment
-00:00:00    21 MB(-4%)  Iter   2   20.00%  Refine tree   00:00:00    21 MB(-4%)  Iter   2   40.00%  Refine tree00:00:00    21 MB(-4%)  Iter   2   60.00%  Refine tree00:00:00    21 MB(-4%)  Iter   2   80.00%  Refine tree00:00:00    21 MB(-4%)  Iter   2  100.00%  Refine tree00:00:00    21 MB(-4%)  Iter   2  120.00%  Refine tree00:00:00    21 MB(-4%)  Iter   2  100.00%  Refine tree
-00:00:00    21 MB(-4%)  Iter   2   14.29%  Root alignment00:00:00    21 MB(-4%)  Iter   2   28.57%  Root alignment00:00:00    21 MB(-4%)  Iter   2   42.86%  Root alignment00:00:00    21 MB(-4%)  Iter   2   57.14%  Root alignment00:00:00    21 MB(-4%)  Iter   2   71.43%  Root alignment00:00:00    21 MB(-4%)  Iter   2   85.71%  Root alignment00:00:00    21 MB(-4%)  Iter   2  100.00%  Root alignment00:00:00    21 MB(-4%)  Iter   2  100.00%  Root alignment
-00:00:00    21 MB(-4%)  Iter   2  100.00%  Root alignment
-00:00:00    21 MB(-4%)  Iter   3   18.18%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   27.27%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   36.36%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   45.45%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   54.55%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   63.64%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   72.73%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   81.82%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   90.91%  Refine biparts00:00:00    21 MB(-4%)  Iter   3  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   3  109.09%  Refine biparts00:00:00    21 MB(-4%)  Iter   3  100.00%  Refine biparts
-00:00:00    21 MB(-4%)  Iter   4   18.18%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   27.27%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   36.36%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   45.45%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   54.55%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   63.64%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   72.73%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   81.82%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   90.91%  Refine biparts00:00:00    21 MB(-4%)  Iter   4  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   4  109.09%  Refine biparts00:00:00    21 MB(-4%)  Iter   4  100.00%  Refine biparts
-00:00:00    21 MB(-4%)  Iter   5   18.18%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   27.27%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   36.36%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   45.45%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   54.55%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   63.64%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   72.73%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   81.82%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   90.91%  Refine biparts00:00:00    21 MB(-4%)  Iter   5  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   5  109.09%  Refine biparts00:00:00    21 MB(-4%)  Iter   5  100.00%  Refine biparts
-00:00:00    21 MB(-4%)  Iter   6   18.18%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   27.27%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   36.36%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   45.45%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   54.55%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   63.64%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   72.73%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   81.82%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   90.91%  Refine biparts00:00:00    21 MB(-4%)  Iter   6  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   6  109.09%  Refine biparts00:00:00    21 MB(-4%)  Iter   6  100.00%  Refine biparts
-
-
-
-   --------------------------------------------------------------------------   
-	    Aligning and cleaning gene [0;32mRibosomal_L16[0m; Number 2 of 14.
-   --------------------------------------------------------------------------   
-
-MUSCLE v3.8.1551 by Robert C. Edgar
-
-http://www.drive5.com/muscle
-This software is donated to the public domain.
-Please cite: Edgar, R.C. Nucleic Acids Res 32(5), 1792-97.
-
-
-*** WARNING *** Invalid character '*' in FASTA sequence data, ignored
-
-*** WARNING *** Invalid character '*' in FASTA sequence data, ignored
-Ribosomal_L16_hits_filtered 7 seqs, lengths min 138, max 139, avg 138
-00:00:00    19 MB(-4%)  Iter   1    3.57%  K-mer dist pass 100:00:00    19 MB(-4%)  Iter   1  100.00%  K-mer dist pass 1
-00:00:00    19 MB(-4%)  Iter   1    3.57%  K-mer dist pass 200:00:00    19 MB(-4%)  Iter   1  100.00%  K-mer dist pass 2
-00:00:00    20 MB(-4%)  Iter   1   16.67%  Align node       00:00:00    21 MB(-4%)  Iter   1   33.33%  Align node00:00:00    21 MB(-4%)  Iter   1   50.00%  Align node00:00:00    21 MB(-4%)  Iter   1   66.67%  Align node00:00:00    21 MB(-4%)  Iter   1   83.33%  Align node00:00:00    21 MB(-4%)  Iter   1  100.00%  Align node00:00:00    21 MB(-4%)  Iter   1  100.00%  Align node
-00:00:00    21 MB(-4%)  Iter   1   14.29%  Root alignment00:00:00    21 MB(-4%)  Iter   1   28.57%  Root alignment00:00:00    21 MB(-4%)  Iter   1   42.86%  Root alignment00:00:00    21 MB(-4%)  Iter   1   57.14%  Root alignment00:00:00    21 MB(-4%)  Iter   1   71.43%  Root alignment00:00:00    21 MB(-4%)  Iter   1   85.71%  Root alignment00:00:00    21 MB(-4%)  Iter   1  100.00%  Root alignment00:00:00    21 MB(-4%)  Iter   1  100.00%  Root alignment
-00:00:00    21 MB(-4%)  Iter   2   20.00%  Refine tree   00:00:00    21 MB(-4%)  Iter   2   40.00%  Refine tree00:00:00    21 MB(-4%)  Iter   2   60.00%  Refine tree00:00:00    21 MB(-4%)  Iter   2  100.00%  Refine tree
-00:00:00    21 MB(-4%)  Iter   2   14.29%  Root alignment00:00:00    21 MB(-4%)  Iter   2   28.57%  Root alignment00:00:00    21 MB(-4%)  Iter   2   42.86%  Root alignment00:00:00    21 MB(-4%)  Iter   2   57.14%  Root alignment00:00:00    21 MB(-4%)  Iter   2   71.43%  Root alignment00:00:00    21 MB(-4%)  Iter   2   85.71%  Root alignment00:00:00    21 MB(-4%)  Iter   2  100.00%  Root alignment00:00:00    21 MB(-4%)  Iter   2  100.00%  Root alignment
-00:00:00    21 MB(-4%)  Iter   2  100.00%  Root alignment
-00:00:00    21 MB(-4%)  Iter   3   18.18%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   27.27%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   36.36%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   45.45%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   54.55%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   63.64%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   72.73%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   81.82%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   90.91%  Refine biparts00:00:00    21 MB(-4%)  Iter   3  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   3  109.09%  Refine biparts00:00:00    21 MB(-4%)  Iter   3  100.00%  Refine biparts
-00:00:00    21 MB(-4%)  Iter   4   18.18%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   27.27%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   36.36%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   45.45%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   54.55%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   63.64%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   72.73%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   81.82%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   90.91%  Refine biparts00:00:00    21 MB(-4%)  Iter   4  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   4  109.09%  Refine biparts00:00:00    21 MB(-4%)  Iter   4  100.00%  Refine biparts
-00:00:00    21 MB(-4%)  Iter   5   18.18%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   27.27%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   36.36%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   45.45%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   54.55%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   63.64%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   72.73%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   81.82%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   90.91%  Refine biparts00:00:00    21 MB(-4%)  Iter   5  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   5  109.09%  Refine biparts00:00:00    21 MB(-4%)  Iter   5  100.00%  Refine biparts
-00:00:00    21 MB(-4%)  Iter   6   18.18%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   27.27%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   36.36%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   45.45%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   54.55%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   63.64%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   72.73%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   81.82%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   90.91%  Refine biparts00:00:00    21 MB(-4%)  Iter   6  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   6  109.09%  Refine biparts00:00:00    21 MB(-4%)  Iter   6  100.00%  Refine biparts
-00:00:00    21 MB(-4%)  Iter   7   18.18%  Refine biparts00:00:00    21 MB(-4%)  Iter   7   27.27%  Refine biparts00:00:00    21 MB(-4%)  Iter   7   36.36%  Refine biparts00:00:00    21 MB(-4%)  Iter   7   45.45%  Refine biparts00:00:00    21 MB(-4%)  Iter   7   54.55%  Refine biparts00:00:00    21 MB(-4%)  Iter   7   63.64%  Refine biparts00:00:00    21 MB(-4%)  Iter   7   72.73%  Refine biparts00:00:00    21 MB(-4%)  Iter   7   81.82%  Refine biparts00:00:00    21 MB(-4%)  Iter   7   90.91%  Refine biparts00:00:00    21 MB(-4%)  Iter   7  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   7  109.09%  Refine biparts00:00:00    21 MB(-4%)  Iter   7  100.00%  Refine biparts
-
-
-
-   --------------------------------------------------------------------------   
-	    Aligning and cleaning gene [0;32mRibosomal_L2[0m; Number 3 of 14.
-   --------------------------------------------------------------------------   
-
-MUSCLE v3.8.1551 by Robert C. Edgar
-
-http://www.drive5.com/muscle
-This software is donated to the public domain.
-Please cite: Edgar, R.C. Nucleic Acids Res 32(5), 1792-97.
-
-
-*** WARNING *** Invalid character '*' in FASTA sequence data, ignored
-
-*** WARNING *** Invalid character '*' in FASTA sequence data, ignored
-Ribosomal_L2_hits_filtered 5 seqs, lengths min 274, max 279, avg 278
-00:00:00    19 MB(-4%)  Iter   1    6.67%  K-mer dist pass 100:00:00    19 MB(-4%)  Iter   1  100.00%  K-mer dist pass 1
-00:00:00    19 MB(-4%)  Iter   1    6.67%  K-mer dist pass 200:00:00    19 MB(-4%)  Iter   1  100.00%  K-mer dist pass 2
-00:00:00    20 MB(-4%)  Iter   1   25.00%  Align node       00:00:00    22 MB(-4%)  Iter   1   50.00%  Align node00:00:00    22 MB(-4%)  Iter   1   75.00%  Align node00:00:00    22 MB(-4%)  Iter   1  100.00%  Align node00:00:00    22 MB(-4%)  Iter   1  100.00%  Align node
-00:00:00    22 MB(-4%)  Iter   1   20.00%  Root alignment00:00:00    22 MB(-4%)  Iter   1   40.00%  Root alignment00:00:00    22 MB(-4%)  Iter   1   60.00%  Root alignment00:00:00    22 MB(-4%)  Iter   1   80.00%  Root alignment00:00:00    22 MB(-4%)  Iter   1  100.00%  Root alignment00:00:00    22 MB(-4%)  Iter   1  100.00%  Root alignment
-00:00:00    22 MB(-4%)  Iter   2   33.33%  Refine tree   00:00:00    22 MB(-4%)  Iter   2   66.67%  Refine tree00:00:00    22 MB(-4%)  Iter   2  100.00%  Refine tree00:00:00    22 MB(-4%)  Iter   2  100.00%  Refine tree
-00:00:00    22 MB(-4%)  Iter   2   20.00%  Root alignment00:00:00    22 MB(-4%)  Iter   2   40.00%  Root alignment00:00:00    22 MB(-4%)  Iter   2   60.00%  Root alignment00:00:00    22 MB(-4%)  Iter   2   80.00%  Root alignment00:00:00    22 MB(-4%)  Iter   2  100.00%  Root alignment00:00:00    22 MB(-4%)  Iter   2  100.00%  Root alignment
-00:00:00    22 MB(-4%)  Iter   2  100.00%  Root alignment
-00:00:00    22 MB(-4%)  Iter   3   28.57%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   42.86%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   57.14%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   71.43%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   85.71%  Refine biparts00:00:00    22 MB(-4%)  Iter   3  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   3  114.29%  Refine biparts00:00:00    22 MB(-4%)  Iter   3  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   4   28.57%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   42.86%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   57.14%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   71.43%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   85.71%  Refine biparts00:00:00    22 MB(-4%)  Iter   4  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   4  114.29%  Refine biparts00:00:00    22 MB(-4%)  Iter   4  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   5   28.57%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   42.86%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   57.14%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   71.43%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   85.71%  Refine biparts00:00:00    22 MB(-4%)  Iter   5  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   5  114.29%  Refine biparts00:00:00    22 MB(-4%)  Iter   5  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   6   28.57%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   42.86%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   57.14%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   71.43%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   85.71%  Refine biparts00:00:00    22 MB(-4%)  Iter   6  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   6  114.29%  Refine biparts00:00:00    22 MB(-4%)  Iter   6  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   7   28.57%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   42.86%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   57.14%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   71.43%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   85.71%  Refine biparts00:00:00    22 MB(-4%)  Iter   7  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   7  114.29%  Refine biparts00:00:00    22 MB(-4%)  Iter   7  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   8   28.57%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   42.86%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   57.14%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   71.43%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   85.71%  Refine biparts00:00:00    22 MB(-4%)  Iter   8  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   8  114.29%  Refine biparts00:00:00    22 MB(-4%)  Iter   8  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   9   28.57%  Refine biparts00:00:00    22 MB(-4%)  Iter   9   42.86%  Refine biparts00:00:00    22 MB(-4%)  Iter   9   57.14%  Refine biparts00:00:00    22 MB(-4%)  Iter   9   71.43%  Refine biparts00:00:00    22 MB(-4%)  Iter   9   85.71%  Refine biparts00:00:00    22 MB(-4%)  Iter   9  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   9  114.29%  Refine biparts00:00:00    22 MB(-4%)  Iter   9  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter  10   28.57%  Refine biparts00:00:00    22 MB(-4%)  Iter  10   42.86%  Refine biparts00:00:00    22 MB(-4%)  Iter  10   57.14%  Refine biparts00:00:00    22 MB(-4%)  Iter  10   71.43%  Refine biparts00:00:00    22 MB(-4%)  Iter  10   85.71%  Refine biparts00:00:00    22 MB(-4%)  Iter  10  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter  10  114.29%  Refine biparts00:00:00    22 MB(-4%)  Iter  10  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter  11   28.57%  Refine biparts00:00:00    22 MB(-4%)  Iter  11   42.86%  Refine biparts00:00:00    22 MB(-4%)  Iter  11   57.14%  Refine biparts00:00:00    22 MB(-4%)  Iter  11   71.43%  Refine biparts00:00:00    22 MB(-4%)  Iter  11   85.71%  Refine biparts00:00:00    22 MB(-4%)  Iter  11  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter  11  114.29%  Refine biparts00:00:00    22 MB(-4%)  Iter  11  100.00%  Refine biparts
-
-
-
-   --------------------------------------------------------------------------   
-	    Aligning and cleaning gene [0;32mRibosomal_L22[0m; Number 4 of 14.
-   --------------------------------------------------------------------------   
-
-MUSCLE v3.8.1551 by Robert C. Edgar
-
-http://www.drive5.com/muscle
-This software is donated to the public domain.
-Please cite: Edgar, R.C. Nucleic Acids Res 32(5), 1792-97.
-
-
-*** WARNING *** Invalid character '*' in FASTA sequence data, ignored
-
-*** WARNING *** Invalid character '*' in FASTA sequence data, ignored
-Ribosomal_L22_hits_filtered 6 seqs, lengths min 114, max 119, avg 118
-00:00:00    19 MB(-4%)  Iter   1    4.76%  K-mer dist pass 100:00:00    19 MB(-4%)  Iter   1  100.00%  K-mer dist pass 1
-00:00:00    19 MB(-4%)  Iter   1    4.76%  K-mer dist pass 200:00:00    19 MB(-4%)  Iter   1  100.00%  K-mer dist pass 2
-00:00:00    20 MB(-4%)  Iter   1   20.00%  Align node       00:00:00    21 MB(-4%)  Iter   1   40.00%  Align node00:00:00    21 MB(-4%)  Iter   1   60.00%  Align node00:00:00    21 MB(-4%)  Iter   1   80.00%  Align node00:00:00    21 MB(-4%)  Iter   1  100.00%  Align node00:00:00    21 MB(-4%)  Iter   1  100.00%  Align node
-00:00:00    21 MB(-4%)  Iter   1   16.67%  Root alignment00:00:00    21 MB(-4%)  Iter   1   33.33%  Root alignment00:00:00    21 MB(-4%)  Iter   1   50.00%  Root alignment00:00:00    21 MB(-4%)  Iter   1   66.67%  Root alignment00:00:00    21 MB(-4%)  Iter   1   83.33%  Root alignment00:00:00    21 MB(-4%)  Iter   1  100.00%  Root alignment00:00:00    21 MB(-4%)  Iter   1  100.00%  Root alignment
-00:00:00    21 MB(-4%)  Iter   2   25.00%  Refine tree   00:00:00    21 MB(-4%)  Iter   2   50.00%  Refine tree00:00:00    21 MB(-4%)  Iter   2   75.00%  Refine tree00:00:00    21 MB(-4%)  Iter   2  100.00%  Refine tree00:00:00    21 MB(-4%)  Iter   2  100.00%  Refine tree
-00:00:00    21 MB(-4%)  Iter   2   16.67%  Root alignment00:00:00    21 MB(-4%)  Iter   2   33.33%  Root alignment00:00:00    21 MB(-4%)  Iter   2   50.00%  Root alignment00:00:00    21 MB(-4%)  Iter   2   66.67%  Root alignment00:00:00    21 MB(-4%)  Iter   2   83.33%  Root alignment00:00:00    21 MB(-4%)  Iter   2  100.00%  Root alignment00:00:00    21 MB(-4%)  Iter   2  100.00%  Root alignment
-00:00:00    21 MB(-4%)  Iter   2  100.00%  Root alignment
-00:00:00    21 MB(-4%)  Iter   3   22.22%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   33.33%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   44.44%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   55.56%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   66.67%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   77.78%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   88.89%  Refine biparts00:00:00    21 MB(-4%)  Iter   3  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   3  111.11%  Refine biparts00:00:00    21 MB(-4%)  Iter   3  100.00%  Refine biparts
-00:00:00    21 MB(-4%)  Iter   4   22.22%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   33.33%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   44.44%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   55.56%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   66.67%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   77.78%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   88.89%  Refine biparts00:00:00    21 MB(-4%)  Iter   4  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   4  111.11%  Refine biparts00:00:00    21 MB(-4%)  Iter   4  100.00%  Refine biparts
-00:00:00    21 MB(-4%)  Iter   5   22.22%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   33.33%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   44.44%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   55.56%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   66.67%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   77.78%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   88.89%  Refine biparts00:00:00    21 MB(-4%)  Iter   5  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   5  111.11%  Refine biparts00:00:00    21 MB(-4%)  Iter   5  100.00%  Refine biparts
-00:00:00    21 MB(-4%)  Iter   6   22.22%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   33.33%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   44.44%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   55.56%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   66.67%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   77.78%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   88.89%  Refine biparts00:00:00    21 MB(-4%)  Iter   6  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   6  111.11%  Refine biparts00:00:00    21 MB(-4%)  Iter   6  100.00%  Refine biparts
-
-
-
-   --------------------------------------------------------------------------   
-	    Aligning and cleaning gene [0;32mribosomal_L24[0m; Number 5 of 14.
-   --------------------------------------------------------------------------   
-
-MUSCLE v3.8.1551 by Robert C. Edgar
-
-http://www.drive5.com/muscle
-This software is donated to the public domain.
-Please cite: Edgar, R.C. Nucleic Acids Res 32(5), 1792-97.
-
-
-*** WARNING *** Invalid character '*' in FASTA sequence data, ignored
-
-*** WARNING *** Invalid character '*' in FASTA sequence data, ignored
-ribosomal_L24_hits_filtered 6 seqs, lengths min 80, max 80, avg 80
-00:00:00    19 MB(-4%)  Iter   1    4.76%  K-mer dist pass 100:00:00    19 MB(-4%)  Iter   1  100.00%  K-mer dist pass 1
-00:00:00    19 MB(-4%)  Iter   1    4.76%  K-mer dist pass 200:00:00    19 MB(-4%)  Iter   1  100.00%  K-mer dist pass 2
-00:00:00    19 MB(-4%)  Iter   1   20.00%  Align node       00:00:00    21 MB(-4%)  Iter   1   40.00%  Align node00:00:00    21 MB(-4%)  Iter   1   60.00%  Align node00:00:00    21 MB(-4%)  Iter   1   80.00%  Align node00:00:00    21 MB(-4%)  Iter   1  100.00%  Align node00:00:00    21 MB(-4%)  Iter   1  100.00%  Align node
-00:00:00    21 MB(-4%)  Iter   1   16.67%  Root alignment00:00:00    21 MB(-4%)  Iter   1   33.33%  Root alignment00:00:00    21 MB(-4%)  Iter   1   50.00%  Root alignment00:00:00    21 MB(-4%)  Iter   1   66.67%  Root alignment00:00:00    21 MB(-4%)  Iter   1   83.33%  Root alignment00:00:00    21 MB(-4%)  Iter   1  100.00%  Root alignment00:00:00    21 MB(-4%)  Iter   1  100.00%  Root alignment
-00:00:00    21 MB(-4%)  Iter   2   25.00%  Refine tree   00:00:00    21 MB(-4%)  Iter   2   50.00%  Refine tree00:00:00    21 MB(-4%)  Iter   2   75.00%  Refine tree00:00:00    21 MB(-4%)  Iter   2  100.00%  Refine tree
-00:00:00    21 MB(-4%)  Iter   2   16.67%  Root alignment00:00:00    21 MB(-4%)  Iter   2   33.33%  Root alignment00:00:00    21 MB(-4%)  Iter   2   50.00%  Root alignment00:00:00    21 MB(-4%)  Iter   2   66.67%  Root alignment00:00:00    21 MB(-4%)  Iter   2   83.33%  Root alignment00:00:00    21 MB(-4%)  Iter   2  100.00%  Root alignment00:00:00    21 MB(-4%)  Iter   2  100.00%  Root alignment
-00:00:00    21 MB(-4%)  Iter   2  100.00%  Root alignment
-00:00:00    21 MB(-4%)  Iter   3   22.22%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   33.33%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   44.44%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   55.56%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   66.67%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   77.78%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   88.89%  Refine biparts00:00:00    21 MB(-4%)  Iter   3  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   3  111.11%  Refine biparts00:00:00    21 MB(-4%)  Iter   3  100.00%  Refine biparts
-00:00:00    21 MB(-4%)  Iter   4   22.22%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   33.33%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   44.44%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   55.56%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   66.67%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   77.78%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   88.89%  Refine biparts00:00:00    21 MB(-4%)  Iter   4  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   4  111.11%  Refine biparts00:00:00    21 MB(-4%)  Iter   4  100.00%  Refine biparts
-00:00:00    21 MB(-4%)  Iter   5   22.22%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   33.33%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   44.44%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   55.56%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   66.67%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   77.78%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   88.89%  Refine biparts00:00:00    21 MB(-4%)  Iter   5  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   5  111.11%  Refine biparts00:00:00    21 MB(-4%)  Iter   5  100.00%  Refine biparts
-00:00:00    21 MB(-4%)  Iter   6   22.22%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   33.33%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   44.44%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   55.56%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   66.67%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   77.78%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   88.89%  Refine biparts00:00:00    21 MB(-4%)  Iter   6  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   6  111.11%  Refine biparts00:00:00    21 MB(-4%)  Iter   6  100.00%  Refine biparts
-
-
-
-   --------------------------------------------------------------------------   
-	    Aligning and cleaning gene [0;32mRibosomal_L3[0m; Number 6 of 14.
-   --------------------------------------------------------------------------   
-
-MUSCLE v3.8.1551 by Robert C. Edgar
-
-http://www.drive5.com/muscle
-This software is donated to the public domain.
-Please cite: Edgar, R.C. Nucleic Acids Res 32(5), 1792-97.
-
-
-*** WARNING *** Invalid character '*' in FASTA sequence data, ignored
-
-*** WARNING *** Invalid character '*' in FASTA sequence data, ignored
-Ribosomal_L3_hits_filtered 6 seqs, lengths min 207, max 209, avg 208
-00:00:00    19 MB(-4%)  Iter   1    4.76%  K-mer dist pass 100:00:00    19 MB(-4%)  Iter   1  100.00%  K-mer dist pass 1
-00:00:00    19 MB(-4%)  Iter   1    4.76%  K-mer dist pass 200:00:00    19 MB(-4%)  Iter   1  100.00%  K-mer dist pass 2
-00:00:00    20 MB(-4%)  Iter   1   20.00%  Align node       00:00:00    22 MB(-4%)  Iter   1   40.00%  Align node00:00:00    22 MB(-4%)  Iter   1   60.00%  Align node00:00:00    22 MB(-4%)  Iter   1   80.00%  Align node00:00:00    22 MB(-4%)  Iter   1  100.00%  Align node00:00:00    22 MB(-4%)  Iter   1  100.00%  Align node
-00:00:00    22 MB(-4%)  Iter   1   16.67%  Root alignment00:00:00    22 MB(-4%)  Iter   1   33.33%  Root alignment00:00:00    22 MB(-4%)  Iter   1   50.00%  Root alignment00:00:00    22 MB(-4%)  Iter   1   66.67%  Root alignment00:00:00    22 MB(-4%)  Iter   1   83.33%  Root alignment00:00:00    22 MB(-4%)  Iter   1  100.00%  Root alignment00:00:00    22 MB(-4%)  Iter   1  100.00%  Root alignment
-00:00:00    22 MB(-4%)  Iter   2  100.00%  Root alignment
-00:00:00    22 MB(-4%)  Iter   3   22.22%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   33.33%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   44.44%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   55.56%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   66.67%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   77.78%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   88.89%  Refine biparts00:00:00    22 MB(-4%)  Iter   3  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   3  111.11%  Refine biparts00:00:00    22 MB(-4%)  Iter   3  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   4   22.22%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   33.33%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   44.44%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   55.56%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   66.67%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   77.78%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   88.89%  Refine biparts00:00:00    22 MB(-4%)  Iter   4  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   4  111.11%  Refine biparts00:00:00    22 MB(-4%)  Iter   4  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   5   22.22%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   33.33%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   44.44%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   55.56%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   66.67%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   77.78%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   88.89%  Refine biparts00:00:00    22 MB(-4%)  Iter   5  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   5  111.11%  Refine biparts00:00:00    22 MB(-4%)  Iter   5  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   6   22.22%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   33.33%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   44.44%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   55.56%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   66.67%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   77.78%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   88.89%  Refine biparts00:00:00    22 MB(-4%)  Iter   6  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   6  111.11%  Refine biparts00:00:00    22 MB(-4%)  Iter   6  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   7   22.22%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   33.33%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   44.44%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   55.56%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   66.67%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   77.78%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   88.89%  Refine biparts00:00:00    22 MB(-4%)  Iter   7  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   7  111.11%  Refine biparts00:00:00    22 MB(-4%)  Iter   7  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   8   22.22%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   33.33%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   44.44%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   55.56%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   66.67%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   77.78%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   88.89%  Refine biparts00:00:00    22 MB(-4%)  Iter   8  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   8  111.11%  Refine biparts00:00:00    22 MB(-4%)  Iter   8  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   9   22.22%  Refine biparts00:00:00    22 MB(-4%)  Iter   9   33.33%  Refine biparts00:00:00    22 MB(-4%)  Iter   9   44.44%  Refine biparts00:00:00    22 MB(-4%)  Iter   9   55.56%  Refine biparts00:00:00    22 MB(-4%)  Iter   9   66.67%  Refine biparts00:00:00    22 MB(-4%)  Iter   9   77.78%  Refine biparts00:00:00    22 MB(-4%)  Iter   9   88.89%  Refine biparts00:00:00    22 MB(-4%)  Iter   9  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   9  111.11%  Refine biparts00:00:00    22 MB(-4%)  Iter   9  100.00%  Refine biparts
-
-
-
-   --------------------------------------------------------------------------   
-	    Aligning and cleaning gene [0;32mRibosomal_L4[0m; Number 7 of 14.
-   --------------------------------------------------------------------------   
-
-MUSCLE v3.8.1551 by Robert C. Edgar
-
-http://www.drive5.com/muscle
-This software is donated to the public domain.
-Please cite: Edgar, R.C. Nucleic Acids Res 32(5), 1792-97.
-
-
-*** WARNING *** Invalid character '*' in FASTA sequence data, ignored
-
-*** WARNING *** Invalid character '*' in FASTA sequence data, ignored
-Ribosomal_L4_hits_filtered 6 seqs, lengths min 208, max 215, avg 210
-00:00:00    19 MB(-4%)  Iter   1    4.76%  K-mer dist pass 100:00:00    19 MB(-4%)  Iter   1  100.00%  K-mer dist pass 1
-00:00:00    19 MB(-4%)  Iter   1    4.76%  K-mer dist pass 200:00:00    19 MB(-4%)  Iter   1  100.00%  K-mer dist pass 2
-00:00:00    20 MB(-4%)  Iter   1   20.00%  Align node       00:00:00    22 MB(-4%)  Iter   1   40.00%  Align node00:00:00    22 MB(-4%)  Iter   1   60.00%  Align node00:00:00    22 MB(-4%)  Iter   1   80.00%  Align node00:00:00    22 MB(-4%)  Iter   1  100.00%  Align node00:00:00    22 MB(-4%)  Iter   1  100.00%  Align node
-00:00:00    22 MB(-4%)  Iter   1   16.67%  Root alignment00:00:00    22 MB(-4%)  Iter   1   33.33%  Root alignment00:00:00    22 MB(-4%)  Iter   1   50.00%  Root alignment00:00:00    22 MB(-4%)  Iter   1   66.67%  Root alignment00:00:00    22 MB(-4%)  Iter   1   83.33%  Root alignment00:00:00    22 MB(-4%)  Iter   1  100.00%  Root alignment00:00:00    22 MB(-4%)  Iter   1  100.00%  Root alignment
-00:00:00    22 MB(-4%)  Iter   2   25.00%  Refine tree   00:00:00    22 MB(-4%)  Iter   2   50.00%  Refine tree00:00:00    22 MB(-4%)  Iter   2   75.00%  Refine tree00:00:00    22 MB(-4%)  Iter   2  100.00%  Refine tree00:00:00    22 MB(-4%)  Iter   2  100.00%  Refine tree
-00:00:00    22 MB(-4%)  Iter   2   16.67%  Root alignment00:00:00    22 MB(-4%)  Iter   2   33.33%  Root alignment00:00:00    22 MB(-4%)  Iter   2   50.00%  Root alignment00:00:00    22 MB(-4%)  Iter   2   66.67%  Root alignment00:00:00    22 MB(-4%)  Iter   2   83.33%  Root alignment00:00:00    22 MB(-4%)  Iter   2  100.00%  Root alignment00:00:00    22 MB(-4%)  Iter   2  100.00%  Root alignment
-00:00:00    22 MB(-4%)  Iter   2  100.00%  Root alignment
-00:00:00    22 MB(-4%)  Iter   3   22.22%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   33.33%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   44.44%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   55.56%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   66.67%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   77.78%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   88.89%  Refine biparts00:00:00    22 MB(-4%)  Iter   3  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   3  111.11%  Refine biparts00:00:00    22 MB(-4%)  Iter   3  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   4   22.22%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   33.33%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   44.44%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   55.56%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   66.67%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   77.78%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   88.89%  Refine biparts00:00:00    22 MB(-4%)  Iter   4  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   4  111.11%  Refine biparts00:00:00    22 MB(-4%)  Iter   4  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   5   22.22%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   33.33%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   44.44%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   55.56%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   66.67%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   77.78%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   88.89%  Refine biparts00:00:00    22 MB(-4%)  Iter   5  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   5  111.11%  Refine biparts00:00:00    22 MB(-4%)  Iter   5  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   6   22.22%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   33.33%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   44.44%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   55.56%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   66.67%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   77.78%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   88.89%  Refine biparts00:00:00    22 MB(-4%)  Iter   6  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   6  111.11%  Refine biparts00:00:00    22 MB(-4%)  Iter   6  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   7   22.22%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   33.33%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   44.44%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   55.56%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   66.67%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   77.78%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   88.89%  Refine biparts00:00:00    22 MB(-4%)  Iter   7  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   7  111.11%  Refine biparts00:00:00    22 MB(-4%)  Iter   7  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   8   22.22%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   33.33%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   44.44%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   55.56%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   66.67%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   77.78%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   88.89%  Refine biparts00:00:00    22 MB(-4%)  Iter   8  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   8  111.11%  Refine biparts00:00:00    22 MB(-4%)  Iter   8  100.00%  Refine biparts
-
-
-
-   --------------------------------------------------------------------------   
-	    Aligning and cleaning gene [0;32mRibosomal_L5[0m; Number 8 of 14.
-   --------------------------------------------------------------------------   
-
-MUSCLE v3.8.1551 by Robert C. Edgar
-
-http://www.drive5.com/muscle
-This software is donated to the public domain.
-Please cite: Edgar, R.C. Nucleic Acids Res 32(5), 1792-97.
-
-
-*** WARNING *** Invalid character '*' in FASTA sequence data, ignored
-
-*** WARNING *** Invalid character '*' in FASTA sequence data, ignored
-Ribosomal_L5_hits_filtered 7 seqs, lengths min 194, max 218, avg 198
-00:00:00    19 MB(-4%)  Iter   1    3.57%  K-mer dist pass 100:00:00    19 MB(-4%)  Iter   1  100.00%  K-mer dist pass 1
-00:00:00    19 MB(-4%)  Iter   1    3.57%  K-mer dist pass 200:00:00    19 MB(-4%)  Iter   1  100.00%  K-mer dist pass 2
-00:00:00    20 MB(-4%)  Iter   1   16.67%  Align node       00:00:00    21 MB(-4%)  Iter   1   33.33%  Align node00:00:00    22 MB(-4%)  Iter   1   50.00%  Align node00:00:00    22 MB(-4%)  Iter   1   66.67%  Align node00:00:00    22 MB(-4%)  Iter   1   83.33%  Align node00:00:00    22 MB(-4%)  Iter   1  100.00%  Align node00:00:00    22 MB(-4%)  Iter   1  100.00%  Align node
-00:00:00    22 MB(-4%)  Iter   1   14.29%  Root alignment00:00:00    22 MB(-4%)  Iter   1   28.57%  Root alignment00:00:00    22 MB(-4%)  Iter   1   42.86%  Root alignment00:00:00    22 MB(-4%)  Iter   1   57.14%  Root alignment00:00:00    22 MB(-4%)  Iter   1   71.43%  Root alignment00:00:00    22 MB(-4%)  Iter   1   85.71%  Root alignment00:00:00    22 MB(-4%)  Iter   1  100.00%  Root alignment00:00:00    22 MB(-4%)  Iter   1  100.00%  Root alignment
-00:00:00    22 MB(-4%)  Iter   2   20.00%  Refine tree   00:00:00    22 MB(-4%)  Iter   2   40.00%  Refine tree00:00:00    22 MB(-4%)  Iter   2   60.00%  Refine tree00:00:00    22 MB(-4%)  Iter   2  100.00%  Refine tree
-00:00:00    22 MB(-4%)  Iter   2   14.29%  Root alignment00:00:00    22 MB(-4%)  Iter   2   28.57%  Root alignment00:00:00    22 MB(-4%)  Iter   2   42.86%  Root alignment00:00:00    22 MB(-4%)  Iter   2   57.14%  Root alignment00:00:00    22 MB(-4%)  Iter   2   71.43%  Root alignment00:00:00    22 MB(-4%)  Iter   2   85.71%  Root alignment00:00:00    22 MB(-4%)  Iter   2  100.00%  Root alignment00:00:00    22 MB(-4%)  Iter   2  100.00%  Root alignment
-00:00:00    22 MB(-4%)  Iter   2  100.00%  Root alignment
-00:00:00    22 MB(-4%)  Iter   3   18.18%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   27.27%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   36.36%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   45.45%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   54.55%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   63.64%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   72.73%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   81.82%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   90.91%  Refine biparts00:00:00    22 MB(-4%)  Iter   3  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   3  109.09%  Refine biparts00:00:00    22 MB(-4%)  Iter   3  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   4   18.18%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   27.27%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   36.36%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   45.45%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   54.55%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   63.64%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   72.73%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   81.82%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   90.91%  Refine biparts00:00:00    22 MB(-4%)  Iter   4  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   4  109.09%  Refine biparts00:00:00    22 MB(-4%)  Iter   4  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   5   18.18%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   27.27%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   36.36%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   45.45%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   54.55%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   63.64%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   72.73%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   81.82%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   90.91%  Refine biparts00:00:00    22 MB(-4%)  Iter   5  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   5  109.09%  Refine biparts00:00:00    22 MB(-4%)  Iter   5  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   6   18.18%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   27.27%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   36.36%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   45.45%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   54.55%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   63.64%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   72.73%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   81.82%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   90.91%  Refine biparts00:00:00    22 MB(-4%)  Iter   6  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   6  109.09%  Refine biparts00:00:00    22 MB(-4%)  Iter   6  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   7   18.18%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   27.27%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   36.36%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   45.45%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   54.55%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   63.64%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   72.73%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   81.82%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   90.91%  Refine biparts00:00:00    22 MB(-4%)  Iter   7  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   7  109.09%  Refine biparts00:00:00    22 MB(-4%)  Iter   7  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   8   18.18%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   27.27%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   36.36%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   45.45%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   54.55%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   63.64%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   72.73%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   81.82%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   90.91%  Refine biparts00:00:00    22 MB(-4%)  Iter   8  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   8  109.09%  Refine biparts00:00:00    22 MB(-4%)  Iter   8  100.00%  Refine biparts
-
-
-
-   --------------------------------------------------------------------------   
-	    Aligning and cleaning gene [0;32mRibosomal_L6[0m; Number 9 of 14.
-   --------------------------------------------------------------------------   
-
-MUSCLE v3.8.1551 by Robert C. Edgar
-
-http://www.drive5.com/muscle
-This software is donated to the public domain.
-Please cite: Edgar, R.C. Nucleic Acids Res 32(5), 1792-97.
-
-
-*** WARNING *** Invalid character '*' in FASTA sequence data, ignored
-
-*** WARNING *** Invalid character '*' in FASTA sequence data, ignored
-Ribosomal_L6_hits_filtered 7 seqs, lengths min 179, max 179, avg 179
-00:00:00    19 MB(-4%)  Iter   1    3.57%  K-mer dist pass 100:00:00    19 MB(-4%)  Iter   1  100.00%  K-mer dist pass 1
-00:00:00    19 MB(-4%)  Iter   1    3.57%  K-mer dist pass 200:00:00    19 MB(-4%)  Iter   1  100.00%  K-mer dist pass 2
-00:00:00    20 MB(-4%)  Iter   1   16.67%  Align node       00:00:00    21 MB(-4%)  Iter   1   33.33%  Align node00:00:00    21 MB(-4%)  Iter   1   50.00%  Align node00:00:00    22 MB(-4%)  Iter   1   66.67%  Align node00:00:00    22 MB(-4%)  Iter   1   83.33%  Align node00:00:00    22 MB(-4%)  Iter   1  100.00%  Align node00:00:00    22 MB(-4%)  Iter   1  100.00%  Align node
-00:00:00    22 MB(-4%)  Iter   1   14.29%  Root alignment00:00:00    22 MB(-4%)  Iter   1   28.57%  Root alignment00:00:00    22 MB(-4%)  Iter   1   42.86%  Root alignment00:00:00    22 MB(-4%)  Iter   1   57.14%  Root alignment00:00:00    22 MB(-4%)  Iter   1   71.43%  Root alignment00:00:00    22 MB(-4%)  Iter   1   85.71%  Root alignment00:00:00    22 MB(-4%)  Iter   1  100.00%  Root alignment00:00:00    22 MB(-4%)  Iter   1  100.00%  Root alignment
-00:00:00    22 MB(-4%)  Iter   2  100.00%  Root alignment
-00:00:00    22 MB(-4%)  Iter   3   18.18%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   27.27%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   36.36%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   45.45%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   54.55%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   63.64%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   72.73%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   81.82%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   90.91%  Refine biparts00:00:00    22 MB(-4%)  Iter   3  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   3  109.09%  Refine biparts00:00:00    22 MB(-4%)  Iter   3  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   4   18.18%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   27.27%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   36.36%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   45.45%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   54.55%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   63.64%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   72.73%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   81.82%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   90.91%  Refine biparts00:00:00    22 MB(-4%)  Iter   4  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   4  109.09%  Refine biparts00:00:00    22 MB(-4%)  Iter   4  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   5   18.18%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   27.27%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   36.36%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   45.45%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   54.55%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   63.64%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   72.73%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   81.82%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   90.91%  Refine biparts00:00:00    22 MB(-4%)  Iter   5  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   5  109.09%  Refine biparts00:00:00    22 MB(-4%)  Iter   5  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   6   18.18%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   27.27%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   36.36%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   45.45%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   54.55%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   63.64%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   72.73%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   81.82%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   90.91%  Refine biparts00:00:00    22 MB(-4%)  Iter   6  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   6  109.09%  Refine biparts00:00:00    22 MB(-4%)  Iter   6  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   7   18.18%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   27.27%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   36.36%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   45.45%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   54.55%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   63.64%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   72.73%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   81.82%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   90.91%  Refine biparts00:00:00    22 MB(-4%)  Iter   7  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   7  109.09%  Refine biparts00:00:00    22 MB(-4%)  Iter   7  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   8   18.18%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   27.27%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   36.36%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   45.45%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   54.55%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   63.64%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   72.73%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   81.82%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   90.91%  Refine biparts00:00:00    22 MB(-4%)  Iter   8  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   8  109.09%  Refine biparts00:00:00    22 MB(-4%)  Iter   8  100.00%  Refine biparts
-
-
-
-   --------------------------------------------------------------------------   
-	    Aligning and cleaning gene [0;32mRibosomal_S10[0m; Number 10 of 14.
-   --------------------------------------------------------------------------   
-
-MUSCLE v3.8.1551 by Robert C. Edgar
-
-http://www.drive5.com/muscle
-This software is donated to the public domain.
-Please cite: Edgar, R.C. Nucleic Acids Res 32(5), 1792-97.
-
-
-*** WARNING *** Invalid character '*' in FASTA sequence data, ignored
-
-*** WARNING *** Invalid character '*' in FASTA sequence data, ignored
-Ribosomal_S10_hits_filtered 6 seqs, lengths min 102, max 103, avg 102
-00:00:00    19 MB(-4%)  Iter   1    4.76%  K-mer dist pass 100:00:00    19 MB(-4%)  Iter   1  100.00%  K-mer dist pass 1
-00:00:00    19 MB(-4%)  Iter   1    4.76%  K-mer dist pass 200:00:00    19 MB(-4%)  Iter   1  100.00%  K-mer dist pass 2
-00:00:00    20 MB(-4%)  Iter   1   20.00%  Align node       00:00:00    21 MB(-4%)  Iter   1   40.00%  Align node00:00:00    21 MB(-4%)  Iter   1   60.00%  Align node00:00:00    21 MB(-4%)  Iter   1   80.00%  Align node00:00:00    21 MB(-4%)  Iter   1  100.00%  Align node00:00:00    21 MB(-4%)  Iter   1  100.00%  Align node
-00:00:00    21 MB(-4%)  Iter   1   16.67%  Root alignment00:00:00    21 MB(-4%)  Iter   1   33.33%  Root alignment00:00:00    21 MB(-4%)  Iter   1   50.00%  Root alignment00:00:00    21 MB(-4%)  Iter   1   66.67%  Root alignment00:00:00    21 MB(-4%)  Iter   1   83.33%  Root alignment00:00:00    21 MB(-4%)  Iter   1  100.00%  Root alignment00:00:00    21 MB(-4%)  Iter   1  100.00%  Root alignment
-00:00:00    21 MB(-4%)  Iter   2   25.00%  Refine tree   00:00:00    21 MB(-4%)  Iter   2   50.00%  Refine tree00:00:00    21 MB(-4%)  Iter   2   75.00%  Refine tree00:00:00    21 MB(-4%)  Iter   2  100.00%  Refine tree
-00:00:00    21 MB(-4%)  Iter   2   16.67%  Root alignment00:00:00    21 MB(-4%)  Iter   2   33.33%  Root alignment00:00:00    21 MB(-4%)  Iter   2   50.00%  Root alignment00:00:00    21 MB(-4%)  Iter   2   66.67%  Root alignment00:00:00    21 MB(-4%)  Iter   2   83.33%  Root alignment00:00:00    21 MB(-4%)  Iter   2  100.00%  Root alignment00:00:00    21 MB(-4%)  Iter   2  100.00%  Root alignment
-00:00:00    21 MB(-4%)  Iter   2  100.00%  Root alignment
-00:00:00    21 MB(-4%)  Iter   3   22.22%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   33.33%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   44.44%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   55.56%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   66.67%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   77.78%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   88.89%  Refine biparts00:00:00    21 MB(-4%)  Iter   3  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   3  111.11%  Refine biparts00:00:00    21 MB(-4%)  Iter   3  100.00%  Refine biparts
-00:00:00    21 MB(-4%)  Iter   4   22.22%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   33.33%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   44.44%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   55.56%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   66.67%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   77.78%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   88.89%  Refine biparts00:00:00    21 MB(-4%)  Iter   4  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   4  111.11%  Refine biparts00:00:00    21 MB(-4%)  Iter   4  100.00%  Refine biparts
-00:00:00    21 MB(-4%)  Iter   5   22.22%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   33.33%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   44.44%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   55.56%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   66.67%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   77.78%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   88.89%  Refine biparts00:00:00    21 MB(-4%)  Iter   5  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   5  111.11%  Refine biparts00:00:00    21 MB(-4%)  Iter   5  100.00%  Refine biparts
-00:00:00    21 MB(-4%)  Iter   6   22.22%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   33.33%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   44.44%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   55.56%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   66.67%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   77.78%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   88.89%  Refine biparts00:00:00    21 MB(-4%)  Iter   6  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   6  111.11%  Refine biparts00:00:00    21 MB(-4%)  Iter   6  100.00%  Refine biparts
-
-
-
-   --------------------------------------------------------------------------   
-	    Aligning and cleaning gene [0;32mRibosomal_S17[0m; Number 11 of 14.
-   --------------------------------------------------------------------------   
-
-MUSCLE v3.8.1551 by Robert C. Edgar
-
-http://www.drive5.com/muscle
-This software is donated to the public domain.
-Please cite: Edgar, R.C. Nucleic Acids Res 32(5), 1792-97.
-
-
-*** WARNING *** Invalid character '*' in FASTA sequence data, ignored
-
-*** WARNING *** Invalid character '*' in FASTA sequence data, ignored
-Ribosomal_S17_hits_filtered 7 seqs, lengths min 85, max 94, avg 89
-00:00:00    19 MB(-4%)  Iter   1    3.57%  K-mer dist pass 100:00:00    19 MB(-4%)  Iter   1  100.00%  K-mer dist pass 1
-00:00:00    19 MB(-4%)  Iter   1    3.57%  K-mer dist pass 200:00:00    19 MB(-4%)  Iter   1  100.00%  K-mer dist pass 2
-00:00:00    20 MB(-4%)  Iter   1   16.67%  Align node       00:00:00    21 MB(-4%)  Iter   1   33.33%  Align node00:00:00    21 MB(-4%)  Iter   1   50.00%  Align node00:00:00    21 MB(-4%)  Iter   1   66.67%  Align node00:00:00    21 MB(-4%)  Iter   1   83.33%  Align node00:00:00    21 MB(-4%)  Iter   1  100.00%  Align node00:00:00    21 MB(-4%)  Iter   1  100.00%  Align node
-00:00:00    21 MB(-4%)  Iter   1   14.29%  Root alignment00:00:00    21 MB(-4%)  Iter   1   28.57%  Root alignment00:00:00    21 MB(-4%)  Iter   1   42.86%  Root alignment00:00:00    21 MB(-4%)  Iter   1   57.14%  Root alignment00:00:00    21 MB(-4%)  Iter   1   71.43%  Root alignment00:00:00    21 MB(-4%)  Iter   1   85.71%  Root alignment00:00:00    21 MB(-4%)  Iter   1  100.00%  Root alignment00:00:00    21 MB(-4%)  Iter   1  100.00%  Root alignment
-00:00:00    21 MB(-4%)  Iter   2   20.00%  Refine tree   00:00:00    21 MB(-4%)  Iter   2   40.00%  Refine tree00:00:00    21 MB(-4%)  Iter   2   60.00%  Refine tree00:00:00    21 MB(-4%)  Iter   2  100.00%  Refine tree
-00:00:00    21 MB(-4%)  Iter   2   14.29%  Root alignment00:00:00    21 MB(-4%)  Iter   2   28.57%  Root alignment00:00:00    21 MB(-4%)  Iter   2   42.86%  Root alignment00:00:00    21 MB(-4%)  Iter   2   57.14%  Root alignment00:00:00    21 MB(-4%)  Iter   2   71.43%  Root alignment00:00:00    21 MB(-4%)  Iter   2   85.71%  Root alignment00:00:00    21 MB(-4%)  Iter   2  100.00%  Root alignment00:00:00    21 MB(-4%)  Iter   2  100.00%  Root alignment
-00:00:00    21 MB(-4%)  Iter   2  100.00%  Root alignment
-00:00:00    21 MB(-4%)  Iter   3   18.18%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   27.27%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   36.36%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   45.45%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   54.55%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   63.64%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   72.73%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   81.82%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   90.91%  Refine biparts00:00:00    21 MB(-4%)  Iter   3  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   3  109.09%  Refine biparts00:00:00    21 MB(-4%)  Iter   3  100.00%  Refine biparts
-00:00:00    21 MB(-4%)  Iter   4   18.18%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   27.27%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   36.36%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   45.45%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   54.55%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   63.64%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   72.73%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   81.82%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   90.91%  Refine biparts00:00:00    21 MB(-4%)  Iter   4  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   4  109.09%  Refine biparts00:00:00    21 MB(-4%)  Iter   4  100.00%  Refine biparts
-00:00:00    21 MB(-4%)  Iter   5   18.18%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   27.27%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   36.36%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   45.45%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   54.55%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   63.64%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   72.73%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   81.82%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   90.91%  Refine biparts00:00:00    21 MB(-4%)  Iter   5  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   5  109.09%  Refine biparts00:00:00    21 MB(-4%)  Iter   5  100.00%  Refine biparts
-00:00:00    21 MB(-4%)  Iter   6   18.18%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   27.27%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   36.36%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   45.45%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   54.55%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   63.64%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   72.73%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   81.82%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   90.91%  Refine biparts00:00:00    21 MB(-4%)  Iter   6  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   6  109.09%  Refine biparts00:00:00    21 MB(-4%)  Iter   6  100.00%  Refine biparts
-
-
-
-   --------------------------------------------------------------------------   
-	    Aligning and cleaning gene [0;32mRibosomal_S19[0m; Number 12 of 14.
-   --------------------------------------------------------------------------   
-
-MUSCLE v3.8.1551 by Robert C. Edgar
-
-http://www.drive5.com/muscle
-This software is donated to the public domain.
-Please cite: Edgar, R.C. Nucleic Acids Res 32(5), 1792-97.
-
-
-*** WARNING *** Invalid character '*' in FASTA sequence data, ignored
-
-*** WARNING *** Invalid character '*' in FASTA sequence data, ignored
-Ribosomal_S19_hits_filtered 6 seqs, lengths min 94, max 99, avg 97
-00:00:00    19 MB(-4%)  Iter   1    4.76%  K-mer dist pass 100:00:00    19 MB(-4%)  Iter   1  100.00%  K-mer dist pass 1
-00:00:00    19 MB(-4%)  Iter   1    4.76%  K-mer dist pass 200:00:00    19 MB(-4%)  Iter   1  100.00%  K-mer dist pass 2
-00:00:00    20 MB(-4%)  Iter   1   20.00%  Align node       00:00:00    21 MB(-4%)  Iter   1   40.00%  Align node00:00:00    21 MB(-4%)  Iter   1   60.00%  Align node00:00:00    21 MB(-4%)  Iter   1   80.00%  Align node00:00:00    21 MB(-4%)  Iter   1  100.00%  Align node00:00:00    21 MB(-4%)  Iter   1  100.00%  Align node
-00:00:00    21 MB(-4%)  Iter   1   16.67%  Root alignment00:00:00    21 MB(-4%)  Iter   1   33.33%  Root alignment00:00:00    21 MB(-4%)  Iter   1   50.00%  Root alignment00:00:00    21 MB(-4%)  Iter   1   66.67%  Root alignment00:00:00    21 MB(-4%)  Iter   1   83.33%  Root alignment00:00:00    21 MB(-4%)  Iter   1  100.00%  Root alignment00:00:00    21 MB(-4%)  Iter   1  100.00%  Root alignment
-00:00:00    21 MB(-4%)  Iter   2   25.00%  Refine tree   00:00:00    21 MB(-4%)  Iter   2   50.00%  Refine tree00:00:00    21 MB(-4%)  Iter   2   75.00%  Refine tree00:00:00    21 MB(-4%)  Iter   2  100.00%  Refine tree
-00:00:00    21 MB(-4%)  Iter   2   16.67%  Root alignment00:00:00    21 MB(-4%)  Iter   2   33.33%  Root alignment00:00:00    21 MB(-4%)  Iter   2   50.00%  Root alignment00:00:00    21 MB(-4%)  Iter   2   66.67%  Root alignment00:00:00    21 MB(-4%)  Iter   2   83.33%  Root alignment00:00:00    21 MB(-4%)  Iter   2  100.00%  Root alignment00:00:00    21 MB(-4%)  Iter   2  100.00%  Root alignment
-00:00:00    21 MB(-4%)  Iter   2  100.00%  Root alignment
-00:00:00    21 MB(-4%)  Iter   3   22.22%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   33.33%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   44.44%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   55.56%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   66.67%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   77.78%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   88.89%  Refine biparts00:00:00    21 MB(-4%)  Iter   3  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   3  111.11%  Refine biparts00:00:00    21 MB(-4%)  Iter   3  100.00%  Refine biparts
-00:00:00    21 MB(-4%)  Iter   4   22.22%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   33.33%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   44.44%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   55.56%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   66.67%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   77.78%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   88.89%  Refine biparts00:00:00    21 MB(-4%)  Iter   4  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   4  111.11%  Refine biparts00:00:00    21 MB(-4%)  Iter   4  100.00%  Refine biparts
-00:00:00    21 MB(-4%)  Iter   5   22.22%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   33.33%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   44.44%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   55.56%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   66.67%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   77.78%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   88.89%  Refine biparts00:00:00    21 MB(-4%)  Iter   5  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   5  111.11%  Refine biparts00:00:00    21 MB(-4%)  Iter   5  100.00%  Refine biparts
-00:00:00    21 MB(-4%)  Iter   6   22.22%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   33.33%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   44.44%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   55.56%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   66.67%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   77.78%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   88.89%  Refine biparts00:00:00    21 MB(-4%)  Iter   6  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   6  111.11%  Refine biparts00:00:00    21 MB(-4%)  Iter   6  100.00%  Refine biparts
-
-
-
-   --------------------------------------------------------------------------   
-	    Aligning and cleaning gene [0;32mRibosomal_S3_C[0m; Number 13 of 14.
-   --------------------------------------------------------------------------   
-
-MUSCLE v3.8.1551 by Robert C. Edgar
-
-http://www.drive5.com/muscle
-This software is donated to the public domain.
-Please cite: Edgar, R.C. Nucleic Acids Res 32(5), 1792-97.
-
-
-*** WARNING *** Invalid character '*' in FASTA sequence data, ignored
-
-*** WARNING *** Invalid character '*' in FASTA sequence data, ignored
-Ribosomal_S3_C_hits_filtered 7 seqs, lengths min 213, max 253, avg 246
-00:00:00    19 MB(-4%)  Iter   1    3.57%  K-mer dist pass 100:00:00    19 MB(-4%)  Iter   1  100.00%  K-mer dist pass 1
-00:00:00    19 MB(-4%)  Iter   1    3.57%  K-mer dist pass 200:00:00    19 MB(-4%)  Iter   1  100.00%  K-mer dist pass 2
-00:00:00    20 MB(-4%)  Iter   1   16.67%  Align node       00:00:00    22 MB(-4%)  Iter   1   33.33%  Align node00:00:00    22 MB(-4%)  Iter   1   50.00%  Align node00:00:00    22 MB(-4%)  Iter   1   66.67%  Align node00:00:00    22 MB(-4%)  Iter   1   83.33%  Align node00:00:00    22 MB(-4%)  Iter   1  100.00%  Align node00:00:00    22 MB(-4%)  Iter   1  100.00%  Align node
-00:00:00    22 MB(-4%)  Iter   1   14.29%  Root alignment00:00:00    22 MB(-4%)  Iter   1   28.57%  Root alignment00:00:00    22 MB(-4%)  Iter   1   42.86%  Root alignment00:00:00    22 MB(-4%)  Iter   1   57.14%  Root alignment00:00:00    22 MB(-4%)  Iter   1   71.43%  Root alignment00:00:00    22 MB(-4%)  Iter   1   85.71%  Root alignment00:00:00    22 MB(-4%)  Iter   1  100.00%  Root alignment00:00:00    22 MB(-4%)  Iter   1  100.00%  Root alignment
-00:00:00    22 MB(-4%)  Iter   2  100.00%  Root alignment
-00:00:00    22 MB(-4%)  Iter   3   18.18%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   27.27%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   36.36%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   45.45%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   54.55%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   63.64%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   72.73%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   81.82%  Refine biparts00:00:00    22 MB(-4%)  Iter   3   90.91%  Refine biparts00:00:00    22 MB(-4%)  Iter   3  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   3  109.09%  Refine biparts00:00:00    22 MB(-4%)  Iter   3  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   4   18.18%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   27.27%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   36.36%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   45.45%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   54.55%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   63.64%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   72.73%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   81.82%  Refine biparts00:00:00    22 MB(-4%)  Iter   4   90.91%  Refine biparts00:00:00    22 MB(-4%)  Iter   4  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   4  109.09%  Refine biparts00:00:00    22 MB(-4%)  Iter   4  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   5   18.18%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   27.27%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   36.36%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   45.45%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   54.55%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   63.64%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   72.73%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   81.82%  Refine biparts00:00:00    22 MB(-4%)  Iter   5   90.91%  Refine biparts00:00:00    22 MB(-4%)  Iter   5  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   5  109.09%  Refine biparts00:00:00    22 MB(-4%)  Iter   5  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   6   18.18%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   27.27%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   36.36%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   45.45%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   54.55%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   63.64%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   72.73%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   81.82%  Refine biparts00:00:00    22 MB(-4%)  Iter   6   90.91%  Refine biparts00:00:00    22 MB(-4%)  Iter   6  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   6  109.09%  Refine biparts00:00:00    22 MB(-4%)  Iter   6  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   7   18.18%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   27.27%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   36.36%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   45.45%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   54.55%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   63.64%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   72.73%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   81.82%  Refine biparts00:00:00    22 MB(-4%)  Iter   7   90.91%  Refine biparts00:00:00    22 MB(-4%)  Iter   7  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   7  109.09%  Refine biparts00:00:00    22 MB(-4%)  Iter   7  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   8   18.18%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   27.27%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   36.36%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   45.45%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   54.55%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   63.64%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   72.73%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   81.82%  Refine biparts00:00:00    22 MB(-4%)  Iter   8   90.91%  Refine biparts00:00:00    22 MB(-4%)  Iter   8  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   8  109.09%  Refine biparts00:00:00    22 MB(-4%)  Iter   8  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter   9   18.18%  Refine biparts00:00:00    22 MB(-4%)  Iter   9   27.27%  Refine biparts00:00:00    22 MB(-4%)  Iter   9   36.36%  Refine biparts00:00:00    22 MB(-4%)  Iter   9   45.45%  Refine biparts00:00:00    22 MB(-4%)  Iter   9   54.55%  Refine biparts00:00:00    22 MB(-4%)  Iter   9   63.64%  Refine biparts00:00:00    22 MB(-4%)  Iter   9   72.73%  Refine biparts00:00:00    22 MB(-4%)  Iter   9   81.82%  Refine biparts00:00:00    22 MB(-4%)  Iter   9   90.91%  Refine biparts00:00:00    22 MB(-4%)  Iter   9  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter   9  109.09%  Refine biparts00:00:00    22 MB(-4%)  Iter   9  100.00%  Refine biparts
-00:00:00    22 MB(-4%)  Iter  10   18.18%  Refine biparts00:00:00    22 MB(-4%)  Iter  10   27.27%  Refine biparts00:00:00    22 MB(-4%)  Iter  10   36.36%  Refine biparts00:00:00    22 MB(-4%)  Iter  10   45.45%  Refine biparts00:00:00    22 MB(-4%)  Iter  10   54.55%  Refine biparts00:00:00    22 MB(-4%)  Iter  10   63.64%  Refine biparts00:00:00    22 MB(-4%)  Iter  10   72.73%  Refine biparts00:00:00    22 MB(-4%)  Iter  10   81.82%  Refine biparts00:00:00    22 MB(-4%)  Iter  10   90.91%  Refine biparts00:00:00    22 MB(-4%)  Iter  10  100.00%  Refine biparts00:00:00    22 MB(-4%)  Iter  10  109.09%  Refine biparts00:00:00    22 MB(-4%)  Iter  10  100.00%  Refine biparts
-
-
-
-   --------------------------------------------------------------------------   
-	    Aligning and cleaning gene [0;32mRibosomal_S8[0m; Number 14 of 14.
-   --------------------------------------------------------------------------   
-
-MUSCLE v3.8.1551 by Robert C. Edgar
-
-http://www.drive5.com/muscle
-This software is donated to the public domain.
-Please cite: Edgar, R.C. Nucleic Acids Res 32(5), 1792-97.
-
-
-*** WARNING *** Invalid character '*' in FASTA sequence data, ignored
-
-*** WARNING *** Invalid character '*' in FASTA sequence data, ignored
-Ribosomal_S8_hits_filtered 7 seqs, lengths min 131, max 131, avg 131
-00:00:00    19 MB(-4%)  Iter   1    3.57%  K-mer dist pass 100:00:00    19 MB(-4%)  Iter   1  100.00%  K-mer dist pass 1
-00:00:00    19 MB(-4%)  Iter   1    3.57%  K-mer dist pass 200:00:00    19 MB(-4%)  Iter   1  100.00%  K-mer dist pass 2
-00:00:00    20 MB(-4%)  Iter   1   16.67%  Align node       00:00:00    21 MB(-4%)  Iter   1   33.33%  Align node00:00:00    21 MB(-4%)  Iter   1   50.00%  Align node00:00:00    21 MB(-4%)  Iter   1   66.67%  Align node00:00:00    21 MB(-4%)  Iter   1   83.33%  Align node00:00:00    21 MB(-4%)  Iter   1  100.00%  Align node00:00:00    21 MB(-4%)  Iter   1  100.00%  Align node
-00:00:00    21 MB(-4%)  Iter   1   14.29%  Root alignment00:00:00    21 MB(-4%)  Iter   1   28.57%  Root alignment00:00:00    21 MB(-4%)  Iter   1   42.86%  Root alignment00:00:00    21 MB(-4%)  Iter   1   57.14%  Root alignment00:00:00    21 MB(-4%)  Iter   1   71.43%  Root alignment00:00:00    21 MB(-4%)  Iter   1   85.71%  Root alignment00:00:00    21 MB(-4%)  Iter   1  100.00%  Root alignment00:00:00    21 MB(-4%)  Iter   1  100.00%  Root alignment
-00:00:00    21 MB(-4%)  Iter   2  100.00%  Root alignment
-00:00:00    21 MB(-4%)  Iter   3   18.18%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   27.27%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   36.36%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   45.45%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   54.55%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   63.64%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   72.73%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   81.82%  Refine biparts00:00:00    21 MB(-4%)  Iter   3   90.91%  Refine biparts00:00:00    21 MB(-4%)  Iter   3  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   3  109.09%  Refine biparts00:00:00    21 MB(-4%)  Iter   3  100.00%  Refine biparts
-00:00:00    21 MB(-4%)  Iter   4   18.18%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   27.27%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   36.36%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   45.45%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   54.55%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   63.64%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   72.73%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   81.82%  Refine biparts00:00:00    21 MB(-4%)  Iter   4   90.91%  Refine biparts00:00:00    21 MB(-4%)  Iter   4  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   4  109.09%  Refine biparts00:00:00    21 MB(-4%)  Iter   4  100.00%  Refine biparts
-00:00:00    21 MB(-4%)  Iter   5   18.18%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   27.27%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   36.36%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   45.45%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   54.55%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   63.64%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   72.73%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   81.82%  Refine biparts00:00:00    21 MB(-4%)  Iter   5   90.91%  Refine biparts00:00:00    21 MB(-4%)  Iter   5  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   5  109.09%  Refine biparts00:00:00    21 MB(-4%)  Iter   5  100.00%  Refine biparts
-00:00:00    21 MB(-4%)  Iter   6   18.18%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   27.27%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   36.36%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   45.45%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   54.55%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   63.64%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   72.73%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   81.82%  Refine biparts00:00:00    21 MB(-4%)  Iter   6   90.91%  Refine biparts00:00:00    21 MB(-4%)  Iter   6  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   6  109.09%  Refine biparts00:00:00    21 MB(-4%)  Iter   6  100.00%  Refine biparts
-00:00:00    21 MB(-4%)  Iter   7   18.18%  Refine biparts00:00:00    21 MB(-4%)  Iter   7   27.27%  Refine biparts00:00:00    21 MB(-4%)  Iter   7   36.36%  Refine biparts00:00:00    21 MB(-4%)  Iter   7   45.45%  Refine biparts00:00:00    21 MB(-4%)  Iter   7   54.55%  Refine biparts00:00:00    21 MB(-4%)  Iter   7   63.64%  Refine biparts00:00:00    21 MB(-4%)  Iter   7   72.73%  Refine biparts00:00:00    21 MB(-4%)  Iter   7   81.82%  Refine biparts00:00:00    21 MB(-4%)  Iter   7   90.91%  Refine biparts00:00:00    21 MB(-4%)  Iter   7  100.00%  Refine biparts00:00:00    21 MB(-4%)  Iter   7  109.09%  Refine biparts00:00:00    21 MB(-4%)  Iter   7  100.00%  Refine biparts
-
-
-
-________________________________________________________________________________
-
-
-
- ############################################################################## 
- ####                  Catting all alignments together                     ####
- ############################################################################## 
-
-           It is currently 02:44 AM; the process started at 02:44 AM.
-               Current process runtime: 0 hours and 0 minutes.
-
-
-________________________________________________________________________________
-
-
-
- ############################################################################## 
- ####                          Running IQ-TREE                            ####
- ############################################################################## 
-
-           It is currently 02:44 AM; the process started at 02:44 AM.
-               Current process runtime: 0 hours and 0 minutes.
-
-IQ-TREE multicore version 1.6.9 for Linux 64-bit built Mar  9 2019
-Developed by Bui Quang Minh, Nguyen Lam Tung, Olga Chernomor,
-Heiko Schmidt, Dominik Schrempf, Michael Woodhams.
-
-Host:    wisteria (AVX2, FMA3, 7 GB RAM)
-Command: iqtree -s phylogeny/gtotree/Aligned_SCGs.faa -nt 1 -mset WAG,LG -bb 1000 -pre iqtree_out
-Seed:    278459 (Using SPRNG - Scalable Parallel Random Number Generator)
-Time:    Wed Aug  7 02:44:33 2019
-Kernel:  AVX+FMA - 1 threads (8 CPU cores detected)
-
-HINT: Use -nt option to specify number of threads because your CPU has 8 cores!
-HINT: -nt AUTO will automatically determine the best number of threads to use.
-
-Reading alignment file phylogeny/gtotree/Aligned_SCGs.faa ... Fasta format detected
-Alignment most likely contains protein sequences
-WARNING: 65 sites contain only gaps or ambiguous characters.
-Alignment has 7 sequences with 2242 columns, 787 distinct patterns
-279 parsimony-informative, 688 singleton sites, 1275 constant sites
-                                          Gap/Ambiguity  Composition  p-value
-   1  Chl_ferrooxidans_KoFox                     47.41%    passed     77.98%
-   2  Chl_luteolum_DSM_273                       15.17%    passed    100.00%
-   3  Chl_phaeoferrooxidans_KB01                  2.90%    passed    100.00%
-   4  Chl_sp_N1                                   2.94%    passed     99.98%
-   5  Ignavibacterium_album_JCM_16511_outgroup    8.12%    passed     87.73%
-   6  L227_enr_S_6D_bin01                         2.90%    passed    100.00%
-   7  L304_enr_S_6D_bin01                         2.94%    passed    100.00%
-****  TOTAL                                      11.77%  0 sequences failed composition chi2 test (p-value<5%; df=19)
-
-
-Create initial parsimony tree by phylogenetic likelihood library (PLL)... 0.000 seconds
-NOTE: ModelFinder requires 11 MB RAM!
-ModelFinder will test 52 protein models (sample size: 2242) ...
- No. Model         -LnL         df  AIC          AICc         BIC
-  1  WAG           13101.497    11  26224.995    26225.113    26287.861
-  2  WAG+I         13005.778    12  26035.555    26035.695    26104.137
-  3  WAG+G4        12994.238    12  26012.476    26012.616    26081.058
-  4  WAG+I+G4      12996.258    13  26018.517    26018.680    26092.813
-  5  WAG+R2        12995.703    13  26017.405    26017.569    26091.702
-  6  WAG+R3        12994.547    15  26019.094    26019.310    26104.821
- 14  WAG+F         12970.172    30  26000.343    26001.184    26171.797
- 15  WAG+F+I       12863.760    31  25789.521    25790.418    25966.689
- 16  WAG+F+G4      12851.034    31  25764.068    25764.965    25941.237
- 17  WAG+F+I+G4    12852.648    32  25769.296    25770.252    25952.180
- 18  WAG+F+R2      12852.285    32  25768.570    25769.526    25951.454
- 19  WAG+F+R3      12851.134    34  25770.268    25771.347    25964.582
- 27  LG            13046.068    11  26114.136    26114.254    26177.002
- 28  LG+I          12933.061    12  25890.123    25890.263    25958.704
- 29  LG+G4         12912.289    12  25848.578    25848.718    25917.159
- 30  LG+I+G4       12914.715    13  25855.430    25855.593    25929.727
- 31  LG+R2         12911.414    13  25848.828    25848.992    25923.125
- 32  LG+R3         12910.257    15  25850.515    25850.730    25936.242
- 40  LG+F          12944.339    30  25948.677    25949.518    26120.131
- 41  LG+F+I        12819.961    31  25701.921    25702.819    25879.090
- 42  LG+F+G4       12798.385    31  25658.771    25659.669    25835.940
- 43  LG+F+I+G4     12800.245    32  25664.491    25665.447    25847.375
- 44  LG+F+R2       12797.702    32  25659.404    25660.360    25842.288
- 45  LG+F+R3       12796.623    34  25661.246    25662.325    25855.561
-Akaike Information Criterion:           LG+F+G4
-Corrected Akaike Information Criterion: LG+F+G4
-Bayesian Information Criterion:         LG+F+G4
-Best-fit model: LG+F+G4 chosen according to BIC
-
-All model information printed to iqtree_out.model.gz
-CPU time for ModelFinder: 1.905 seconds (0h:0m:1s)
-Wall-clock time for ModelFinder: 1.910 seconds (0h:0m:1s)
-Generating 1000 samples for ultrafast bootstrap (seed: 278459)...
-
-NOTE: 6 MB RAM (0 GB) is required!
-Estimate model parameters (epsilon = 0.100)
-1. Initial log-likelihood: -12816.670
-2. Current log-likelihood: -12801.317
-3. Current log-likelihood: -12798.505
-4. Current log-likelihood: -12798.392
-Optimal log-likelihood: -12798.384
-Gamma shape alpha: 0.596
-Parameters optimization took 4 rounds (0.106 sec)
-Computing ML distances based on estimated model parameters... 0.007 sec
-Computing BIONJ tree...
-0.000 seconds
-Log-likelihood of BIONJ tree: -12798.384
---------------------------------------------------------------------
-|             INITIALIZING CANDIDATE TREE SET                      |
---------------------------------------------------------------------
-Generating 99 parsimony trees... 0.051 second
-Computing log-likelihood of 36 initial trees ... 0.405 seconds
-Current best score: -12798.384
-
-Do NNI search on 20 best initial trees
-Estimate model parameters (epsilon = 0.100)
-BETTER TREE FOUND at iteration 1: -12798.384
-Iteration 10 / LogL: -12799.562 / Time: 0h:0m:1s
-Iteration 20 / LogL: -12798.399 / Time: 0h:0m:1s
-Finish initializing candidate tree set (1)
-Current best tree score: -12798.384 / CPU time: 1.632
-Number of iterations: 20
---------------------------------------------------------------------
-|               OPTIMIZING CANDIDATE TREE SET                      |
---------------------------------------------------------------------
-UPDATE BEST LOG-LIKELIHOOD: -12798.384
-UPDATE BEST LOG-LIKELIHOOD: -12798.384
-UPDATE BEST LOG-LIKELIHOOD: -12798.384
-Iteration 30 / LogL: -12798.384 / Time: 0h:0m:2s (0h:0m:5s left)
-UPDATE BEST LOG-LIKELIHOOD: -12798.384
-UPDATE BEST LOG-LIKELIHOOD: -12798.384
-UPDATE BEST LOG-LIKELIHOOD: -12798.384
-Iteration 40 / LogL: -12798.384 / Time: 0h:0m:2s (0h:0m:4s left)
-UPDATE BEST LOG-LIKELIHOOD: -12798.384
-Iteration 50 / LogL: -12799.405 / Time: 0h:0m:3s (0h:0m:3s left)
-Log-likelihood cutoff on original alignment: -12836.645
-Iteration 60 / LogL: -12798.384 / Time: 0h:0m:4s (0h:0m:2s left)
-Iteration 70 / LogL: -12798.384 / Time: 0h:0m:4s (0h:0m:2s left)
-Iteration 80 / LogL: -12798.909 / Time: 0h:0m:5s (0h:0m:1s left)
-Iteration 90 / LogL: -12799.713 / Time: 0h:0m:5s (0h:0m:0s left)
-Iteration 100 / LogL: -12798.397 / Time: 0h:0m:6s (0h:0m:0s left)
-Log-likelihood cutoff on original alignment: -12836.645
-NOTE: Bootstrap correlation coefficient of split occurrence frequencies: 1.000
-TREE SEARCH COMPLETED AFTER 102 ITERATIONS / Time: 0h:0m:6s
-
---------------------------------------------------------------------
-|                    FINALIZING TREE SEARCH                        |
---------------------------------------------------------------------
-Performs final model parameters optimization
-Estimate model parameters (epsilon = 0.010)
-1. Initial log-likelihood: -12798.384
-Optimal log-likelihood: -12798.384
-Gamma shape alpha: 0.596
-Parameters optimization took 1 rounds (0.016 sec)
-BEST SCORE FOUND : -12798.384
-Creating bootstrap support values...
-Split supports printed to NEXUS file iqtree_out.splits.nex
-Total tree length: 1.174
-
-Total number of iterations: 102
-CPU time used for tree search: 6.127 sec (0h:0m:6s)
-Wall-clock time used for tree search: 6.155 sec (0h:0m:6s)
-Total CPU time used: 6.337 sec (0h:0m:6s)
-Total wall-clock time used: 6.366 sec (0h:0m:6s)
-
-Computing bootstrap consensus tree...
-Reading input file iqtree_out.splits.nex...
-7 taxa and 19 splits.
-Consensus tree written to iqtree_out.contree
-Reading input trees file iqtree_out.contree
-Log-likelihood of consensus tree: -12798.384
-
-Analysis results written to: 
-  IQ-TREE report:                iqtree_out.iqtree
-  Maximum-likelihood tree:       iqtree_out.treefile
-  Likelihood distances:          iqtree_out.mldist
-
-Ultrafast bootstrap approximation results written to:
-  Split support values:          iqtree_out.splits.nex
-  Consensus tree:                iqtree_out.contree
-  Screen log file:               iqtree_out.log
-
-Date and Time: Wed Aug  7 02:44:41 2019
-
-
-#################################################################################
-####                                 [0;32mDone!![0m                                  ####
-#################################################################################
-
-            [0;32mAll 7 input genomes were retained through the workflow![0m
-
-    Tree written to:
-        [0;32mphylogeny/gtotree/phylogeny/gtotree.tre[0m
-
-mv: cannot stat 'phylogeny/gtotree/Aligned_SCGs.tre': No such file or directory
-    Alignment written to:
-        [0;32mphylogeny/gtotree/Aligned_SCGs.faa[0m
-
-    Summary file with comp./redund. estimates written to:
-        [0;32mphylogeny/gtotree/Genomes_summary_info.tsv[0m
-
-    Summary table with hits per target gene per genome written to:
-        [0;32mphylogeny/gtotree/SCG_hit_counts.tsv[0m
-
-    Partitions (for downstream use with mixed-model treeing) written to:
-        [0;32mphylogeny/gtotree/run_files/Partitions.txt[0m
-
-________________________________________________________________________________
-
-  Notes:
-
-    1 gene(s) had no hits in any genome.
-
-        Reported in "phylogeny/gtotree/run_files/".
-________________________________________________________________________________
-
-    Log file written to:
-        [0;32mphylogeny/gtotree/gtotree-runlog.txt[0m
-
-    Programs used and their citations have been written to:
-        [0;32mphylogeny/gtotree/citations.txt[0m
-
-                                         Total process runtime: 0 hours and 0 minutes.
-                                                      [0;32mHappy Wednesday :)[0m
-
