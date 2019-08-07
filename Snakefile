@@ -33,7 +33,7 @@ rule run_reciprocal_blast:
     shell:
         "BackBLAST.py --gene_cluster {params.query_genes} --query_proteome {params.query_genome_orfs} --subject_proteome {input} "
             "--e_value {params.eval} --min_ident {params.pident} --output_file {output} > {log} 2>&1 && "
-        "rm tempQuery.faa"
+        "if [[ -f tempQuery.faa ]]; then rm tempQuery.faa; fi"
 
 # Remove duplicate BLAST hits for each BLAST table
 rule remove_duplicates:

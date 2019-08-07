@@ -33,11 +33,11 @@ cd /tmp/BackBLAST_Reciprocal_BLAST
 git checkout develop
 
 # Install dependencies
-conda env create -n backblast --file="conda_requirements.yaml"
+conda create -n backblast -c bioconda -c conda-forge snakemake=5.5.4
 
 # Install main scripts
 conda activate backblast
-cp BackBLAST.sh BackBLAST.py Graph.py Graph.pyc Snakefile template_config.yaml ${CONDA_PREFIX}/bin
+cp -r BackBLAST.sh BackBLAST.py Graph.py Snakefile template_config.yaml envs ${CONDA_PREFIX}/bin
 cd Visualization
 cp RemoveDuplicates.sh CreateBlankResults.py CombineBlastTables.R generate_BackBLAST_heatmap.R ${CONDA_PREFIX}/bin
 

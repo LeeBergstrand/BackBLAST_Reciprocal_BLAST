@@ -374,7 +374,7 @@ function perform_run() {
     printf "Advanced parameters:\n"
     printf "   -S snakefile: Path to the Snakefile used to run BackBLAST [default: ${SNAKEFILE}]\n"
     printf "   -C conda: specify either 'use_conda' or 'no_conda' for whether or not each job should be run in \n"
-    printf "             its own conda env [default: no_conda]\n"
+    printf "             its own conda env [default: use_conda]\n"
     printf "             If 'no_conda' is run, then all dependencies need to be installed in the main environment\n"
     printf "             where BackBLAST is running. Could be tricky.\n\n"
     printf "Note: Currently does NOT support whitespaces in any input variables.\n\n"
@@ -389,7 +389,7 @@ function perform_run() {
   local snakefile
   snakefile=${SNAKEFILE}
   local conda
-  conda="with_conda"
+  conda="use_conda"
 
   # Set options (help from https://wiki.bash-hackers.org/howto/getopts_tutorial; accessed March 8th, 2019)
   OPTIND=1 # reset the OPTIND counter just in case
@@ -474,7 +474,7 @@ function perform_auto() {
     printf "   -T template_config: Path to the template config file used in setup [default: ${TEMPLATE_CONFIG}]\n"
     printf "   -S snakefile: Path to the Snakefile used to run BackBLAST [default: ${SNAKEFILE}]\n"
     printf "   -C conda: specify either 'use_conda' or 'no_conda' for whether or not each job should be run in \n"
-    printf "             its own conda env [default: with_conda]\n"
+    printf "             its own conda env [default: use_conda]\n"
     printf "             If 'no_conda' is run, then all dependencies need to be installed in the main environment\n"
     printf "             where BackBLAST is running. Could be tricky.\n\n"
     printf "Note: Currently does NOT support whitespaces in any input variables.\n\n"
@@ -503,7 +503,7 @@ function perform_auto() {
   local snakefile
   snakefile=${SNAKEFILE}
   local conda
-  conda="with_conda"
+  conda="use_conda"
 
   # Set options (help from https://wiki.bash-hackers.org/howto/getopts_tutorial; accessed March 8th, 2019)
   OPTIND=1 # reset the OPTIND counter just in case
