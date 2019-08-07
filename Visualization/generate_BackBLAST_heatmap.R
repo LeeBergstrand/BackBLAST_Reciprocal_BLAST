@@ -367,34 +367,29 @@ overlay_gene_naming <- function(blast_results, gene_metadata_filepath) {
   
   # If entries are not identical, try filtering down to just what is in the BLAST table
   if ( !identical(sort(unique(blast_results$qseqid)), sort(gene_metadata_table$qseqid)) ) {
-    
-    # Make sure that the qseqid's are contained in the metadata; if so, everything is okay
-    # The length should be zero if all tree tips are contained in the metadata table
+    # Remove any entries from the BLAST table that are missing in the metadata
     if(length(setdiff(unique(blast_results$qseqid), gene_metadata_table$qseqid)) > 0) {
-      
-      # But if the length is > 0, it means some entries are MISSING in the metadata, a major issue
       missing_metadata_entries <- setdiff(unique(blast_results$qseqid), gene_metadata_table$qseqid)
-      flog.error(glue::glue("The provided gene metadata file is missing some entries in the BLAST table: '",
+      flog.warn(glue::glue("The provided gene metadata file is missing some entries in the BLAST table: '",
                             glue::glue_collapse(missing_metadata_entries, sep = ", "),
-                            "'. Cannot continue -- exiting..."))
-      quit(save = "no", status = 1)
+                            "'. These entries will be REMOVED from the BLAST table when plotting."))
+      blast_results <- dplyr::filter(blast_results, !(qseqid %in% (missing_metadata_entries)))
     }
     
-    # Report to the user which entries in the metadata are extra and will be ignored
-    extra_metadata_entries <- dplyr::filter(gene_metadata_table,
-                                            qseqid %in% setdiff(gene_metadata_table$qseqid, 
-                                                                unique(blast_results$qseqid)))
-    extra_metadata_entries$user_reporting <- paste(extra_metadata_entries$qseqid, " (",
-                                                   extra_metadata_entries$gene_name, ")",
-                                                   sep = "")
-    
-    futile.logger::flog.info(glue::glue("Some entries in the gene metadata are missing in the BLAST table ",
-                                        "and will be removed in plotting: '", 
-                                        glue::glue_collapse(extra_metadata_entries$user_reporting, 
-                                                            sep = ", "),  "'."))
-    
-    # Filter down the metadata to match the BLAST table entries
-    gene_metadata_table <- dplyr::filter(gene_metadata_table, qseqid %in% unique(blast_results$qseqid))
+    # Remove any entries in the metadata that are missing in the BLAST table
+    if (length(setdiff(gene_metadata_table$qseqid, unique(blast_results$qseqid))) > 0) {
+      extra_metadata_entries <- dplyr::filter(gene_metadata_table,
+                                              qseqid %in% setdiff(gene_metadata_table$qseqid, 
+                                                                  unique(blast_results$qseqid)))
+      extra_metadata_entries$user_reporting <- paste(extra_metadata_entries$qseqid, " (",
+                                                     extra_metadata_entries$gene_name, ")",
+                                                     sep = "")
+      futile.logger::flog.info(glue::glue("Some entries in the gene metadata are missing in the BLAST table ",
+                                          "and will be removed in plotting: '", 
+                                          glue::glue_collapse(extra_metadata_entries$user_reporting, 
+                                                              sep = ", "),  "'."))
+      gene_metadata_table <- dplyr::filter(gene_metadata_table, qseqid %in% unique(blast_results$qseqid))
+    }
   }
   
   # Change qseqid to gene_name and order according to the gene_metadata_table
