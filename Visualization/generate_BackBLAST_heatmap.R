@@ -169,7 +169,7 @@ plot_ggtree <- function(phylo_tree, bootstrap_label_data) {
     geom_tiplab(align = TRUE, linetype = "dotted", size = 0.1, offset = 0.1) +
     
     # Add scale bar
-    geom_treescale(x = 0, y = 8, linesize = 1, fontsize = 3, offset = 0.5) +
+    geom_treescale(x = 0, y = 1.5, linesize = 1, fontsize = 3, offset = 0.1) +
     
     # Manually tune the y-axis boundaries to match the heatmap: https://stackoverflow.com/a/18718196 (accessed Sept. 15, 2018)
     # TODO - this might need to be a function of the number of entries
