@@ -8,13 +8,11 @@ min_version("5.0")
 shell.executable("/bin/bash")
 shell.prefix("set -o pipefail; ")
 
-
 rule all:
     input:
         "generate_heatmap/BackBLAST_heatmap.pdf"
 
-
-# Runs reciprocal BLAST for each subject genome against the target genes in the query genome
+# Run reciprocal BLAST for each subject genome against the target genes in the query genome
 rule run_reciprocal_blast:
     input:
         lambda wildcards: config["subjects"][wildcards.subject]
@@ -36,8 +34,7 @@ rule run_reciprocal_blast:
         "BackBLAST.py --gene_cluster {params.query_genes} --query_proteome {params.query_genome_orfs} --subject_proteome {input} "
             "--e_value {params.eval} --min_ident {params.pident} --output_file {output} > {log} 2>&1"
 
-
-# Removes duplicate BLAST hits for each BLAST table
+# Remove duplicate BLAST hits for each BLAST table
 rule remove_duplicates:
     input:
         "reciprocal_blast/{subject}.csv"
@@ -51,8 +48,7 @@ rule remove_duplicates:
     shell:
         "RemoveDuplicates.sh {input} > {output} 2> {log}"
 
-
-# If BLAST CSV is empty, creates a blank BLAST table
+# If BLAST CSV is empty, create a blank BLAST table
 rule create_blank_results:
     input:
         "remove_duplicates/{subject}.csv"
@@ -69,7 +65,6 @@ rule create_blank_results:
     shell:
         "CreateBlankResults.py -i {input} -q {params.query_genes} -o {output} > {log} 2>&1"
 
-
 # Combine the BLAST tables into a single table, and add a column for sample ID
 rule combine_blast_tables:
     input:
@@ -85,10 +80,8 @@ rule combine_blast_tables:
     shell:
         "CombineBlastTables.R {input} {output} > {log} 2>&1"
 
-
 # Generate phylogenetic tree if desired by the user
 if config.get("phylogenetic_tree_newick") == "subjects":
-
     # Makes a list of filepaths to the FAA genome files for use by GToTree
     # Part 1 - generate for each sample
     rule generate_phylogenetic_tree_input_individual:
@@ -136,7 +129,6 @@ if config.get("phylogenetic_tree_newick") == "subjects":
                 "-n {threads} -j {threads} > {log} 2>&1 && "
             "ln phylogeny/gtotree/iqtree_out/iqtree_out.treefile phylogeny/iqtree_out.treefile"
 
-
 # Generate the final heatmap
 rule generate_heatmap:
     input:
@@ -155,7 +147,10 @@ rule generate_heatmap:
         gene_metadata = config.get("gene_metadata_tsv", "NA"),
         bootstrap_cutoff = config.get("bootstrap_cutoff", "NA"),
         root_name = config.get("root_name", "NA")
+        plot_width = config.get("plot_width_mm", 400)
+        plot_height = config.get("plot_height_mm", 200)
     shell:
         "generate_BackBLAST_heatmap.R -m {params.genome_metadata} -g {params.gene_metadata} "
-            "-b {params.bootstrap_cutoff} -r {params.root_name} {input.tree_file} {input.blast_table} {output} 2>&1 | tee {log}"
+            "-b {params.bootstrap_cutoff} -r {params.root_name} -w {params.plot_width} -z {params.plot_height} "
+            "{input.tree_file} {input.blast_table} {output} 2>&1 | tee {log}"
 
