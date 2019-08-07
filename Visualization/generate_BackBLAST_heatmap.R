@@ -490,7 +490,7 @@ main <- function(params) {
   # Startup messages
   futile.logger::flog.info("Running generate_BackBLAST_heatmap.R")
   futile.logger::flog.info("######### Settings #########")
-  futile.logger::flog.info(glue::glue("Input phylogenetic tree filepath: ", params$input_phylogenetic_tree_filepath))
+  futile.logger::flog.info(glue::glue("Input phylogenetic tree filepath (ignored if 'NA'): ", params$input_phylogenetic_tree_filepath))
   futile.logger::flog.info(glue::glue("Input BLAST table filepath: ", params$input_blast_table_filepath))
   futile.logger::flog.info(glue::glue("Output PDF filepath: ", params$output_pdf_filepath))
   futile.logger::flog.info(glue::glue("Bootstrap display cutoff (%; ignored if 'NA'): ", params$bootstrap_cutoff))
@@ -559,7 +559,7 @@ if ( !interactive() ) {
   
   # Add required args
   parser <- argparser::add_argument(parser = parser, arg = "input_phylogenetic_tree_filepath", 
-                                    help = "Input phylogenetic tree filepath", 
+                                    help = "Input phylogenetic tree filepath (set to 'NA' to plot heatmap only)", 
                                     type = "character", default = NULL)
   parser <- argparser::add_argument(parser = parser, arg = "input_blast_table_filepath", 
                                     help = "Input BLAST table filepath", 
