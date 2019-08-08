@@ -1,5 +1,6 @@
 # Snakefile rules for BackBLAST pipeline
 # Copyright Lee Bergstrand and Jackson M. Tsuji, 2018
+import os
 from snakemake.utils import logger, min_version, update_config
 
 # Specify the minimum snakemake version allowable
@@ -10,20 +11,21 @@ shell.prefix("set -o pipefail; ")
 
 rule all:
     input:
-        "generate_heatmap/BackBLAST_heatmap.pdf"
+        "logging/checkpoints/finished_blast",
+        "logging/checkpoints/finished_heatmap"
 
 # Run reciprocal BLAST for each subject genome against the target genes in the query genome
 rule run_reciprocal_blast:
     input:
         lambda wildcards: config["subjects"][wildcards.subject]
     output:
-        "reciprocal_blast/{subject}.csv"
+        temp("blast/intermediate/reciprocal_blast/{subject}.csv")
     conda:
         "envs/reciprocal_blast.yaml"
     log:
-        "logs/reciprocal_blast/{subject}.log"
+        "logging/logs/blast/intermediate/reciprocal_blast/{subject}.log"
     benchmark:
-        "benchmarks/{subject}.reciprocal_blast.benchmark.txt"
+        "logging/benchmarks/{subject}.reciprocal_blast.benchmark.txt"
     threads: 1
     params:
         query_genes = config.get("query_genes"),
@@ -37,13 +39,13 @@ rule run_reciprocal_blast:
 # Remove duplicate BLAST hits for each BLAST table
 rule remove_duplicates:
     input:
-        "reciprocal_blast/{subject}.csv"
+        "blast/intermediate/reciprocal_blast/{subject}.csv"
     output:
-        "remove_duplicates/{subject}.csv"
+        temp("blast/intermediate/remove_duplicates/{subject}.csv")
     log:
-        "logs/remove_duplicates/{subject}.log"
+        "logging/logs/blast/intermediate/remove_duplicates/{subject}.log"
     benchmark:
-        "benchmarks/{subject}.remove_duplicates.benchmark.txt"
+        "logging/benchmarks/{subject}.remove_duplicates.benchmark.txt"
     threads: 1
     shell:
         "RemoveDuplicates.sh {input} > {output} 2> {log}"
@@ -51,15 +53,15 @@ rule remove_duplicates:
 # If BLAST CSV is empty, create a blank BLAST table
 rule create_blank_results:
     input:
-        "remove_duplicates/{subject}.csv"
+        "blast/intermediate/remove_duplicates/{subject}.csv"
     output:
-        "fix_blank_results/{subject}.csv"
+        temp("blast/intermediate/fix_blank_results/{subject}.csv")
     conda:
         "envs/reciprocal_blast.yaml"
     log:
-        "logs/create_blank_results/{subject}.log"
+        "logging/logs/blast/intermediate/create_blank_results/{subject}.log"
     benchmark:
-        "benchmarks/{subject}.create_blank_results.txt"
+        "logging/benchmarks/{subject}.create_blank_results.txt"
     params:
         query_genes=config.get("query_genes")
     shell:
@@ -68,17 +70,32 @@ rule create_blank_results:
 # Combine the BLAST tables into a single table, and add a column for sample ID
 rule combine_blast_tables:
     input:
-        blast_tables=expand("fix_blank_results/{subject}.csv", subject=config.get("subjects"))
+        blast_tables=expand("blast/intermediate/fix_blank_results/{subject}.csv", subject=config.get("subjects"))
     output:
-        "combine_blast_tables/blast_tables_combined.csv"
+        "blast/combine_blast_tables/blast_tables_combined.csv"
     conda:
         "envs/R_viz.yaml"
     log:
-        "logs/combine_blast_tables/combine_blast_tables.log"
+        "logging/logs/blast/combine_blast_tables/combine_blast_tables.log"
     benchmark:
-        "benchmarks/combine_blast_tables.txt"
+        "logging/benchmarks/combine_blast_tables.txt"
     shell:
         "CombineBlastTables.R {input} {output} > {log} 2>&1"
+
+# Create a symlink of the combined BLAST table to make it easier for the user to find
+rule symlink_combined_blast_table:
+    input:
+        "blast/combine_blast_tables/blast_tables_combined.csv"
+    output:
+        "blast/blast_tables_combined.csv"
+    run:
+        source_relpath = os.path.relpath(str(input), os.path.dirname(str(output)))
+        os.symlink(source_relpath, str(output))
+
+# Checkpoint that BLAST step is finished
+rule finished_blast:
+    input: "blast/blast_tables_combined.csv"
+    output: touch("logging/checkpoints/finished_blast")
 
 # Generate phylogenetic tree if desired by the user
 if config.get("phylogenetic_tree_newick") == "subjects":
@@ -115,9 +132,9 @@ if config.get("phylogenetic_tree_newick") == "subjects":
         conda:
             "envs/gtotree.yaml"
         log:
-            "logs/phylogeny/gtotree.log"
+            "logging/logs/phylogeny/gtotree.log"
         benchmark:
-            "benchmarks/gtotree.txt"
+            "logging/benchmarks/gtotree.txt"
         threads: config.get("threads", 1)
         params:
             phylogenetic_model = config.get("gtotree_phylogenetic_model", "Universal_Hug_et_al.hmm"),
@@ -130,26 +147,24 @@ if config.get("phylogenetic_tree_newick") == "subjects":
             "ln phylogeny/gtotree/iqtree_out/iqtree_out.treefile phylogeny/iqtree_out.treefile"
 
 # Create a fake temp file to allow plotter to run if 'NA' is selected
-# TODO - this is hacky
+# TODO - this is a hack; is there a proper way to make this work?
 if config.get("phylogenetic_tree_newick") == "NA":
     rule generate_fake_phylogenetic_tree:
-        output: temp("NA")
-        shell:
-            "touch NA"
+        output: temp(touch("NA"))
 
 # Generate the final heatmap
 rule generate_heatmap:
     input:
-        blast_table = "combine_blast_tables/blast_tables_combined.csv",
+        blast_table = "blast/combine_blast_tables/blast_tables_combined.csv",
         tree_file = "phylogeny/iqtree_out.treefile" if config.get("phylogenetic_tree_newick") == "subjects" else config.get("phylogenetic_tree_newick", "NA")
     output:
-        "generate_heatmap/BackBLAST_heatmap.pdf"
+        "heatmap/BackBLAST_heatmap.pdf"
     conda:
         "envs/R_viz.yaml"
     log:
-        "logs/generate_heatmap/generate_heatmap.log"
+        "logging/logs/heatmap/generate_heatmap.log"
     benchmark:
-        "benchmarks/generate_heatmap.txt"
+        "logging/benchmarks/generate_heatmap.txt"
     params:
         genome_metadata = config.get("genome_metadata_tsv", "NA"),
         gene_metadata = config.get("gene_metadata_tsv", "NA"),
@@ -161,5 +176,11 @@ rule generate_heatmap:
         "generate_BackBLAST_heatmap.R -m {params.genome_metadata} -g {params.gene_metadata} "
             "-b {params.bootstrap_cutoff} -r {params.root_name} -w {params.plot_width} -z {params.plot_height} "
             "{input.tree_file} {input.blast_table} {output} 2>&1 | tee {log} && "
-        "rm Rplots.pdf"
+        "if [[ -f Rplots.pdf ]]; then rm Rplots.pdf; fi"
+
+# Checkpoint that the plot is done
+# This is probably over-engineered, but it is helpful to mirror what is being done for the BLAST step and could help to one day separate this Snakefile into modules
+rule finished_heatmap:
+    input: "heatmap/BackBLAST_heatmap.pdf"
+    output: touch("logging/checkpoints/finished_heatmap")
 
