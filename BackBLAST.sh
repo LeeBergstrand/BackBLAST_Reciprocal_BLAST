@@ -16,7 +16,7 @@ readonly SNAKEFILE="${SCRIPT_DIR}/Snakefile"
 # Globals: (none)
 # Arguments:
 #   output_config_filepath: the path to the config.yaml file to which the subject names will be added
-#   subject_faa_directory: the path to the directory containing the subject .faa (whole-genome protein prediction, FastA format) files
+#   subject_genome_directory: the path to the directory containing the protein files for subject genomes (FastA format)
 #   genome_extension: the extension of the predicted protein files for subject genomes (e.g., faa)
 # Returns:
 #   writes to output_config_filepath
@@ -25,24 +25,24 @@ function add_subjects_to_config_file() {
   # User-provided inputs
   local output_config_filepath
   output_config_filepath=$1
-  local subject_faa_directory
-  subject_faa_directory=$2
+  local subject_genome_directory
+  subject_genome_directory=$2
   local genome_extension
   genome_extension=$3
 
   # Find the subjects
-  local subject_faa_files
-  subject_faa_files=($(find ${subject_faa_directory} -maxdepth 1 -type f -name "*.${genome_extension}" | sort -h | xargs realpath))
+  local subject_genome_files
+  subject_genome_files=($(find ${subject_genome_directory} -maxdepth 1 -type f -name "*.${genome_extension}" | sort -h | xargs realpath))
 
-  echo "[ $(date -u) ]: Found ${#subject_faa_files[@]} subject genomes with extension ${genome_extension}"
+  echo "[ $(date -u) ]: Found ${#subject_genome_files[@]} subject genomes with extension ${genome_extension}"
 
   # Append to the bottom of the file (a bit hacky)
   # Note that the arbitrary sample name is defined here for each sample as the basename of the file
-  for subject_faa_file in ${subject_faa_files[@]}; do
+  for subject_genome_file in ${subject_genome_files[@]}; do
 
-    subject_faa_basename=${subject_faa_file%.${genome_extension}}
-    subject_faa_basename=${subject_faa_basename##*/}
-    echo "  ${subject_faa_basename}: '${subject_faa_file}'" >> ${output_config_filepath}
+    subject_genome_basename=${subject_genome_file%.${genome_extension}}
+    subject_genome_basename=${subject_genome_basename##*/}
+    echo "  ${subject_genome_basename}: '${subject_genome_file}'" >> ${output_config_filepath}
 
   done
 }
@@ -53,9 +53,9 @@ function add_subjects_to_config_file() {
 # Arguments:
 #   genome_metadata_tsv: the path to which the genome metadata TSV file is to be written
 #   gene_metadata_tsv: the path to which the gene metadata TSV file is to be written
-#   subject_faa_directory: the path to the directory containing the subject .faa (whole-genome protein prediction, FastA format) files
+#   subject_genome_directory: the path to the directory containing the protein files for subject genomes (FastA format)
 #   genome_extension: the extension of the predicted protein files for subject genomes (e.g., faa)
-#   query_faa_filepath: the path to the query protein sequences (FastA format)
+#   query_filepath: the path to the query protein sequences (FastA format)
 # Returns:
 #   writes to genome_metadata_tsv and gene_metadata_tsv
 #######################################
@@ -65,25 +65,25 @@ function generate_metadata_templates() {
   genome_metadata_tsv=$1
   local gene_metadata_tsv
   gene_metadata_tsv=$2
-  local subject_faa_directory
-  subject_faa_directory=$3
+  local subject_genome_directory
+  subject_genome_directory=$3
   local genome_extension
   genome_extension=$4
-  local query_faa_filepath
-  query_faa_filepath=$5
+  local query_filepath
+  query_filepath=$5
 
   # Generate genome metadata template
   echo "[ $(date -u) ]: Writing genome metadata template to '${genome_metadata_tsv}'" >&2
   printf "subject_name\tplotting_name\n" > ${genome_metadata_tsv}
 
-  local subject_faa_files
-  subject_faa_files=($(find ${subject_faa_directory} -maxdepth 1 -type f -name "*.${genome_extension}" | sort -h))
+  local subject_genome_files
+  subject_genome_files=($(find ${subject_genome_directory} -maxdepth 1 -type f -name "*.${genome_extension}" | sort -h))
 
-  for subject_faa_file in ${subject_faa_files[@]}; do
+  for subject_genome_file in ${subject_genome_files[@]}; do
 
-    subject_faa_basename=${subject_faa_file%.${genome_extension}}
-    subject_faa_basename=${subject_faa_basename##*/}
-    printf "${subject_faa_basename}\t\n" >> ${genome_metadata_tsv}
+    subject_genome_basename=${subject_genome_file%.${genome_extension}}
+    subject_genome_basename=${subject_genome_basename##*/}
+    printf "${subject_genome_basename}\t\n" >> ${genome_metadata_tsv}
 
   done
 
@@ -92,7 +92,7 @@ function generate_metadata_templates() {
   printf "qseqid\tgene_name\n" > ${gene_metadata_tsv}
 
   local query_accessions
-  query_accessions=($(grep "^>" ${query_faa_filepath} | cut -d ">" -f 2 | cut -d " " -f 1))
+  query_accessions=($(grep "^>" ${query_filepath} | cut -d ">" -f 2 | cut -d " " -f 1))
 
   for query_accession in ${query_accessions[@]}; do
 
@@ -106,9 +106,9 @@ function generate_metadata_templates() {
 # Globals: (none)
 # Arguments:
 #   template_config: the path to the template Snakemake configuration file (YAML format)
-#   query_faa_filepath: the path to the query protein sequences (FastA format)
-#   query_faa_genome_filepath: the path to the predicted protein sequences of the entire genome corresponding to the query protein sequences (FastA format)
-#   subject_faa_directory: the path to the directory containing the protein files for subject genomes (FastA format)
+#   query_filepath: the path to the query protein sequences (FastA format)
+#   query_genome_filepath: the path to the predicted protein sequences of the entire genome corresponding to the query protein sequences (FastA format)
+#   subject_genome_directory: the path to the directory containing the protein files for subject genomes (FastA format)
 #   genome_extension: the extension of the predicted protein files for subject genomes (e.g., faa)
 #   output_directory: path to the directory where output files should be written
 #   threads: maximum number of threads that any given task within the snakemake pipeline ought to use
@@ -125,12 +125,12 @@ function make_run_templates() {
   # TODO - is there a more elegant way of doing this? This is a ton of input variables to have to bring in one at a time
   local template_config
   template_config=$1
-  local query_faa_filepath
-  query_faa_filepath=$2
-  local query_faa_genome_filepath
-  query_faa_genome_filepath=$3
-  local subject_faa_directory
-  subject_faa_directory=$4
+  local query_filepath
+  query_filepath=$2
+  local query_genome_filepath
+  query_genome_filepath=$3
+  local subject_genome_directory
+  subject_genome_directory=$4
   local genome_extension
   genome_extension=$5
   local output_directory
@@ -168,14 +168,14 @@ function make_run_templates() {
   fi
 
   # Generate the metadata templates
-  generate_metadata_templates ${genome_metadata_tsv} ${gene_metadata_tsv} ${subject_faa_directory} ${genome_extension} ${query_faa_filepath}
+  generate_metadata_templates ${genome_metadata_tsv} ${gene_metadata_tsv} ${subject_genome_directory} ${genome_extension} ${query_filepath}
 
   ### Generate config file and add variables
   echo "[ $(date -u) ]: Writing config info to '${output_config_filepath}'" >&2
   cp ${template_config} ${output_config_filepath}
 
   # Add subject info
-  add_subjects_to_config_file ${output_config_filepath} ${subject_faa_directory} ${genome_extension}
+  add_subjects_to_config_file ${output_config_filepath} ${subject_genome_directory} ${genome_extension}
 
   # Special check for the phylogenetic tree - if the entry is not a file (e.g., 'subjects' or 'NA'), then do not run realpath
   if [[ -f ${phylogenetic_tree_newick} ]]; then
@@ -185,8 +185,8 @@ function make_run_templates() {
   # Add other variables to config file
   # NOTE: I'm using the '|' symbol as the sed separator because some of the variables contain forward slashes (which is the normal separator)
   # TODO - is there a more elegant way of doing this?
-  sed -i "s|^query_genes: .*|query_genes: '$(realpath ${query_faa_filepath})'|" ${output_config_filepath}
-  sed -i "s|^query_genome_orfs: .*|query_genome_orfs: '$(realpath ${query_faa_genome_filepath})'|" ${output_config_filepath}
+  sed -i "s|^query_genes: .*|query_genes: '$(realpath ${query_filepath})'|" ${output_config_filepath}
+  sed -i "s|^query_genome_orfs: .*|query_genome_orfs: '$(realpath ${query_genome_filepath})'|" ${output_config_filepath}
   sed -i "s|^threads: .*|threads: ${threads}|" ${output_config_filepath}
   sed -i "s|^phylogenetic_tree_newick: .*|phylogenetic_tree_newick: '${phylogenetic_tree_newick}'|" ${output_config_filepath}
   sed -i "s|^genome_metadata_tsv: .*|genome_metadata_tsv: '${genome_metadata_tsv}'|" ${output_config_filepath}
@@ -356,12 +356,12 @@ function perform_setup() {
   local original_arguments
   original_arguments=${@} # save for reporting later
   shift $((OPTIND - 1)) # shift to avoid flags when assigning positional arguments
-  local query_faa_filepath
-  query_faa_filepath=$1
-  local query_faa_genome_filepath
-  query_faa_genome_filepath=$2
-  local subject_faa_directory
-  subject_faa_directory=$3
+  local query_filepath
+  query_filepath=$1
+  local query_genome_filepath
+  query_genome_filepath=$2
+  local subject_genome_directory
+  subject_genome_directory=$3
   local output_directory
   output_directory=$4
 
@@ -369,7 +369,7 @@ function perform_setup() {
   echo "[ $(date -u) ]: Command run: ${SCRIPT_NAME} setup ${original_arguments}" >&2
 
   # Make the template files for the run
-  make_run_templates ${template_config} ${query_faa_filepath} ${query_faa_genome_filepath} ${subject_faa_directory} \
+  make_run_templates ${template_config} ${query_filepath} ${query_genome_filepath} ${subject_genome_directory} \
     ${genome_extension} ${output_directory} ${threads} ${phylogenetic_tree_newick} ${bootstrap_cutoff} ${root_name} ${evalue} ${pident}
 
   echo "[ $(date -u) ]: Setup complete. After modifying the config.yaml file to your liking, run ${SCRIPT_NAME} using 'run' mode." >&2
@@ -502,8 +502,8 @@ function perform_auto() {
     printf "Version: ${VERSION}\n\n"
     printf "Usage: ${SCRIPT_NAME} auto [OPTIONS] query_filepath query_genome_filepath subject_genome_directory output_directory [SNAKEMAKE_ARGUMENTS]\n\n"
     printf "Positional arguments (required):\n"
-    printf "   query_filepath: path to the query predicted protein sequences from the query genome, with extension '.faa'\n"
-    printf "   query_genome_filepath: path to the predicted proteins of the entire query genome, with extension '.faa'\n"
+    printf "   query_filepath: path to the query predicted protein sequences from the query genome, FastA format\n"
+    printf "   query_genome_filepath: path to the predicted proteins of the entire query genome, FastA format\n"
     printf "   subject_genome_directory: directory containing predicted proteins of all subject genomes (FastA format).\n"
     printf "                                 One genome per file, with extension '.faa' (or specify -x)\n"
     printf "   output_directory: directory where config ('config.yaml') and metadata templates ('genome_metadata.tsv', 'gene_metadata.tsv') will be created\n\n"
@@ -615,12 +615,12 @@ function perform_auto() {
   local original_arguments
   original_arguments=${@} # save for reporting later
   shift $((OPTIND - 1)) # shift to avoid flags when assigning positional arguments
-  local query_faa_filepath
-  query_faa_filepath=$1
-  local query_faa_genome_filepath
-  query_faa_genome_filepath=$2
-  local subject_faa_directory
-  subject_faa_directory=$3
+  local query_filepath
+  query_filepath=$1
+  local query_genome_filepath
+  query_genome_filepath=$2
+  local subject_genome_directory
+  subject_genome_directory=$3
   local output_directory
   output_directory=$4
 
@@ -632,7 +632,7 @@ function perform_auto() {
   echo "[ $(date -u) ]: Command run: ${SCRIPT_NAME} setup ${original_arguments}" >&2
 
   # Make the template files for the run
-  make_run_templates ${template_config} ${query_faa_filepath} ${query_faa_genome_filepath} ${subject_faa_directory} \
+  make_run_templates ${template_config} ${query_filepath} ${query_genome_filepath} ${subject_genome_directory} \
     ${genome_extension} ${output_directory} ${threads} ${phylogenetic_tree_newick} ${bootstrap_cutoff} ${root_name} ${evalue} ${pident}
 
   # Change metadata files to NA for default run
