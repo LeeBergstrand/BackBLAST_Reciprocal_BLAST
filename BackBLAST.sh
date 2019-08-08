@@ -34,7 +34,7 @@ function add_subjects_to_config_file() {
   local subject_genome_files
   subject_genome_files=($(find ${subject_genome_directory} -maxdepth 1 -type f -name "*.${genome_extension}" | sort -h | xargs realpath))
 
-  echo "[ $(date -u) ]: Found ${#subject_genome_files[@]} subject genomes with extension ${genome_extension}"
+  echo "[ $(date -u) ]: Found ${#subject_genome_files[@]} subject genomes with extension '${genome_extension}'"
 
   # Append to the bottom of the file (a bit hacky)
   # Note that the arbitrary sample name is defined here for each sample as the basename of the file
@@ -147,6 +147,12 @@ function make_run_templates() {
   evalue=${11}
   local pident
   pident=${12}
+
+  # Check if output directory exists
+  if [[ ! -d ${output_directory} ]]; then
+    echo "[ $(date -u) ]: ERROR: output directory '${output_directory}' does not exist. Exiting..."
+    exit 1
+  fi
 
   # Check if desired output files already exist
   local output_config_filepath
@@ -276,7 +282,7 @@ function perform_setup() {
     printf "   query_filepath: path to the query predicted protein sequences from the query genome, FastA format\n"
     printf "   query_genome_filepath: path to the predicted proteins of the entire query genome, FastA format\n"
     printf "   subject_genome_directory: directory containing predicted proteins of all subject genomes (FastA format).\n"
-    printf "                                 One genome per file, with extension '.faa' (or specify -x)\n"
+    printf "                                 One genome per file, with extension 'faa' (or specify -x)\n"
     printf "   output_directory: directory where config ('config.yaml') and metadata templates ('genome_metadata.tsv', 'gene_metadata.tsv') will be created\n\n"
     printf "Optional arguments:\n"
     printf "   -t phylogenetic_tree_newick: path to the pre-calculated phylogenetic tree [default: 'subjects' - auto-calculate tree]\n"
@@ -505,7 +511,7 @@ function perform_auto() {
     printf "   query_filepath: path to the query predicted protein sequences from the query genome, FastA format\n"
     printf "   query_genome_filepath: path to the predicted proteins of the entire query genome, FastA format\n"
     printf "   subject_genome_directory: directory containing predicted proteins of all subject genomes (FastA format).\n"
-    printf "                                 One genome per file, with extension '.faa' (or specify -x)\n"
+    printf "                                 One genome per file, with extension 'faa' (or specify -x)\n"
     printf "   output_directory: directory where config ('config.yaml') and metadata templates ('genome_metadata.tsv', 'gene_metadata.tsv') will be created\n\n"
     printf "Optional arguments:\n"
     printf "   -t phylogenetic_tree_newick: path to the pre-calculated phylogenetic tree [default: 'subjects' - auto-calculate tree]\n"
