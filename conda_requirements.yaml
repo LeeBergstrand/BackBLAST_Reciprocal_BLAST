@@ -7,7 +7,7 @@ channels:
 dependencies:
   - python=2.7
   - biopython=1.72
-  - blast=2.6.0
+  - blast=2.9.0
   - gtotree=1.4.3
   - r=3.5.1
   - r-argparser=0.4

@@ -17,6 +17,7 @@ readonly SNAKEFILE="${SCRIPT_DIR}/Snakefile"
 # Arguments:
 #   output_config_filepath: the path to the config.yaml file to which the subject names will be added
 #   subject_faa_directory: the path to the directory containing the subject .faa (whole-genome protein prediction, FastA format) files
+#   genome_extension: the extension of the predicted protein files for subject genomes (e.g., faa)
 # Returns:
 #   writes to output_config_filepath
 #######################################
@@ -26,16 +27,20 @@ function add_subjects_to_config_file() {
   output_config_filepath=$1
   local subject_faa_directory
   subject_faa_directory=$2
+  local genome_extension
+  genome_extension=$3
 
-  # Fine the subjects
+  # Find the subjects
   local subject_faa_files
-  subject_faa_files=($(find ${subject_faa_directory} -maxdepth 1 -type f -name "*.faa" | sort -h | xargs realpath))
+  subject_faa_files=($(find ${subject_faa_directory} -maxdepth 1 -type f -name "*.${genome_extension}" | sort -h | xargs realpath))
+
+  echo "[ $(date -u) ]: Found ${#subject_faa_files[@]} subject genomes with extension ${genome_extension}"
 
   # Append to the bottom of the file (a bit hacky)
   # Note that the arbitrary sample name is defined here for each sample as the basename of the file
   for subject_faa_file in ${subject_faa_files[@]}; do
 
-    subject_faa_basename=${subject_faa_file%.faa}
+    subject_faa_basename=${subject_faa_file%.${genome_extension}}
     subject_faa_basename=${subject_faa_basename##*/}
     echo "  ${subject_faa_basename}: '${subject_faa_file}'" >> ${output_config_filepath}
 
@@ -49,6 +54,7 @@ function add_subjects_to_config_file() {
 #   genome_metadata_tsv: the path to which the genome metadata TSV file is to be written
 #   gene_metadata_tsv: the path to which the gene metadata TSV file is to be written
 #   subject_faa_directory: the path to the directory containing the subject .faa (whole-genome protein prediction, FastA format) files
+#   genome_extension: the extension of the predicted protein files for subject genomes (e.g., faa)
 #   query_faa_filepath: the path to the query protein sequences (FastA format)
 # Returns:
 #   writes to genome_metadata_tsv and gene_metadata_tsv
@@ -61,19 +67,21 @@ function generate_metadata_templates() {
   gene_metadata_tsv=$2
   local subject_faa_directory
   subject_faa_directory=$3
+  local genome_extension
+  genome_extension=$4
   local query_faa_filepath
-  query_faa_filepath=$4
+  query_faa_filepath=$5
 
   # Generate genome metadata template
   echo "[ $(date -u) ]: Writing genome metadata template to '${genome_metadata_tsv}'" >&2
   printf "subject_name\tplotting_name\n" > ${genome_metadata_tsv}
 
   local subject_faa_files
-  subject_faa_files=($(find ${subject_faa_directory} -maxdepth 1 -type f -name "*.faa" | sort -h))
+  subject_faa_files=($(find ${subject_faa_directory} -maxdepth 1 -type f -name "*.${genome_extension}" | sort -h))
 
   for subject_faa_file in ${subject_faa_files[@]}; do
 
-    subject_faa_basename=${subject_faa_file%.faa}
+    subject_faa_basename=${subject_faa_file%.${genome_extension}}
     subject_faa_basename=${subject_faa_basename##*/}
     printf "${subject_faa_basename}\t\n" >> ${genome_metadata_tsv}
 
@@ -100,7 +108,8 @@ function generate_metadata_templates() {
 #   template_config: the path to the template Snakemake configuration file (YAML format)
 #   query_faa_filepath: the path to the query protein sequences (FastA format)
 #   query_faa_genome_filepath: the path to the predicted protein sequences of the entire genome corresponding to the query protein sequences (FastA format)
-#   subject_faa_directory: the path to the directory containing the subject .faa (whole-genome protein prediction, FastA format) files
+#   subject_faa_directory: the path to the directory containing the protein files for subject genomes (FastA format)
+#   genome_extension: the extension of the predicted protein files for subject genomes (e.g., faa)
 #   output_directory: path to the directory where output files should be written
 #   threads: maximum number of threads that any given task within the snakemake pipeline ought to use
 #   phylogenetic_tree_newick: path to the phylogenetic tree file corresponding to the subject genomes (or type 'subjects' to have the tree auto-generated)
@@ -122,20 +131,22 @@ function make_run_templates() {
   query_faa_genome_filepath=$3
   local subject_faa_directory
   subject_faa_directory=$4
+  local genome_extension
+  genome_extension=$5
   local output_directory
-  output_directory=$5
+  output_directory=$6
   local threads
-  threads=$6
+  threads=$7
   local phylogenetic_tree_newick
-  phylogenetic_tree_newick=$7
+  phylogenetic_tree_newick=$8
   local bootstrap_cutoff
-  bootstrap_cutoff=$8
+  bootstrap_cutoff=$9
   local root_name
-  root_name=$9
+  root_name=${10}
   local evalue
-  evalue=${10}
+  evalue=${11}
   local pident
-  pident=${11}
+  pident=${12}
 
   # Check if desired output files already exist
   local output_config_filepath
@@ -157,14 +168,14 @@ function make_run_templates() {
   fi
 
   # Generate the metadata templates
-  generate_metadata_templates ${genome_metadata_tsv} ${gene_metadata_tsv} ${subject_faa_directory} ${query_faa_filepath}
+  generate_metadata_templates ${genome_metadata_tsv} ${gene_metadata_tsv} ${subject_faa_directory} ${genome_extension} ${query_faa_filepath}
 
   ### Generate config file and add variables
   echo "[ $(date -u) ]: Writing config info to '${output_config_filepath}'" >&2
   cp ${template_config} ${output_config_filepath}
 
   # Add subject info
-  add_subjects_to_config_file ${output_config_filepath} ${subject_faa_directory}
+  add_subjects_to_config_file ${output_config_filepath} ${subject_faa_directory} ${genome_extension}
 
   # Special check for the phylogenetic tree - if the entry is not a file (e.g., 'subjects' or 'NA'), then do not run realpath
   if [[ -f ${phylogenetic_tree_newick} ]]; then
@@ -193,9 +204,11 @@ function make_run_templates() {
 #   snakefile: the path to the Snakefile used to run BackBLAST
 #   config_file: path to the config.yaml file containing settings for the run
 #   run_directory: path to the directory where output files should be written
+#   conda_prefix: the path to where conda environments are stored
 #   jobs: maximum number of parallel jobs for the snakemake scheduler to run
-#   conda: character value of either 'use_conda' or 'no_conda' to specify whether each job should be run in its own conda environment.
-#          If 'no_conda' is specified, then all dependencies need to be installed on your machine (e.g., in a central conda env).
+#   use_conda: character value of either 'True' or 'False' to specify whether each job should be run in its own conda environment.
+#          If 'False' is specified, then all dependencies need to be installed on your machine (e.g., in a central conda env).
+#   snakemake_arguments: everything after argument 6 are flags passed directly to snakemake. May contain spaces inbetween!
 # Returns:
 #   output files from the BackBLAST pipeline, in the run_directory
 #######################################
@@ -207,19 +220,31 @@ function run_snakemake() {
   config_file=$2
   local run_directory
   run_directory=$3
+  local conda_prefix
+  conda_prefix=$4
   local jobs
-  jobs=$4
-  local conda
-  conda=$5
+  jobs=$5
+  local use_conda
+  use_conda=$6
+  local snakemake_arguments
+  # Get everything after argument 6
+  snakemake_arguments=${@:7}
 
-  if [[ ${conda} == "use_conda" ]]; then
-    echo "[ $(date -u) ]: Command: snakemake --snakefile ${snakefile} --configfile ${config_file} --directory ${run_directory} --jobs ${jobs} --reason --printshellcmds --use-conda"
-    snakemake --snakefile ${snakefile} --configfile ${config_file} --directory ${run_directory} --jobs ${jobs} --reason --printshellcmds --use-conda
-  elif  [[ ${conda} == "no_conda" ]]; then
-    echo "[ $(date -u) ]: Command: snakemake --snakefile ${snakefile} --configfile ${config_file} --directory ${run_directory} --jobs ${jobs} --reason --printshellcmds"
-    snakemake --snakefile ${snakefile} --configfile ${config_file} --directory ${run_directory} --jobs ${jobs} --reason --printshellcmds
+  # Make sure conda_prefix is an absolute path if not the default
+  if [[ "${conda_prefix}" != ".snakemake/conda" ]]; then
+    conda_prefix=$(realpath "${conda_prefix}")
+  fi
+
+  # Run snakemake
+  if [[ ${use_conda} == "True" ]]; then
+    echo "[ $(date -u) ]: Command: snakemake --snakefile '${snakefile}' --configfile '${config_file}' --directory '${run_directory}' --conda-prefix '${conda_prefix}' --jobs ${jobs} --rerun-incomplete --reason --printshellcmds --use-conda ${snakemake_arguments}"
+    snakemake --snakefile "${snakefile}" --configfile "${config_file}" --directory "${run_directory}" --conda-prefix "${conda_prefix}" --jobs "${jobs}" --rerun-incomplete --reason --printshellcmds --use-conda ${snakemake_arguments}
+  elif  [[ ${use_conda} == "False" ]]; then
+    # No need for --conda-prefix here; do not use
+    echo "[ $(date -u) ]: Command: snakemake --snakefile '${snakefile}' --configfile '${config_file}' --directory '${run_directory}' --jobs ${jobs} --rerun-incomplete --reason --printshellcmds ${snakemake_arguments}"
+    snakemake --snakefile "${snakefile}" --configfile "${config_file}" --directory "${run_directory}" --jobs ${jobs} --rerun-incomplete --reason --printshellcmds ${snakemake_arguments}
   else
-    echo "[ $(date -u) ]: 'conda' variable must be either 'use_conda' or 'no_conda'; instead, '${conda}' was specified. Exiting..."
+    echo "[ $(date -u) ]: the 'use_conda' variable must be either 'True' or 'False'; instead, '${use_conda}' was specified. Exiting..."
     exit 1
   fi
 }
@@ -246,11 +271,12 @@ function perform_setup() {
     printf "${SCRIPT_NAME} setup: module for setting up a BackBLAST run.\n"
     printf "Copyright Lee H. Bergstrand and Jackson M. Tsuji, Neufeld Research Group, 2019\n"
     printf "Version: ${VERSION}\n\n"
-    printf "Usage: ${SCRIPT_NAME} setup [OPTIONS] query_faa_filepath query_faa_genome_filepath subject_faa_genome_directory output_directory\n\n"
+    printf "Usage: ${SCRIPT_NAME} setup [OPTIONS] query_filepath query_genome_filepath subject_genome_directory output_directory\n\n"
     printf "Positional arguments (required):\n"
-    printf "   query_faa_filepath: path to the query predicted protein sequences from the query genome, with extension '.faa'\n"
-    printf "   query_faa_genome_filepath: path to the predicted proteins of the entire query genome, with extension '.faa'\n"
-    printf "   subject_faa_genome_directory: directory containing predicted proteins of all subject genomes. One genome per file, with extension '.faa'\n"
+    printf "   query_filepath: path to the query predicted protein sequences from the query genome, FastA format\n"
+    printf "   query_genome_filepath: path to the predicted proteins of the entire query genome, FastA format\n"
+    printf "   subject_genome_directory: directory containing predicted proteins of all subject genomes (FastA format).\n"
+    printf "                                 One genome per file, with extension '.faa' (or specify -x)\n"
     printf "   output_directory: directory where config ('config.yaml') and metadata templates ('genome_metadata.tsv', 'gene_metadata.tsv') will be created\n\n"
     printf "Optional arguments:\n"
     printf "   -t phylogenetic_tree_newick: path to the pre-calculated phylogenetic tree [default: 'subjects' - auto-calculate tree]\n"
@@ -259,8 +285,9 @@ function perform_setup() {
     printf "   -r root_name: Exact name of the tree tip label at the desired root of the tree [default: NA; will skip rooting]\n"
     printf "   -e evalue: e-value cutoff for reciprocal BLASTP [default: 1e-40]\n"
     printf "   -p pident: percent identity cutoff for reciprocal BLASTP [default: 25]\n"
+    printf "   -x genome_extension: extension for predicted protein files of subject genomes [default: faa]\n"
     printf "   -@ threads: maximum threads to use for any process [default: 1]\n\n"
-    printf "Advanced parameters:\n"
+    printf "Advanced parameters (use with care):\n"
     printf "   -T template_config: Path to the template config file used in setup [default: ${TEMPLATE_CONFIG}]\n\n"
     printf "Note: Currently does NOT support whitespaces in any input variables.\n\n"
 
@@ -281,12 +308,14 @@ function perform_setup() {
   evalue=1e-40
   local pident
   pident=25
+  local genome_extension
+  genome_extension="faa"
   local template_config
   template_config=${TEMPLATE_CONFIG}
 
   # Set options (help from https://wiki.bash-hackers.org/howto/getopts_tutorial; accessed March 8th, 2019)
   OPTIND=1 # reset the OPTIND counter just in case
-  while getopts ":@:t:b:r:e:p:T:" opt; do
+  while getopts ":@:t:b:r:e:p:x:T:" opt; do
     case ${opt} in
       \@)
         threads=${OPTARG}
@@ -305,6 +334,9 @@ function perform_setup() {
         ;;
       p)
         pident=${OPTARG}
+        ;;
+      x)
+        genome_extension=${OPTARG}
         ;;
       T)
         template_config=${OPTARG}
@@ -338,7 +370,7 @@ function perform_setup() {
 
   # Make the template files for the run
   make_run_templates ${template_config} ${query_faa_filepath} ${query_faa_genome_filepath} ${subject_faa_directory} \
-    ${output_directory} ${threads} ${phylogenetic_tree_newick} ${bootstrap_cutoff} ${root_name} ${evalue} ${pident}
+    ${genome_extension} ${output_directory} ${threads} ${phylogenetic_tree_newick} ${bootstrap_cutoff} ${root_name} ${evalue} ${pident}
 
   echo "[ $(date -u) ]: Setup complete. After modifying the config.yaml file to your liking, run ${SCRIPT_NAME} using 'run' mode." >&2
 }
@@ -365,18 +397,22 @@ function perform_run() {
     printf "${SCRIPT_NAME} run: module for initializing a BackBLAST run.\n"
     printf "Copyright Lee H. Bergstrand and Jackson M. Tsuji, Neufeld Research Group, 2019\n"
     printf "Version: ${VERSION}\n\n"
-    printf "Usage: ${SCRIPT_NAME} run config_filepath run_directory\n\n"
+    printf "Usage: ${SCRIPT_NAME} run [OPTIONS] config_filepath run_directory [SNAKEMAKE_ARGUMENTS]\n\n"
     printf "Positional arguments (required):\n"
     printf "   config_filepath: path to the config file generated using the 'setup' module\n"
     printf "   run_directory: the directory where BackBLAST results out to be output\n\n"
     printf "Optional arguments:\n"
-    printf "   -j jobs: Number of processing threads available for the run [default: 1]\n\n"
-    printf "Advanced parameters:\n"
+    printf "   -P conda_prefix: path to where the conda envs should be stored [default: '.snakemake/conda' in the run_directory]\n"
+    printf "   -j jobs: Number of processing threads available for the run [default: 1]\n"
+    printf "            **Should be no lower than the 'threads' setting in the config file**\n\n"
+    printf "Advanced parameters (use with care):\n"
     printf "   -S snakefile: Path to the Snakefile used to run BackBLAST [default: ${SNAKEFILE}]\n"
-    printf "   -C conda: specify either 'use_conda' or 'no_conda' for whether or not each job should be run in \n"
-    printf "             its own conda env [default: use_conda]\n"
-    printf "             If 'no_conda' is run, then all dependencies need to be installed in the main environment\n"
+    printf "   -C use_conda: specify either 'True' or 'False' for whether or not each job should be run in \n"
+    printf "             its own conda env [default: True]\n"
+    printf "             If 'False' is set, then all dependencies need to be installed in the main environment\n"
     printf "             where BackBLAST is running. Could be tricky.\n\n"
+    printf "Snakemake arguments:\n"
+    printf "   Any flags added at the end of the command will be passed directly to snakemake, e.g., --notemp\n\n"
     printf "Note: Currently does NOT support whitespaces in any input variables.\n\n"
 
     # Exit
@@ -386,23 +422,28 @@ function perform_run() {
   # Set defaults for options
   local jobs
   jobs=1
+  local conda_prefix
+  conda_prefix=".snakemake/conda"
   local snakefile
   snakefile=${SNAKEFILE}
-  local conda
-  conda="use_conda"
+  local use_conda
+  use_conda="True"
 
   # Set options (help from https://wiki.bash-hackers.org/howto/getopts_tutorial; accessed March 8th, 2019)
   OPTIND=1 # reset the OPTIND counter just in case
-  while getopts ":j:S:C:" opt; do
+  while getopts ":j:P:S:C:" opt; do
     case ${opt} in
       j)
         jobs=${OPTARG}
+        ;;
+      P)
+        conda_prefix=${OPTARG}
         ;;
       S)
         snakefile=${OPTARG}
         ;;
       C)
-        conda=${OPTARG}
+        use_conda=${OPTARG}
         ;;
       \?)
         echo "[ $(date -u) ]: ERROR: Invalid option: '-${OPTARG}'. Exiting..." >&2
@@ -424,11 +465,15 @@ function perform_run() {
   local run_directory
   run_directory=$2
 
+  # Get Snakemake arguments; i.e., everything after argument 2
+  local snakemake_arguments
+  snakemake_arguments=${@:3}
+
   echo "[ $(date -u) ]: Running ${SCRIPT_NAME} in run mode" >&2
   echo "[ $(date -u) ]: Command run: ${SCRIPT_NAME} run ${original_arguments}" >&2
 
   # Start the run
-  run_snakemake ${snakefile} ${config_filepath} ${run_directory} ${jobs} ${conda}
+  run_snakemake ${snakefile} ${config_filepath} ${run_directory} ${conda_prefix} ${jobs} ${use_conda} ${snakemake_arguments}
 }
 
 #######################################
@@ -455,11 +500,12 @@ function perform_auto() {
     printf "${SCRIPT_NAME} auto: module for setting up a BackBLAST run AND starting with some defaults.\n"
     printf "Copyright Lee H. Bergstrand and Jackson M. Tsuji, Neufeld Research Group, 2019\n"
     printf "Version: ${VERSION}\n\n"
-    printf "Usage: ${SCRIPT_NAME} auto [OPTIONS] query_faa_filepath query_faa_genome_filepath subject_faa_genome_directory output_directory\n\n"
+    printf "Usage: ${SCRIPT_NAME} auto [OPTIONS] query_filepath query_genome_filepath subject_genome_directory output_directory [SNAKEMAKE_ARGUMENTS]\n\n"
     printf "Positional arguments (required):\n"
-    printf "   query_faa_filepath: path to the query predicted protein sequences from the query genome, with extension '.faa'\n"
-    printf "   query_faa_genome_filepath: path to the predicted proteins of the entire query genome, with extension '.faa'\n"
-    printf "   subject_faa_genome_directory: directory containing predicted proteins of all subject genomes. One genome per file, with extension '.faa'\n"
+    printf "   query_filepath: path to the query predicted protein sequences from the query genome, with extension '.faa'\n"
+    printf "   query_genome_filepath: path to the predicted proteins of the entire query genome, with extension '.faa'\n"
+    printf "   subject_genome_directory: directory containing predicted proteins of all subject genomes (FastA format).\n"
+    printf "                                 One genome per file, with extension '.faa' (or specify -x)\n"
     printf "   output_directory: directory where config ('config.yaml') and metadata templates ('genome_metadata.tsv', 'gene_metadata.tsv') will be created\n\n"
     printf "Optional arguments:\n"
     printf "   -t phylogenetic_tree_newick: path to the pre-calculated phylogenetic tree [default: 'subjects' - auto-calculate tree]\n"
@@ -468,15 +514,20 @@ function perform_auto() {
     printf "   -r root_name: Exact name of the tree tip label at the desired root of the tree [default: NA; will skip rooting]\n"
     printf "   -e evalue: e-value cutoff for reciprocal BLASTP [default: 1e-40]\n"
     printf "   -p pident: percent identity cutoff for reciprocal BLASTP [default: 25]\n"
+    printf "   -x genome_extension: extension for predicted protein files of subject genomes [default: faa]\n"
+    printf "   -P conda_prefix: path to where the conda envs should be stored [default: '.snakemake/conda' in the run_directory]"
     printf "   -@ threads: maximum threads to use for any process [default: 1]\n"
-    printf "   -j jobs: Number of processing threads available for the run [default: 1]\n\n"
-    printf "Advanced parameters:\n"
+    printf "   -j jobs: Number of processing threads available for the run [default: 1]\n"
+    printf "            **Should be no lower than the 'threads' setting in the config file**\n\n"
+    printf "Advanced parameters (use with care):\n"
     printf "   -T template_config: Path to the template config file used in setup [default: ${TEMPLATE_CONFIG}]\n"
     printf "   -S snakefile: Path to the Snakefile used to run BackBLAST [default: ${SNAKEFILE}]\n"
-    printf "   -C conda: specify either 'use_conda' or 'no_conda' for whether or not each job should be run in \n"
-    printf "             its own conda env [default: use_conda]\n"
-    printf "             If 'no_conda' is run, then all dependencies need to be installed in the main environment\n"
+    printf "   -C use_conda: specify either 'True' or 'False' for whether or not each job should be run in \n"
+    printf "             its own conda env [default: True]\n"
+    printf "             If 'False' is set, then all dependencies need to be installed in the main environment\n"
     printf "             where BackBLAST is running. Could be tricky.\n\n"
+    printf "Snakemake arguments:\n"
+    printf "   Any flags added at the end of the command will be passed directly to snakemake, e.g., --notemp\n\n"
     printf "Note: Currently does NOT support whitespaces in any input variables.\n\n"
 
     # Exit
@@ -488,6 +539,8 @@ function perform_auto() {
   jobs=1
   local threads
   threads=1
+  local conda_prefix
+  conda_prefix=".snakemake/conda"
   local phylogenetic_tree_newick
   phylogenetic_tree_newick="subjects"
   local bootstrap_cutoff
@@ -498,22 +551,27 @@ function perform_auto() {
   evalue=1e-40
   local pident
   pident=25
+  local genome_extension
+  genome_extension="faa"
   local template_config
   template_config=${TEMPLATE_CONFIG}
   local snakefile
   snakefile=${SNAKEFILE}
-  local conda
-  conda="use_conda"
+  local use_conda
+  use_conda="True"
 
   # Set options (help from https://wiki.bash-hackers.org/howto/getopts_tutorial; accessed March 8th, 2019)
   OPTIND=1 # reset the OPTIND counter just in case
-  while getopts ":j:@:t:b:r:e:p:T:S:C:" opt; do
+  while getopts ":j:@:P:t:b:r:e:p:x:T:S:C:" opt; do
     case ${opt} in
       j)
         jobs=${OPTARG}
         ;;
       \@)
         threads=${OPTARG}
+        ;;
+      P)
+        conda_prefix=${OPTARG}
         ;;
       t)
         phylogenetic_tree_newick=${OPTARG}
@@ -530,6 +588,9 @@ function perform_auto() {
       p)
         pident=${OPTARG}
         ;;
+      x)
+        genome_extension=${OPTARG}
+        ;;
       T)
         template_config=${OPTARG}
         ;;
@@ -537,7 +598,7 @@ function perform_auto() {
         snakefile=${OPTARG}
         ;;
       C)
-        conda=${OPTARG}
+        use_conda=${OPTARG}
         ;;
       \?)
         echo "[ $(date -u) ]: ERROR: Invalid option: '-${OPTARG}'. Exiting..." >&2
@@ -563,12 +624,16 @@ function perform_auto() {
   local output_directory
   output_directory=$4
 
+  # Get Snakemake arguments; i.e., everything after argument 4
+  local snakemake_arguments
+  snakemake_arguments=${@:5}
+
   echo "[ $(date -u) ]: Running ${SCRIPT_NAME} in 'auto' mode" >&2
   echo "[ $(date -u) ]: Command run: ${SCRIPT_NAME} setup ${original_arguments}" >&2
 
   # Make the template files for the run
   make_run_templates ${template_config} ${query_faa_filepath} ${query_faa_genome_filepath} ${subject_faa_directory} \
-    ${output_directory} ${threads} ${phylogenetic_tree_newick} ${bootstrap_cutoff} ${root_name} ${evalue} ${pident}
+    ${genome_extension} ${output_directory} ${threads} ${phylogenetic_tree_newick} ${bootstrap_cutoff} ${root_name} ${evalue} ${pident}
 
   # Change metadata files to NA for default run
   local output_config_filepath
@@ -578,7 +643,7 @@ function perform_auto() {
 
   # Start the run
   echo "[ $(date -u) ]: Default setup finished; starting pipeline" >&2
-  run_snakemake ${snakefile} ${output_config_filepath} ${output_directory} ${jobs} ${conda}
+  run_snakemake ${snakefile} ${output_config_filepath} ${output_directory} ${conda_prefix} ${jobs} ${use_conda} ${snakemake_arguments}
 }
 
 function main() {
