@@ -19,6 +19,7 @@ import csv
 import subprocess
 import sys
 import thread
+import os
 
 from Bio import SeqIO
 
@@ -260,6 +261,7 @@ def main(args):
         for row in filterable_forward_blast_results:
             writer.writerow(row)
         write_file.close()
+        os.remove(temp_filename)
     except IOError:
         print(">> Failed to create " + out_file)
         sys.exit(1)
