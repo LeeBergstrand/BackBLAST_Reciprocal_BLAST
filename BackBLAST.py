@@ -18,6 +18,8 @@ import argparse
 import csv
 import subprocess
 import sys
+import thread
+import os
 
 from Bio import SeqIO
 
@@ -233,16 +235,18 @@ def main(args):
 
     # Attempt to write a temporary FASTA file for the reverse BLAST to use.
     try:
-        write_file = open("tempQuery.faa", "w")
+        temp_filename = "tempQuery_" + str(thread.get_ident()) + ".faa"
+        print(">> Writing Back-Blasting Query to temporary file " + temp_filename)
+        write_file = open(temp_filename, "w")
         write_file.write(complete_back_blast_query)
         write_file.close()
     except IOError:
-        print("Failed to create tempQuery.faa")
+        print("Failed to create " + temp_filename)
         sys.exit(1)
 
     print(">> Blasting backwards from subject genome to query genome.")
     # Run backwards BLAST towards query proteome and filters BLAST results by percent identity.
-    reverse_blast_high_scoring_pairs = get_blast_hight_scoring_pairs(query_gene_cluster_path="tempQuery.faa",
+    reverse_blast_high_scoring_pairs = get_blast_hight_scoring_pairs(query_gene_cluster_path=temp_filename,
                                                                       subject_proteome_file=query_proteome_path,
                                                                       e_value_cutoff=input_e_value_cutoff,
                                                                       minimum_identity=input_min_ident_cutoff)
@@ -257,6 +261,7 @@ def main(args):
         for row in filterable_forward_blast_results:
             writer.writerow(row)
         write_file.close()
+        os.remove(temp_filename)
     except IOError:
         print(">> Failed to create " + out_file)
         sys.exit(1)
