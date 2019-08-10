@@ -18,7 +18,7 @@ import argparse
 import csv
 import subprocess
 import sys
-import thread
+import uuid
 import os
 
 from Bio import SeqIO
@@ -235,7 +235,7 @@ def main(args):
 
     # Attempt to write a temporary FASTA file for the reverse BLAST to use.
     try:
-        temp_filename = "tempQuery_" + str(thread.get_ident()) + ".faa"
+        temp_filename = "temp_query_" + uuid.uuid4().hex + ".faa"
         print(">> Writing Back-Blasting Query to temporary file " + temp_filename)
         write_file = open(temp_filename, "w")
         write_file.write(complete_back_blast_query)
