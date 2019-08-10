@@ -18,6 +18,8 @@ import argparse
 import csv
 import subprocess
 import sys
+import thread
+import os
 
 from Bio import SeqIO
 
@@ -187,6 +189,7 @@ def main(args):
     subject_proteome_file = args.subject_proteome
     input_e_value_cutoff = args.e_value
     input_min_ident_cutoff = args.min_ident
+    out_file = args.output_file
 
     print("Opening " + subject_proteome_file + "...")
 
@@ -198,7 +201,6 @@ def main(args):
     if not subject_proteome_file.endswith(".faa"):
         print("[Warning] " + subject_proteome_file + " may not be a amino acid FASTA file!")
 
-    out_file = subject_proteome_file.rstrip(".faa") + ".csv"
 
     print(">> Forward Blasting to subject proteome...")
     # Forward BLASTs from query proteins to subject proteome and filters BLAST results by percent identity.
@@ -233,16 +235,18 @@ def main(args):
 
     # Attempt to write a temporary FASTA file for the reverse BLAST to use.
     try:
-        write_file = open("tempQuery.faa", "w")
+        temp_filename = "tempQuery_" + str(thread.get_ident()) + ".faa"
+        print(">> Writing Back-Blasting Query to temporary file " + temp_filename)
+        write_file = open(temp_filename, "w")
         write_file.write(complete_back_blast_query)
         write_file.close()
     except IOError:
-        print("Failed to create tempQuery.faa")
+        print("Failed to create " + temp_filename)
         sys.exit(1)
 
     print(">> Blasting backwards from subject genome to query genome.")
     # Run backwards BLAST towards query proteome and filters BLAST results by percent identity.
-    reverse_blast_high_scoring_pairs = get_blast_hight_scoring_pairs(query_gene_cluster_path="tempQuery.faa",
+    reverse_blast_high_scoring_pairs = get_blast_hight_scoring_pairs(query_gene_cluster_path=temp_filename,
                                                                       subject_proteome_file=query_proteome_path,
                                                                       e_value_cutoff=input_e_value_cutoff,
                                                                       minimum_identity=input_min_ident_cutoff)
@@ -257,6 +261,7 @@ def main(args):
         for row in filterable_forward_blast_results:
             writer.writerow(row)
         write_file.close()
+        os.remove(temp_filename)
     except IOError:
         print(">> Failed to create " + out_file)
         sys.exit(1)
@@ -276,13 +281,16 @@ if __name__ == '__main__':
     parser.add_argument('-s', '--subject_proteome', metavar='FASTA', required=True,
                         help='''The path to a FASTA file containing all proteins from subject organism.''')
 
-    parser.add_argument('-e', '--e_value', metavar='E-VALUE', default=DEFAULT_E_VALUE_CUTOFF,
+    parser.add_argument('-e', '--e_value', metavar='E-VALUE', default=DEFAULT_E_VALUE_CUTOFF, type=float,
                         help='''The Expect value (E) cutoff for removing high scoring pairs. ''' +
                              '''The smaller this number is, the stricter the BLAST search.''')
 
-    parser.add_argument('-i', '--min_ident', metavar='IDENT', default=DEFAULT_MINIMUM_IDENTITY_CUTOFF,
-                        help='''The minimum sequence identify cutoff for removing high scoring pairs. ''' +
+    parser.add_argument('-i', '--min_ident', metavar='IDENT', default=DEFAULT_MINIMUM_IDENTITY_CUTOFF, type=float,
+                        help='''The minimum sequence identify cutoff for removing high scoring pairs.''' +
                              '''The larger this number is, the stricter the BLAST search.''')
+
+    parser.add_argument('-o', '--output_file', metavar='OUTPUT', required=True,
+                        help='''The path to write CSV-format BLAST results to.''')
 
     cli_args = parser.parse_args()
     main(cli_args)

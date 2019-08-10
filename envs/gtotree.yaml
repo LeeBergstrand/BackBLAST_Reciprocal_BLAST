@@ -1,0 +1,7 @@
+channels:
+  - conda-forge
+  - bioconda
+  - astrobiomike
+  - defaults
+dependencies:
+  - gtotree=1.4.3

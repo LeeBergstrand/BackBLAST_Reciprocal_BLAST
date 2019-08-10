@@ -23,4 +23,3 @@ dependencies:
   - bioconductor-ggtree=1.14.4
   - r-gridextra=2.3
   - r-egg=0.4.5
-
