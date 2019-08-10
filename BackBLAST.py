@@ -58,7 +58,7 @@ def run_blastp(query_file_path, subject_file_path, e_value_cutoff):
     """
     blast_out = subprocess.check_output(
         ["blastp", "-query", query_file_path, "-subject", subject_file_path, "-evalue", str(e_value_cutoff),
-         "-soft_masking true", "-seg yes", "-outfmt", "10 qseqid sseqid pident evalue qcovhsp bitscore"])
+         "-soft_masking", "true", "-seg", "yes", "-outfmt", "10 qseqid sseqid pident evalue qcovhsp bitscore"])
 
     # Decodes BLASTp output to UTF-8 (In Py3 check_output returns raw bytes)
     blast_out = blast_out.decode().replace(' ', '')
