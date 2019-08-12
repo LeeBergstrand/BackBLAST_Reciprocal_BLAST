@@ -18,7 +18,7 @@ import argparse
 import csv
 import subprocess
 import sys
-import thread
+import uuid
 import os
 
 from Bio import SeqIO
@@ -58,7 +58,7 @@ def run_blastp(query_file_path, subject_file_path, e_value_cutoff):
     """
     blast_out = subprocess.check_output(
         ["blastp", "-query", query_file_path, "-subject", subject_file_path, "-evalue", str(e_value_cutoff),
-         "-outfmt", "10 qseqid sseqid pident evalue qcovhsp bitscore"])
+         "-soft_masking", "true", "-seg", "yes", "-outfmt", "10 qseqid sseqid pident evalue qcovhsp bitscore"])
 
     # Decodes BLASTp output to UTF-8 (In Py3 check_output returns raw bytes)
     blast_out = blast_out.decode().replace(' ', '')
@@ -235,7 +235,7 @@ def main(args):
 
     # Attempt to write a temporary FASTA file for the reverse BLAST to use.
     try:
-        temp_filename = "tempQuery_" + str(thread.get_ident()) + ".faa"
+        temp_filename = "temp_query_" + uuid.uuid4().hex + ".faa"
         print(">> Writing Back-Blasting Query to temporary file " + temp_filename)
         write_file = open(temp_filename, "w")
         write_file.write(complete_back_blast_query)
