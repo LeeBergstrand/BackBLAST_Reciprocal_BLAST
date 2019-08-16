@@ -1,6 +1,0 @@
-[ 2019-08-08 05:58:45,651 UTC ]: DEBUG: CreateBlankResults: Running CreateBlankResults.py
-[ 2019-08-08 05:58:45,651 UTC ]: DEBUG: CreateBlankResults: Settings: Input BLAST CSV table: blast/intermediate/remove_duplicates/Chl_phaeoferrooxidans_KB01.csv
-[ 2019-08-08 05:58:45,651 UTC ]: DEBUG: CreateBlankResults: Settings: Query protein FastA file: ../Example_inputs/Chl_ferrooxidans_KoFox_gene_targets.faa
-[ 2019-08-08 05:58:45,651 UTC ]: DEBUG: CreateBlankResults: Settings: Output BLAST CSV table: blast/intermediate/fix_blank_results/Chl_phaeoferrooxidans_KB01.csv
-[ 2019-08-08 05:58:45,651 UTC ]: DEBUG: CreateBlankResults: Provided BLAST file has content - no need to replace. Copying to output file.
-[ 2019-08-08 05:58:45,651 UTC ]: DEBUG: CreateBlankResults: Done
