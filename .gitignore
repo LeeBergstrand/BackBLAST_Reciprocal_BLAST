@@ -66,3 +66,4 @@ BackLog*.txt
 
 # Testing
 .log
+.benchmark.txt

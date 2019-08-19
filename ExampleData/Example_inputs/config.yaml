@@ -64,5 +64,3 @@ subjects:
   Chl_phaeoferrooxidans_KB01: "../Example_inputs/subjects/Chl_phaeoferrooxidans_KB01.faa"
   Chl_sp_N1: "../Example_inputs/subjects/Chl_sp_N1.faa"
   Ignavibacterium_album_JCM_16511_outgroup: "../Example_inputs/subjects/Ignavibacterium_album_JCM_16511_outgroup.faa"
-  L227_enr_S_6D_bin01: "../Example_inputs/subjects/L227_enr_S_6D_bin01.faa"
-  L304_enr_S_6D_bin01: "../Example_inputs/subjects/L304_enr_S_6D_bin01.faa"

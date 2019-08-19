@@ -61,7 +61,7 @@ rule create_blank_results:
     log:
         "logging/logs/blast/intermediate/create_blank_results/{subject}.log"
     benchmark:
-        "logging/benchmarks/{subject}.create_blank_results.txt"
+        "logging/benchmarks/{subject}.create_blank_results.benchmark.txt"
     params:
         query_genes=config.get("query_genes")
     shell:
@@ -78,7 +78,7 @@ rule combine_blast_tables:
     log:
         "logging/logs/blast/combine_blast_tables/combine_blast_tables.log"
     benchmark:
-        "logging/benchmarks/combine_blast_tables.txt"
+        "logging/benchmarks/combine_blast_tables.benchmark.txt"
     shell:
         "CombineBlastTables.R {input} {output} > {log} 2>&1"
 
@@ -134,7 +134,7 @@ if config.get("phylogenetic_tree_newick") == "subjects":
         log:
             "logging/logs/phylogeny/gtotree.log"
         benchmark:
-            "logging/benchmarks/gtotree.txt"
+            "logging/benchmarks/gtotree.benchmark.txt"
         threads: config.get("threads", 1)
         params:
             phylogenetic_model = config.get("gtotree_phylogenetic_model", "Universal_Hug_et_al.hmm"),
@@ -164,7 +164,7 @@ rule generate_heatmap:
     log:
         "logging/logs/heatmap/generate_heatmap.log"
     benchmark:
-        "logging/benchmarks/generate_heatmap.txt"
+        "logging/benchmarks/generate_heatmap.benchmark.txt"
     params:
         genome_metadata = config.get("genome_metadata_tsv", "NA"),
         gene_metadata = config.get("gene_metadata_tsv", "NA"),
