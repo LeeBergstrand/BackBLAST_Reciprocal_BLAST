@@ -25,47 +25,50 @@ Temporary instructions while BackBLAST2 is still under development, to install t
 - Workflow is pretty light on RAM, CPU, and storage space, so most machines should be able to handle BackBLAST without issue. The only exception is if you create genome trees within the pipeline, in which case you'll need a fair amount of CPU and time to calculate large trees.
 
 ## Instructions
+This is a hacky, bleeding-edge install of BackBLAST, to be revised once we make a conda install.  
+This method will only work in your single, active Bash session. One-time use.  
+Keep checking in for updates to the code. Hoping to have a better solution soon.
 ```bash
 # Download
-cd /tmp
+# Before running this code, change directory into whatever folder you want to use the tool in
 git clone https://github.com/LeeBergstrand/BackBLAST_Reciprocal_BLAST.git
-cd /tmp/BackBLAST_Reciprocal_BLAST
+cd BackBLAST_Reciprocal_BLAST
 git checkout develop
 
 # Install dependencies
 conda create -n backblast -c bioconda -c conda-forge snakemake=5.5.4
 
-# Install main scripts
-conda activate backblast
-cp -r BackBLAST.sh BackBLAST.py Graph.py Snakefile template_config.yaml envs ${CONDA_PREFIX}/bin
-cd Visualization
-cp RemoveDuplicates.sh CreateBlankResults.py CombineBlastTables.R generate_BackBLAST_heatmap.R ${CONDA_PREFIX}/bin
-
-# Clean up
-cd /tmp && rm -r BackBLAST_Reciprocal_BLAST
+# Add the repo scripts to your PATH temporarily in the current Bash session
+PATH=${PATH}:${PWD}:${PWD}/Visualization
 ```
 Now you should be good to go! Run `BackBLAST.sh -h` to get started.
 
 
 # Usage
-Rough notes on develop version for now
+Rough notes on develop version for now.
 
 ## Recommended workflow
 ```bash
 # Set up the run
-BackBLAST.sh setup query.faa query_genome.faa subject_dir/ output_dir/
+BackBLAST.sh setup query.faa query_genome.faa subject_dir output_dir
 # Then edit output_dir/config.yaml
 # You can also edit output_dir/gene_metadata.tsv and output_dir/genome_metadata.tsv to make the plot look better
 
 # Start the run
-BackBLAST.sh run output_dir/
+BackBLAST.sh run output_dir/config.yaml output_dir
 # All done! You can iteratively refine the plot from here as you'd like.
 ```
 
 ## Speedy workflow
 Gets the job done without any custom settings
 ```bash
-BackBLAST.sh auto query.faa query_genome.faa subject_dir/ output_dir/
+BackBLAST.sh auto query.faa query_genome.faa subject_dir output_dir
+```
+
+## Test data
+Try a test run from inside the repo with:
+```bash
+./BackBLAST.sh run ExampleData/Example_inputs/config.yaml ExampleData/Example_outputs --notemp
 ```
 
 # Going deeper
