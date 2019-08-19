@@ -38,7 +38,7 @@ genome_metadata_tsv: "../Example_inputs/genome_metadata.tsv"
   # See ../Example_inputs/gene_metadata.tsv
 gene_metadata_tsv: "../Example_inputs/gene_metadata.tsv"
 plot_width_mm: 250
-plot_height_mm: 100
+plot_height_mm: 70
 
 
 ## BLAST settings
