@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # ----------------------------------------------------------------------------------------
-# Created by: Lee Bergstrand (2017)
+# Copyright: Lee H. Bergstrand (2019)
 # Description: A Biopython program that takes a list of query proteins and uses local BLASTp to search
 #              for highly similar proteins within a local blast database (usually a local db of a target
 #              proteome). The program then BLASTps backwards from the found subject proteins to the query
@@ -78,7 +78,7 @@ def filter_blast_csv(raw_blast_output, minimum_identity):
     filtered_blast_output = []  # Note should simply delete unwanted HSPs from current list rather than making new list.
     # Rather than making a new one.
     for high_scoring_pair in blast_results:
-        if high_scoring_pair[2] >= minimum_identity:  # Filter by minimum identity.
+        if float(high_scoring_pair[2]) >= minimum_identity:  # Filter by minimum identity.
             # Converts each high_scoring_pair parameter that should be a number to a number.
             high_scoring_pair[2] = float(high_scoring_pair[2])
             high_scoring_pair[3] = float(high_scoring_pair[3])

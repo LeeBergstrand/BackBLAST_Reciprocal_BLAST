@@ -1,7 +1,8 @@
 channels:
   - bioconda
+  - conda-forge
   - defaults
 dependencies:
-  - python=2.7
-  - biopython=1.72
-  - blast=2.6.0
+  - python=3.7
+  - biopython=1.74
+  - blast=2.9
