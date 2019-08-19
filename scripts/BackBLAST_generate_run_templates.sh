@@ -6,10 +6,13 @@ set -euo pipefail
 # Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2019
 
 # GLOBAL variables
-readonly VERSION="0.8.0"
-readonly SCRIPT_NAME="${0##*/}"
-readonly SCRIPT_DIR="$(realpath ${0%/*})"
-readonly TEMPLATE_CONFIG="${SCRIPT_DIR}/../template_config.yaml"
+# Assign ones that overlap with the main BackBLAST script only if this script is called independently
+if [[ ${BASH_SOURCE[0]} = ${0} ]]; then
+  readonly VERSION="0.8.0"
+  readonly SCRIPT_NAME="${0##*/}"
+  readonly SCRIPT_DIR="$(realpath ${0%/*})"
+  readonly TEMPLATE_CONFIG="${SCRIPT_DIR}/../template_config.yaml"
+fi
 
 #######################################
 # Add the user-provided subject files to the end of the template config file

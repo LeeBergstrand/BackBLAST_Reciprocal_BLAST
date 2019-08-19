@@ -504,5 +504,8 @@ function main() {
   echo "[ $(date -u) ]: BackBLAST finished." >&2
 }
 
-main $@
+# Only run the script if it is called from the command line
+if [[ ${BASH_SOURCE[0]} = ${0} ]]; then
+  main $@
+fi
 
