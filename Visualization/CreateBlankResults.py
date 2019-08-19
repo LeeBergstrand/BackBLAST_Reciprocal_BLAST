@@ -47,7 +47,7 @@ def file_extension_check(filename, extension):
 def generate_blank_results(query_proteins):
     blank_results_list = []
 
-    with open(query_proteins, "r") as fasta_file:
+    with open(query_proteins, "r", newline=None) as fasta_file:
         fasta_entries = SeqIO.parse(fasta_file, "fasta")
 
         for entry in fasta_entries:
