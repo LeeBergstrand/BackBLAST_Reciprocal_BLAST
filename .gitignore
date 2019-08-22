@@ -60,3 +60,10 @@ nosetests.xml
 tempQuery.faa
 BackLog*.txt
 .idea
+
+# Snakemake
+.snakemake
+
+# Testing
+*.log
+*.benchmark.txt
