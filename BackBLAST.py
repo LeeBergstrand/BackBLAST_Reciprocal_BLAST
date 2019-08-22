@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # ----------------------------------------------------------------------------------------
-# Created by: Lee Bergstrand (2017)
+# Copyright: Lee H. Bergstrand (2019)
 # Description: A Biopython program that takes a list of query proteins and uses local BLASTp to search
 #              for highly similar proteins within a local blast database (usually a local db of a target
 #              proteome). The program then BLASTps backwards from the found subject proteins to the query
@@ -18,6 +18,8 @@ import argparse
 import csv
 import subprocess
 import sys
+import uuid
+import os
 
 from Bio import SeqIO
 
@@ -56,7 +58,7 @@ def run_blastp(query_file_path, subject_file_path, e_value_cutoff):
     """
     blast_out = subprocess.check_output(
         ["blastp", "-query", query_file_path, "-subject", subject_file_path, "-evalue", str(e_value_cutoff),
-         "-outfmt", "10 qseqid sseqid pident evalue qcovhsp bitscore"])
+         "-soft_masking", "true", "-seg", "yes", "-outfmt", "10 qseqid sseqid pident evalue qcovhsp bitscore"])
 
     # Decodes BLASTp output to UTF-8 (In Py3 check_output returns raw bytes)
     blast_out = blast_out.decode().replace(' ', '')
@@ -76,7 +78,7 @@ def filter_blast_csv(raw_blast_output, minimum_identity):
     filtered_blast_output = []  # Note should simply delete unwanted HSPs from current list rather than making new list.
     # Rather than making a new one.
     for high_scoring_pair in blast_results:
-        if high_scoring_pair[2] >= minimum_identity:  # Filter by minimum identity.
+        if float(high_scoring_pair[2]) >= minimum_identity:  # Filter by minimum identity.
             # Converts each high_scoring_pair parameter that should be a number to a number.
             high_scoring_pair[2] = float(high_scoring_pair[2])
             high_scoring_pair[3] = float(high_scoring_pair[3])
@@ -233,16 +235,18 @@ def main(args):
 
     # Attempt to write a temporary FASTA file for the reverse BLAST to use.
     try:
-        write_file = open("tempQuery.faa", "w")
+        temp_filename = "temp_query_" + uuid.uuid4().hex + ".faa"
+        print(">> Writing Back-Blasting Query to temporary file " + temp_filename)
+        write_file = open(temp_filename, "w")
         write_file.write(complete_back_blast_query)
         write_file.close()
     except IOError:
-        print("Failed to create tempQuery.faa")
+        print("Failed to create " + temp_filename)
         sys.exit(1)
 
     print(">> Blasting backwards from subject genome to query genome.")
     # Run backwards BLAST towards query proteome and filters BLAST results by percent identity.
-    reverse_blast_high_scoring_pairs = get_blast_hight_scoring_pairs(query_gene_cluster_path="tempQuery.faa",
+    reverse_blast_high_scoring_pairs = get_blast_hight_scoring_pairs(query_gene_cluster_path=temp_filename,
                                                                       subject_proteome_file=query_proteome_path,
                                                                       e_value_cutoff=input_e_value_cutoff,
                                                                       minimum_identity=input_min_ident_cutoff)
@@ -257,6 +261,7 @@ def main(args):
         for row in filterable_forward_blast_results:
             writer.writerow(row)
         write_file.close()
+        os.remove(temp_filename)
     except IOError:
         print(">> Failed to create " + out_file)
         sys.exit(1)

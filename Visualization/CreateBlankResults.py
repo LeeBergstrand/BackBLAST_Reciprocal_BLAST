@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # -----------------------------------------------------------------------------------------------------------
-# Created by: Lee Bergstrand
+# Copyright: Lee H. Bergstrand (2019)
 # Description: A simple program that takes a FASTA file query and makes a csv of blank BLAST results.
 #
 # Requirements: - This script requires the Biopython module: http://biopython.org/wiki/Download
@@ -47,7 +47,7 @@ def file_extension_check(filename, extension):
 def generate_blank_results(query_proteins):
     blank_results_list = []
 
-    with open(query_proteins, "rU") as fasta_file:
+    with open(query_proteins, "r", newline=None) as fasta_file:
         fasta_entries = SeqIO.parse(fasta_file, "fasta")
 
         for entry in fasta_entries:
@@ -107,7 +107,7 @@ if __name__ == '__main__':
                                                    "Creates a BLAST results template based on the query_proteome "
                                                    "if the input blast file is blank. "
                                                    "Returns the original file if not blank. "
-                                                   "Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2018.")
+                                                   "Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2019.")
     parser.add_argument('-i', '--blast_results', metavar='BLAST_IN', required=True,
                         help='''The path to CSV-format BLAST results (to be checked by this script if empty or not).''')
 
