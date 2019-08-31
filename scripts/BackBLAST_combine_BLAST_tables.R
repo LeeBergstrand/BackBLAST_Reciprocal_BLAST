@@ -35,6 +35,7 @@ parse_command_line_input <- function(commandArgs) {
   num_args <- length(commandArgs)
   
   # Return output params
+  params <- list()
   params$input_filenames <- commandArgs[1:(num_args-1)]
   params$output_filename <- commandArgs[num_args]
   

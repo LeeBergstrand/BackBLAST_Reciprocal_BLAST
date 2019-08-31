@@ -36,7 +36,7 @@ cd BackBLAST_Reciprocal_BLAST
 git checkout develop
 
 # Install dependencies
-conda env create -n backblast file="envs/conda_requirements.yaml"
+conda env create --name backblast --file="envs/conda_requirements.yaml"
 
 # Add the repo scripts to your PATH temporarily in the current Bash session
 PATH=${PATH}:${PWD}:${PWD}/scripts
@@ -50,25 +50,26 @@ Rough notes on develop version for now.
 ## Recommended workflow
 ```bash
 # Set up the run
-BackBLAST.sh setup query.faa query_genome.faa subject_dir output_dir
+BackBLAST setup query.faa query_genome.faa subject_dir output_dir
 # Then edit output_dir/config.yaml
 # You can also edit output_dir/gene_metadata.tsv and output_dir/genome_metadata.tsv to make the plot look better
 
 # Start the run
-BackBLAST.sh run output_dir/config.yaml output_dir
+BackBLAST run output_dir/config.yaml output_dir
 # All done! You can iteratively refine the plot from here as you'd like.
 ```
 
 ## Speedy workflow
 Gets the job done without any custom settings
 ```bash
-BackBLAST.sh auto query.faa query_genome.faa subject_dir output_dir
+BackBLAST auto query.faa query_genome.faa subject_dir output_dir
 ```
 
 ## Test data
 Try a test run from inside the repo with:
 ```bash
-./BackBLAST.sh run ExampleData/Example_inputs/config.yaml ExampleData/Example_outputs --notemp
+mkdir -p testing/outputs
+./BackBLAST run testing/inputs/config.yaml testing/outputs --notemp
 ```
 
 # Going deeper
