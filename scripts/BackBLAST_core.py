@@ -5,7 +5,7 @@
 # Description: A Biopython program that takes a list of query proteins and uses local BLASTp to search
 #              for highly similar proteins within a local blast database (usually a local db of a target
 #              proteome). The program then BLASTps backwards from the found subject proteins to the query
-#              proteome to confirm gene orthology.
+#              proteome to confirm gene orthology. Part of the BackBLAST pipeline.
 #             
 # Requirements: - This script requires BLAST+ 2.2.9 or later.
 #               - All operations are done with protein sequences.
