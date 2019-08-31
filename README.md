@@ -7,11 +7,11 @@ This repository contains a reciprocal BLAST program for filtering down BLAST res
 # Repo contents
 (To be updated once BackBLAST2 is complete)
 
-- **BackBLAST.py** - A script that uses NCBI BLAST to search for gene clusters within a within a bacterial genome genome. Non-orthalagous genes are filtred out by identifying and extracting only Bidirectional BLAST Hits using a graph-based algorithm. The algorithm is illustrated below:
+- **BackBLAST_core.py** - A script that uses NCBI BLAST to search for gene clusters within a within a bacterial genome genome. Non-orthalagous genes are filtred out by identifying and extracting only Bidirectional BLAST Hits using a graph-based algorithm. The algorithm is illustrated below:
 
 ![BackBLAST Algorithm](https://raw.githubusercontent.com/LeeBergstrand/BackBLAST-Gene-Cluster-Finder/master/Media/BackBLAST-Algorithm.gif)
 
-- **Visualization** - This repository also includes tools for visualizing the results from **BackBLAST.py** in the form of a R heatmap. Here is an example:
+- **Visualization** - This repository also includes tools for visualizing the results from **BackBLAST_core.py** in the form of a R heatmap. Here is an example:
 
 ![Example Results](https://raw.githubusercontent.com/LeeBergstrand/BackBLAST-Gene-Cluster-Finder/master/Media/ExampleResults.jpeg)
 
@@ -36,12 +36,12 @@ cd BackBLAST_Reciprocal_BLAST
 git checkout develop
 
 # Install dependencies
-conda create -n backblast -c bioconda -c conda-forge snakemake=5.5.4
+conda env create -n backblast file="envs/conda_requirements.yaml"
 
 # Add the repo scripts to your PATH temporarily in the current Bash session
-PATH=${PATH}:${PWD}:${PWD}/Visualization
+PATH=${PATH}:${PWD}:${PWD}/scripts
 ```
-Now you should be good to go! Run `BackBLAST.sh -h` to get started.
+Now you should be good to go! Run `BackBLAST -h` to get started.
 
 
 # Usage
@@ -72,5 +72,5 @@ Try a test run from inside the repo with:
 ```
 
 # Going deeper
-For more thorough descriptions and information on usage please check the [**wiki**] (https://github.com/LeeBergstrand/BackBLAST-Gene-Cluster-Finder/wiki) or look at the help information within `BackBLAST.sh`. Enjoy!
+For more thorough descriptions and information on usage please check the [**wiki**] (https://github.com/LeeBergstrand/BackBLAST-Gene-Cluster-Finder/wiki) or look at the help information within `BackBLAST`. Enjoy!
 
