@@ -1,43 +1,29 @@
 #!/usr/bin/env Rscript
 
-# CombineBlastTables.R
-# Copyright Lee Bergstrand and Jackson M. Tsuji, 2018
-# See required R packages below.
+# BackBLAST_combine_BLAST_tables.R
+# Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2019
+# Combines BLAST output (CSV) tables into a single output table with headers
+# Part of the BackBLAST pipeline
 
-#####################################################
-## User variables: #################################
-RUN_COMMAND_LINE <- TRUE # If selected, all user input here is ignored, and terminal-based input is expected instead.
-
-# Set other user variables here
-if (RUN_COMMAND_LINE == FALSE) {
-  setwd("/Users/JTsuji/Downloads") # your working directory where files are stored
-  input_filenames <- c("subject1.csv", "subject2.csv", "subject3.csv") # NOTE: filename minux extesion will become the subject_name!
-  output_filename <- "combined_blast_tables.csv"
-}
-#####################################################
-
-#####################################################
-## Load required packages: ##########################
+# Load libraries
 library(getopt)
+library(futile.logger)
 library(tools)
 library(plyr)
-suppressMessages(library(dplyr))
-#####################################################
+library(dplyr, warn.conflicts = FALSE)
 
 # Hard-coded variables
-header_names <- c("qseqid", "sseqid", "pident", "evalue", "qcovhsp", "bitscore")
-
+HEADER_NAMES <- c("qseqid", "sseqid", "pident", "evalue", "qcovhsp", "bitscore")
 
 # Function to assign command line input to variables, or throw help message
-parse_command_line_input <- function() {
+parse_command_line_input <- function(commandArgs) {
   
-  inputArgs <- commandArgs(trailingOnly = TRUE)
-  if (length(inputArgs) < 2) {
-    cat("CombineBlastTables.R: Combines BLAST tables and makes new column for sample ID based on the filenames.\n")
-    cat("Lee Bergstrand and Jackson M. Tsuji, 2018\n")
-    cat("Contact Jackson M. Tsuji (jackson.@uwaterloo.ca) for bug reports or feature requests.\n\n")
+  if (length(commandArgs) < 2) {
+    cat("BackBLAST_combine_BLAST_tables.R: Combines BLAST tables and makes new column for sample ID based on the filenames.\n")
+    cat("Copyright Lee Bergstrand and Jackson M. Tsuji, 2019\n")
+    cat("Part of the BackBLAST pipeline.\n\n")
     
-    cat("Usage: CombineBlastTables.R subject1.csv subject2.csv ... subjectN.csv combined_blast_tables.csv\n\n")
+    cat("Usage: BackBLAST_combine_BLAST_tables.R subject1.csv subject2.csv ... subjectN.csv combined_blast_tables.csv\n\n")
     
     cat("Details:\n",
         "subject1.csv, etc.: CSV BLAST tables for all individual samples (subjects for BLAST). Name should be the subject name [Required]\n",
@@ -46,28 +32,18 @@ parse_command_line_input <- function() {
     quit(status = 1)
   }
   
-  num_args <- length(inputArgs)
+  num_args <- length(commandArgs)
   
-  # Make variables from provided input and save as global variables (<<-)
-  input_filenames <<- inputArgs[1:(num_args-1)]
-  output_filename <<- inputArgs[num_args]
+  # Return output params
+  params$input_filenames <- commandArgs[1:(num_args-1)]
+  params$output_filename <- commandArgs[num_args]
   
+  return(params)
 }
-
-# Helper function for timestamps
-timestamp <- function() {
-  
-  datetime_utc <- format(as.POSIXlt(Sys.time(), tz = "UTC"), "%a %d %b %Y %H:%M:%S %Z")
-  
-  date_message <- paste("[ ", datetime_utc, " ]: ", sep = "")
-  
-  return(date_message)
-}
-
 
 # Function to load table of data, add header IDs, and add query/subject name by parsing filename
 load_individual_table <- function(table_filename, header_names) {
-  cat(paste(timestamp(), "Reading table '", table_filename, "'\n", sep = ""))
+  flog.info(paste("Reading table '", table_filename, "'", sep = ""))
   
   # Read the table and add columns
   data_table <- read.table(table_filename, header = FALSE, sep = ",", stringsAsFactors = FALSE, comment.char = "")
@@ -79,7 +55,7 @@ load_individual_table <- function(table_filename, header_names) {
   # Add new columns to table
   # TODO - consider also adding query_name
   # data_table$query_name <- query_name
-  cat(paste(timestamp(), "Adding subject_name of '", subject_name, "'\n", sep = ""))
+  flog.info(paste("Adding subject_name of '", subject_name, "'", sep = ""))
   data_table$subject_name <- subject_name
   
   # Re-order columns to be more user friendly
@@ -90,27 +66,25 @@ load_individual_table <- function(table_filename, header_names) {
 }
 
 main <- function() {
-  # Run command line version if requested
-  if (RUN_COMMAND_LINE == TRUE) {
-    parse_command_line_input()
-  }
+  # Parse command line input
+  params <- parse_command_line_input(commandArgs(trailingOnly = TRUE))
   
   # Startup messages
-  cat(paste(timestamp(), "Running CombineBlastTables.R\n", sep = ""))
-  cat(paste(timestamp(), "Input tables: ", length(input_filenames), " total\n", sep = ""))
-  cat(paste(timestamp(), "Output table: ", output_filename, "\n", sep = ""))
+  flog.info("Running BackBLAST_combine_BLAST_tables.R")
+  flog.info(paste("Input tables: ", length(params$input_filenames), " total", sep = ""))
+  flog.info(paste("Output table: '", params$output_filename, "'", sep = ""))
   
   # Load all tables
-  cat(paste(timestamp(), "Loading BLAST tables\n", sep = ""))
-  blast_tables <- lapply(input_filenames, function(x) { load_individual_table(x, header_names) })
+  flog.info("Loading BLAST tables")
+  blast_tables <- lapply(params$input_filenames, function(x) { load_individual_table(x, HEADER_NAMES) })
   
-  cat(paste(timestamp(), "Combining BLAST tables\n", sep = ""))
+  flog.info("Combining BLAST tables")
   output_table <- dplyr::bind_rows(blast_tables)
   
-  cat(paste(timestamp(), "Writing combining BLAST table to file (**with headers**)\n", sep = ""))
-  write.table(output_table, file = output_filename, sep = ",", row.names = FALSE, col.names = TRUE)
+  flog.info("Writing combining BLAST table to file (**with headers**)")
+  write.table(output_table, file = params$output_filename, sep = ",", row.names = FALSE, col.names = TRUE)
   
-  cat(paste(timestamp(), "Done\n", sep = ""))
+  flog.info("BackBLAST_combine_BLAST_tables.R: Done.")
 }
 
 main()
