@@ -1,17 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 # BackBLAST_generate_run_templates.sh
-# Bash script for generating and manipulating BackBLAST config templates
-# Part of the larger BackBLAST suite
 # Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2019
+# Script for generating and manipulating BackBLAST config templates
+# Part of the BackBLAST pipeline
 
 # GLOBAL variables
 # Assign ones that overlap with the main BackBLAST script only if this script is called independently
 if [[ ${BASH_SOURCE[0]} = ${0} ]]; then
-  readonly VERSION="0.8.0"
   readonly SCRIPT_NAME="${0##*/}"
   readonly SCRIPT_DIR="$(realpath ${0%/*})"
-  readonly TEMPLATE_CONFIG="${SCRIPT_DIR}/../template_config.yaml"
+  readonly TEMPLATE_CONFIG="${SCRIPT_DIR}/../snakemake/template_config.yaml"
 fi
 
 #######################################
@@ -215,8 +214,7 @@ function main() {
 
     # Help statement
     printf "${SCRIPT_NAME}: generate template config files for a BackBLAST 'setup'. Part of the BackBLAST suite.\n"
-    printf "Copyright Lee H. Bergstrand and Jackson M. Tsuji, Neufeld Research Group, 2019\n"
-    printf "Version: ${VERSION}\n\n"
+    printf "Copyright Lee H. Bergstrand and Jackson M. Tsuji, Neufeld Research Group, 2019\n\n"
     printf "Usage: ${SCRIPT_NAME} [OPTIONS] query_filepath query_genome_filepath subject_genome_directory output_directory\n\n"
     printf "Positional arguments (required):\n"
     printf "   query_filepath: path to the query predicted protein sequences from the query genome, FastA format\n"

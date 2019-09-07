@@ -1,7 +1,8 @@
 #!/usr/bin/env Rscript
-# generate_BackBLAST_heatmap.R
-# Copyright Lee Bergstrand and Jackson M. Tsuji, 2019
+# BackBLAST_generate_heatmap.R
+# Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2019
 # Plots a newick treefile and BLAST table together as a phylogenetic tree and heatmap
+# Part of the BackBLAST pipeline
 
 # Load libraries
 # Note: warn.conflicts: Normally, when a library is loaded that has a function with identical 
@@ -65,7 +66,7 @@ choose_discrete_colour_scale <- function(length) {
   return(colour_palette)
 }
 
-#' Convert character "NA" (from command line) into true NA
+#' Convert character "NA" (from command line) into constant NA
 #' 
 #' @param entry single-length vector of any type
 #' @return single-length vector; if it was "NA", it will now be NA; otherwise it will be the same as input
@@ -483,7 +484,7 @@ load_and_plot_blast_results <- function(input_blast_table_filepath, tip_order = 
 
 main <- function(params) {
   # Startup messages
-  futile.logger::flog.info("Running generate_BackBLAST_heatmap.R")
+  futile.logger::flog.info("Running BackBLAST_generate_heatmap.R")
   futile.logger::flog.info("######### Settings #########")
   futile.logger::flog.info(glue::glue("Input phylogenetic tree filepath (ignored if 'NA'): ", params$input_phylogenetic_tree_filepath))
   futile.logger::flog.info(glue::glue("Input BLAST table filepath: ", params$input_blast_table_filepath))
@@ -545,13 +546,13 @@ main <- function(params) {
     print(blast_results_list[[2]])
     dev.off()
   }
-  futile.logger::flog.info("generate_BackBLAST_heatmap.R: done.")
+  futile.logger::flog.info("BackBLAST_generate_heatmap.R: done.")
 }
 
 if ( !interactive() ) {
   parser <- argparser::arg_parser(
-      description = glue::glue("generate_BackBLAST_heatmap.R: Binds a phylogenetic tree to a BLAST table heatmap.
-                                Copyright Lee Bergstrand and Jackson M. Tsuji, 2019."))
+      description = glue::glue("BackBLAST_generate_heatmap.R: Binds a phylogenetic tree to a BLAST table heatmap.
+                                Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2019."))
   
   # Add required args
   parser <- argparser::add_argument(parser = parser, arg = "input_phylogenetic_tree_filepath", 

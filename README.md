@@ -7,11 +7,11 @@ This repository contains a reciprocal BLAST program for filtering down BLAST res
 # Repo contents
 (To be updated once BackBLAST2 is complete)
 
-- **BackBLAST.py** - A script that uses NCBI BLAST to search for gene clusters within a within a bacterial genome genome. Non-orthalagous genes are filtred out by identifying and extracting only Bidirectional BLAST Hits using a graph-based algorithm. The algorithm is illustrated below:
+- **BackBLAST_core.py** - A script that uses NCBI BLAST to search for gene clusters within a within a bacterial genome genome. Non-orthalagous genes are filtred out by identifying and extracting only Bidirectional BLAST Hits using a graph-based algorithm. The algorithm is illustrated below:
 
 ![BackBLAST Algorithm](https://raw.githubusercontent.com/LeeBergstrand/BackBLAST-Gene-Cluster-Finder/master/Media/BackBLAST-Algorithm.gif)
 
-- **Visualization** - This repository also includes tools for visualizing the results from **BackBLAST.py** in the form of a R heatmap. Here is an example:
+- **Visualization** - This repository also includes tools for visualizing the results from **BackBLAST_core.py** in the form of a R heatmap. Here is an example:
 
 ![Example Results](https://raw.githubusercontent.com/LeeBergstrand/BackBLAST-Gene-Cluster-Finder/master/Media/ExampleResults.jpeg)
 
@@ -36,12 +36,12 @@ cd BackBLAST_Reciprocal_BLAST
 git checkout develop
 
 # Install dependencies
-conda create -n backblast -c bioconda -c conda-forge snakemake=5.5.4
+conda env create --name backblast --file="envs/conda_requirements.yaml"
 
 # Add the repo scripts to your PATH temporarily in the current Bash session
-PATH=${PATH}:${PWD}:${PWD}/Visualization
+PATH=${PATH}:${PWD}:${PWD}/scripts
 ```
-Now you should be good to go! Run `BackBLAST.sh -h` to get started.
+Now you should be good to go! Run `BackBLAST -h` to get started.
 
 
 # Usage
@@ -50,27 +50,28 @@ Rough notes on develop version for now.
 ## Recommended workflow
 ```bash
 # Set up the run
-BackBLAST.sh setup query.faa query_genome.faa subject_dir output_dir
+BackBLAST setup query.faa query_genome.faa subject_dir output_dir
 # Then edit output_dir/config.yaml
 # You can also edit output_dir/gene_metadata.tsv and output_dir/genome_metadata.tsv to make the plot look better
 
 # Start the run
-BackBLAST.sh run output_dir/config.yaml output_dir
+BackBLAST run output_dir/config.yaml output_dir
 # All done! You can iteratively refine the plot from here as you'd like.
 ```
 
 ## Speedy workflow
 Gets the job done without any custom settings
 ```bash
-BackBLAST.sh auto query.faa query_genome.faa subject_dir output_dir
+BackBLAST auto query.faa query_genome.faa subject_dir output_dir
 ```
 
 ## Test data
 Try a test run from inside the repo with:
 ```bash
-./BackBLAST.sh run ExampleData/Example_inputs/config.yaml ExampleData/Example_outputs --notemp
+mkdir -p testing/outputs
+./BackBLAST run testing/inputs/config.yaml testing/outputs --notemp
 ```
 
 # Going deeper
-For more thorough descriptions and information on usage please check the [**wiki**] (https://github.com/LeeBergstrand/BackBLAST-Gene-Cluster-Finder/wiki) or look at the help information within `BackBLAST.sh`. Enjoy!
+For more thorough descriptions and information on usage please check the [**wiki**] (https://github.com/LeeBergstrand/BackBLAST-Gene-Cluster-Finder/wiki) or look at the help information within `BackBLAST`. Enjoy!
 

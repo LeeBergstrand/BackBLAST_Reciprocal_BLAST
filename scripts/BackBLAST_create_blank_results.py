@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
 # -----------------------------------------------------------------------------------------------------------
-# Copyright: Lee H. Bergstrand (2019)
-# Description: A simple program that takes a FASTA file query and makes a csv of blank BLAST results.
+# Copyright: Lee H. Bergstrand and Jackson M. Tsuji (2019)
+# Description: A simple program that takes a FASTA file query and makes a csv of blank BLAST results. Part of the BackBLAST pipeline.
 #
 # Requirements: - This script requires the Biopython module: http://biopython.org/wiki/Download
 #
-# Usage: CreateBlankResults.py -i blast_file.csv -q query_proteins.faa -o new_blast_output_file.csv
+# Usage: BackBLAST_create_blank_results.py -i blast_file.csv -q query_proteins.faa -o new_blast_output_file.csv
 #       Will make a blank file if the input blast file is blank, and will otherwise return the original file.
 # -----------------------------------------------------------------------------------------------------------
 # ===========================================================================================================

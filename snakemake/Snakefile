@@ -1,5 +1,6 @@
-# Snakefile rules for BackBLAST pipeline
-# Copyright Lee Bergstrand and Jackson M. Tsuji, 2018
+# Snakemake rules for the BackBLAST pipeline
+# Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2019
+
 import os
 from snakemake.utils import logger, min_version, update_config
 
@@ -20,8 +21,6 @@ rule run_reciprocal_blast:
         lambda wildcards: config["subjects"][wildcards.subject]
     output:
         temp("blast/intermediate/reciprocal_blast/{subject}.csv")
-    conda:
-        "envs/reciprocal_blast.yaml"
     log:
         "logging/logs/blast/intermediate/reciprocal_blast/{subject}.log"
     benchmark:
@@ -33,7 +32,7 @@ rule run_reciprocal_blast:
         eval = config.get("e_value_cutoff"),
         pident = config.get("minimum_percent_identity")
     shell:
-        "BackBLAST.py --gene_cluster {params.query_genes} --query_proteome {params.query_genome_orfs} --subject_proteome {input} "
+        "BackBLAST_core.py --gene_cluster {params.query_genes} --query_proteome {params.query_genome_orfs} --subject_proteome {input} "
             "--e_value {params.eval} --min_ident {params.pident} --output_file {output} > {log} 2>&1"
 
 # Remove duplicate BLAST hits for each BLAST table
@@ -48,7 +47,7 @@ rule remove_duplicates:
         "logging/benchmarks/{subject}.remove_duplicates.benchmark.txt"
     threads: 1
     shell:
-        "RemoveDuplicates.sh {input} > {output} 2> {log}"
+        "BackBLAST_remove_duplicates.sh {input} > {output} 2> {log}"
 
 # If BLAST CSV is empty, create a blank BLAST table
 rule create_blank_results:
@@ -56,8 +55,6 @@ rule create_blank_results:
         "blast/intermediate/remove_duplicates/{subject}.csv"
     output:
         temp("blast/intermediate/fix_blank_results/{subject}.csv")
-    conda:
-        "envs/reciprocal_blast.yaml"
     log:
         "logging/logs/blast/intermediate/create_blank_results/{subject}.log"
     benchmark:
@@ -65,7 +62,7 @@ rule create_blank_results:
     params:
         query_genes=config.get("query_genes")
     shell:
-        "CreateBlankResults.py -i {input} -q {params.query_genes} -o {output} > {log} 2>&1"
+        "BackBLAST_create_blank_results.py -i {input} -q {params.query_genes} -o {output} > {log} 2>&1"
 
 # Combine the BLAST tables into a single table, and add a column for sample ID
 rule combine_blast_tables:
@@ -73,14 +70,12 @@ rule combine_blast_tables:
         blast_tables=expand("blast/intermediate/fix_blank_results/{subject}.csv", subject=config.get("subjects"))
     output:
         "blast/combine_blast_tables/blast_tables_combined.csv"
-    conda:
-        "envs/R_viz.yaml"
     log:
         "logging/logs/blast/combine_blast_tables/combine_blast_tables.log"
     benchmark:
         "logging/benchmarks/combine_blast_tables.benchmark.txt"
     shell:
-        "CombineBlastTables.R {input} {output} > {log} 2>&1"
+        "BackBLAST_combine_BLAST_tables.R {input} {output} > {log} 2>&1"
 
 # Create a symlink of the combined BLAST table to make it easier for the user to find
 rule symlink_combined_blast_table:
@@ -95,7 +90,7 @@ rule symlink_combined_blast_table:
 # Checkpoint that BLAST step is finished
 rule finished_blast:
     input: "blast/blast_tables_combined.csv"
-    output: touch("logging/checkpoints/finished_blast")
+    output: temp(touch("logging/checkpoints/finished_blast"))
 
 # Generate phylogenetic tree if desired by the user
 if config.get("phylogenetic_tree_newick") == "subjects":
@@ -111,8 +106,8 @@ if config.get("phylogenetic_tree_newick") == "subjects":
             "echo {input} > {output}"
 
     # Part 2 of the above rule
-    # TODO - check {output} does not already exist before run start?
-    # TODO - how to merge parts 1 and 2 together?
+    # TODO - check {output} does not already exist before run start or move output to a different folder
+    # TODO - Is it possible to merge Parts 1 and 2 together into a single rule?
     rule generate_phylogenetic_tree_input_grouped:
         input:
             blast_tables=expand("phylogeny/input/{subject}.list", subject=config.get("subjects"))
@@ -123,7 +118,7 @@ if config.get("phylogenetic_tree_newick") == "subjects":
             "cat {input} >> {output}"
 
     # Run GToTree
-    # TODO - expose more params to the user
+    # TODO - note that it is possible to expose more params to the user
     rule generate_phylogenetic_tree:
         input:
             "phylogeny/input/input_genomes_faa.list"
@@ -159,8 +154,6 @@ rule generate_heatmap:
         tree_file = "phylogeny/iqtree_out.treefile" if config.get("phylogenetic_tree_newick") == "subjects" else config.get("phylogenetic_tree_newick", "NA")
     output:
         "heatmap/BackBLAST_heatmap.pdf"
-    conda:
-        "envs/R_viz.yaml"
     log:
         "logging/logs/heatmap/generate_heatmap.log"
     benchmark:
@@ -173,7 +166,7 @@ rule generate_heatmap:
         plot_width = config.get("plot_width_mm", 400),
         plot_height = config.get("plot_height_mm", 200)
     shell:
-        "generate_BackBLAST_heatmap.R -m {params.genome_metadata} -g {params.gene_metadata} "
+        "BackBLAST_generate_heatmap.R -m {params.genome_metadata} -g {params.gene_metadata} "
             "-b {params.bootstrap_cutoff} -r {params.root_name} -w {params.plot_width} -z {params.plot_height} "
             "{input.tree_file} {input.blast_table} {output} 2>&1 | tee {log} && "
         "if [[ -f Rplots.pdf ]]; then rm Rplots.pdf; fi"
@@ -182,5 +175,5 @@ rule generate_heatmap:
 # This is probably over-engineered, but it is helpful to mirror what is being done for the BLAST step and could help to one day separate this Snakefile into modules
 rule finished_heatmap:
     input: "heatmap/BackBLAST_heatmap.pdf"
-    output: touch("logging/checkpoints/finished_heatmap")
+    output: temp(touch("logging/checkpoints/finished_heatmap"))
 

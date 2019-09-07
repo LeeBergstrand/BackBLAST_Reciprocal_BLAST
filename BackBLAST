@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
-# BackBLAST.sh
-# The entry script for running BackBLAST via command line
+# BackBLAST
 # Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2019
+# The entry script for running BackBLAST via command line
 
 # GLOBAL variables
 readonly VERSION="0.8.0"
 readonly SCRIPT_NAME="${0##*/}"
 readonly SCRIPT_DIR="$(realpath ${0%/*})"
-readonly TEMPLATE_CONFIG="${SCRIPT_DIR}/template_config.yaml"
-readonly SNAKEFILE="${SCRIPT_DIR}/Snakefile"
+readonly TEMPLATE_CONFIG="${SCRIPT_DIR}/snakemake/template_config.yaml"
+readonly SNAKEFILE="${SCRIPT_DIR}/snakemake/Snakefile"
 
 # Load modules
 source "${SCRIPT_DIR}/scripts/BackBLAST_generate_run_templates.sh" # the 'make_run_templates' function is called
@@ -54,14 +54,14 @@ function run_snakemake() {
 
   # Run snakemake
   if [[ ${use_conda} == "True" ]]; then
-    echo "[ $(date -u) ]: Command: snakemake --snakefile '${snakefile}' --configfile '${config_file}' --directory '${run_directory}' --conda-prefix '${conda_prefix}' --jobs ${jobs} --rerun-incomplete --reason --printshellcmds --use-conda ${snakemake_arguments}"
+    echo "[ $(date -u) ]: Command: snakemake --snakefile '${snakefile}' --configfile '${config_file}' --directory '${run_directory}' --conda-prefix '${conda_prefix}' --jobs ${jobs} --rerun-incomplete --reason --printshellcmds --use-conda ${snakemake_arguments}" >&2
     snakemake --snakefile "${snakefile}" --configfile "${config_file}" --directory "${run_directory}" --conda-prefix "${conda_prefix}" --jobs "${jobs}" --rerun-incomplete --reason --printshellcmds --use-conda ${snakemake_arguments}
   elif  [[ ${use_conda} == "False" ]]; then
     # No need for --conda-prefix here; do not use
-    echo "[ $(date -u) ]: Command: snakemake --snakefile '${snakefile}' --configfile '${config_file}' --directory '${run_directory}' --jobs ${jobs} --rerun-incomplete --reason --printshellcmds ${snakemake_arguments}"
+    echo "[ $(date -u) ]: Command: snakemake --snakefile '${snakefile}' --configfile '${config_file}' --directory '${run_directory}' --jobs ${jobs} --rerun-incomplete --reason --printshellcmds ${snakemake_arguments}" >&2
     snakemake --snakefile "${snakefile}" --configfile "${config_file}" --directory "${run_directory}" --jobs ${jobs} --rerun-incomplete --reason --printshellcmds ${snakemake_arguments}
   else
-    echo "[ $(date -u) ]: the 'use_conda' variable must be either 'True' or 'False'; instead, '${use_conda}' was specified. Exiting..."
+    echo "[ $(date -u) ]: the 'use_conda' variable must be either 'True' or 'False'; instead, '${use_conda}' was specified. Exiting..." >&2
     exit 1
   fi
 }
@@ -508,4 +508,3 @@ function main() {
 if [[ ${BASH_SOURCE[0]} = ${0} ]]; then
   main $@
 fi
-
