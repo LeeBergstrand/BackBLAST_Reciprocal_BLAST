@@ -8,11 +8,13 @@ set -euo pipefail
 readonly VERSION="0.8.0"
 readonly SCRIPT_NAME="${0##*/}"
 readonly SCRIPT_DIR="$(realpath ${0%/*})"
+readonly UTILS_DIR="${SCRIPT_DIR}/BackBLAST_utils"
 readonly TEMPLATE_CONFIG="${SCRIPT_DIR}/snakemake/template_config.yaml"
 readonly SNAKEFILE="${SCRIPT_DIR}/snakemake/Snakefile"
 
 # Load modules
-source "${SCRIPT_DIR}/scripts/BackBLAST_generate_run_templates.sh" # the 'make_run_templates' function is called
+# NOTE: internal modules are loaded in main() after the UTILS_DIR is specified. Current modules:
+# - generate_run_templates.sh: function 'make_run_templates' is called
 
 #######################################
 # Run snakemake
@@ -474,18 +476,55 @@ function main() {
     printf "${SCRIPT_NAME}: pipeline to search for and visualize gene homologs across multiple genomes.\n"
     printf "Copyright Lee H. Bergstrand and Jackson M. Tsuji, Neufeld Research Group, 2019\n"
     printf "Version: ${VERSION}\n\n"
-    printf "Please specify a run mode for further usage instructions:\n"
+    printf "Please specify a run mode for the main workflow for further usage instructions:\n"
     printf "   1. setup: for setting up pre-run configuration files\n"
     printf "   2. run: to start a run using configuration files\n"
     printf "   3. auto: to skip setup and run the pipeline end-to-end with default values\n\n"
+    printf "Or run a specific step in the workflow manually:\n"
+    printf "   search: performs reciprocal BLASTP on given inputs\n"
+    printf "   remove_duplicates: removes duplicate hits from reciprocal BLASTP results\n"
+    printf "   fix_blanks: creates a blank output BLAST table for entries with no reciprocal BLASTP hits\n"
+    printf "   combine_tables: combines a set of input BLAST tables\n"
+    printf "   generate_heatmap: generates a heatmap from input BLAST and phylogeny data\n\n"
+    printf "Advanced parameters (use with care):\n"
+    printf "   -U utils_dir: Path to the BackBLAST utility script directory [default: ${UTILS_DIR}]\n\n"
 
     # Exit
     exit 0
-  fi    
+  fi
 
-  # Get user-supplied variables
+  # Set defaults for options
+  local utils_dir
+  utils_dir="${UTILS_DIR}"
+
+  # Set options (help from https://wiki.bash-hackers.org/howto/getopts_tutorial; accessed March 8th, 2019)
+  OPTIND=1 # reset the OPTIND counter just in case
+  while getopts ":U:" opt; do
+    case ${opt} in
+      U)
+        utils_dir=${OPTARG}
+        ;;
+      \?)
+        echo "[ $(date -u) ]: ERROR: Invalid option: '-${OPTARG}'. Exiting..." >&2
+        exit 1
+        ;;
+      :)
+        echo "[ $(date -u) ]: ERROR: argument needed following '-${OPTARG}'. Exiting..." >&2
+        exit 1
+        ;;
+    esac
+  done
+
+  # Set positional arguments
+  local original_arguments
+  original_arguments=${@} # save for reporting later
+  shift $((OPTIND - 1)) # shift to avoid flags when assigning positional arguments
   local run_mode
   run_mode=$1
+
+  # Load internal modules
+  # TODO: redesign the code so that this can be done at the top of the script, or run via CLI instead of loading as a module
+  source "${utils_dir}/generate_run_templates.sh" # the 'make_run_templates' function is called
 
   # Determine the run mode based on user input
   # Different variables are needed for the different run modes
@@ -496,8 +535,18 @@ function main() {
     perform_run ${@:2}
   elif [[ ${run_mode} = "auto" ]]; then
     perform_auto ${@:2}
+  elif [[ ${run_mode} = "search" ]]; then
+    "${utils_dir}/BackBLAST_core.py" ${@:2}
+  elif [[ ${run_mode} = "remove_duplicates" ]]; then
+    "${utils_dir}/remove_duplicates.sh" ${@:2}
+  elif [[ ${run_mode} = "fix_blanks" ]]; then
+    "${utils_dir}/create_blank_results.py" ${@:2}
+  elif [[ ${run_mode} = "combine_tables" ]]; then
+    "${utils_dir}/combine_tables.R" ${@:2}
+  elif [[ ${run_mode} = "generate_heatmap" ]]; then
+    "${utils_dir}/generate_heatmap.R" ${@:2}
   else
-    echo "Provided run_mode must be 'setup', 'run', or 'auto'. You provided '${run_mode}'. Exiting..." >&2
+    echo "Provided run mode ('${run_mode}') does not match those available. Exiting..." >&2
     exit 1
   fi
 

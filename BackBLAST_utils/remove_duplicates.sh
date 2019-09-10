@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+# remove_duplicates.sh
 # Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2019
 # A simple script that removes multiple hits from BackBLAST results
 # Part of the BackBLAST pipeline
