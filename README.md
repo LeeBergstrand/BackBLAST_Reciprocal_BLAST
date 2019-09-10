@@ -39,7 +39,7 @@ git checkout develop
 conda env create --name backblast --file="envs/conda_requirements.yaml"
 
 # Add the repo scripts to your PATH temporarily in the current Bash session
-PATH=${PATH}:${PWD}:${PWD}/scripts
+PATH=${PATH}:${PWD}
 ```
 Now you should be good to go! Run `BackBLAST -h` to get started.
 
@@ -70,6 +70,10 @@ Try a test run from inside the repo with:
 ```bash
 mkdir -p testing/outputs
 ./BackBLAST run testing/inputs/config.yaml testing/outputs --notemp
+
+# See if the output file looks as expected
+cmp testing/outputs/blast/combine_blast_tables/blast_tables_combined.csv \
+  testing/outputs_expected/blast/combine_blast_tables/blast_tables_combined.csv
 ```
 
 # Going deeper
