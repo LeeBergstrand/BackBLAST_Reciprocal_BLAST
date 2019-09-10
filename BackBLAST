@@ -536,7 +536,7 @@ function main() {
   elif [[ ${run_mode} = "auto" ]]; then
     perform_auto ${@:2}
   elif [[ ${run_mode} = "search" ]]; then
-    "${utils_dir}/BackBLAST_core.py" ${@:2}
+    "${utils_dir}/search.py" ${@:2}
   elif [[ ${run_mode} = "remove_duplicates" ]]; then
     "${utils_dir}/remove_duplicates.sh" ${@:2}
   elif [[ ${run_mode} = "create_blank_results" ]]; then
