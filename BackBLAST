@@ -192,6 +192,7 @@ function perform_setup() {
     ${genome_extension} ${output_directory} ${threads} ${phylogenetic_tree_newick} ${bootstrap_cutoff} ${root_name} ${evalue} ${pident}
 
   echo "[ $(date -u) ]: Setup complete. After modifying the config.yaml file to your liking, run ${SCRIPT_NAME} using 'run' mode." >&2
+  echo "[ $(date -u) ]: BackBLAST finished." >&2
 }
 
 #######################################
@@ -293,6 +294,8 @@ function perform_run() {
 
   # Start the run
   run_snakemake ${snakefile} ${config_filepath} ${run_directory} ${conda_prefix} ${jobs} ${use_conda} ${snakemake_arguments}
+
+  echo "[ $(date -u) ]: BackBLAST finished." >&2
 }
 
 #######################################
@@ -463,6 +466,8 @@ function perform_auto() {
   # Start the run
   echo "[ $(date -u) ]: Default setup finished; starting pipeline" >&2
   run_snakemake ${snakefile} ${output_config_filepath} ${output_directory} ${conda_prefix} ${jobs} ${use_conda} ${snakemake_arguments}
+
+  echo "[ $(date -u) ]: BackBLAST finished." >&2
 }
 
 function main() {
@@ -550,7 +555,6 @@ function main() {
     exit 1
   fi
 
-  echo "[ $(date -u) ]: BackBLAST finished." >&2
 }
 
 # Only run the script if it is called from the command line
