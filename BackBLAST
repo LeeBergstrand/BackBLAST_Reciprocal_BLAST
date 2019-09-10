@@ -483,7 +483,7 @@ function main() {
     printf "Or run a specific step in the workflow manually:\n"
     printf "   search: performs reciprocal BLASTP on given inputs\n"
     printf "   remove_duplicates: removes duplicate hits from reciprocal BLASTP results\n"
-    printf "   fix_blanks: creates a blank output BLAST table for entries with no reciprocal BLASTP hits\n"
+    printf "   create_blank_results: creates a blank output BLAST table for entries with no reciprocal BLASTP hits\n"
     printf "   combine_tables: combines a set of input BLAST tables\n"
     printf "   generate_heatmap: generates a heatmap from input BLAST and phylogeny data\n\n"
     printf "Advanced parameters (use with care):\n"
@@ -539,7 +539,7 @@ function main() {
     "${utils_dir}/BackBLAST_core.py" ${@:2}
   elif [[ ${run_mode} = "remove_duplicates" ]]; then
     "${utils_dir}/remove_duplicates.sh" ${@:2}
-  elif [[ ${run_mode} = "fix_blanks" ]]; then
+  elif [[ ${run_mode} = "create_blank_results" ]]; then
     "${utils_dir}/create_blank_results.py" ${@:2}
   elif [[ ${run_mode} = "combine_tables" ]]; then
     "${utils_dir}/combine_tables.R" ${@:2}
