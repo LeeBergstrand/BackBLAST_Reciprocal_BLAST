@@ -25,21 +25,39 @@ Temporary instructions while BackBLAST2 is still under development, to install t
 - Workflow is pretty light on RAM, CPU, and storage space, so most machines should be able to handle BackBLAST without issue. The only exception is if you create genome trees within the pipeline, in which case you'll need a fair amount of CPU and time to calculate large trees.
 
 ## Instructions
-This is a hacky, bleeding-edge install of BackBLAST, to be revised once we make a conda install.  
-This method will only work in your single, active Bash session. One-time use.  
-Keep checking in for updates to the code. Hoping to have a better solution soon.
+Takes a few steps -- to be revised once we make a conda install.
 ```bash
-# Download
-# Before running this code, change directory into whatever folder you want to use the tool in
+# Download the repo
+cd /tmp
 git clone https://github.com/LeeBergstrand/BackBLAST_Reciprocal_BLAST.git
 cd BackBLAST_Reciprocal_BLAST
-git checkout develop
+git checkout develop # optionally go to a specific branch
 
-# Install dependencies
-conda env create --name backblast --file="envs/conda_requirements.yaml"
+# Create the conda env based on the YAML file in the repo
+conda env create -n backblast --file=envs/conda_requirements.yaml
 
-# Add the repo scripts to your PATH temporarily in the current Bash session
-PATH=${PATH}:${PWD}
+# Copy the key repo contents into a conda share folder
+conda activate backblast_dev_0f1277a
+mkdir -p ${CONDA_PREFIX}/share/BackBLAST
+cp -r * ${CONDA_PREFIX}/share/BackBLAST
+
+# Remove the original repo
+cd ..
+rm -rf BackBLAST_Reciprocal_BLAST
+
+# Add instructions to export the BackBLAST folder to the PATH when the repo activates
+mkdir -p ${CONDA_PREFIX}/etc/conda/activate.d
+
+if [[ ! -f ${CONDA_PREFIX}/etc/conda/activate.d/env_vars.sh ]]; then
+  echo '#!/bin/sh' > ${CONDA_PREFIX}/etc/conda/activate.d/env_vars.sh
+fi
+echo "export PATH=\${PATH}:${CONDA_PREFIX}/share/BackBLAST:${CONDA_PREFIX}/share/BackBLAST/scripts" \
+  >> ${CONDA_PREFIX}/etc/conda/activate.d/env_vars.sh
+chmod 755 ${CONDA_PREFIX}/etc/conda/activate.d/env_vars.sh
+
+# Re-activate the repo to apply the changes
+conda deactivate
+conda activate backblast
 ```
 Now you should be good to go! Run `BackBLAST -h` to get started.
 
@@ -74,6 +92,9 @@ mkdir -p testing/outputs
 # See if the output file looks as expected
 cmp testing/outputs/blast/combine_blast_tables/blast_tables_combined.csv \
   testing/outputs_expected/blast/combine_blast_tables/blast_tables_combined.csv
+
+# Clean up test if everything looks good
+rm -r testing/outputs
 ```
 
 # Going deeper

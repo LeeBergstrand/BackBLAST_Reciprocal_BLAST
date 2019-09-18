@@ -12,10 +12,6 @@ readonly UTILS_DIR="${SCRIPT_DIR}/scripts"
 readonly TEMPLATE_CONFIG="${SCRIPT_DIR}/snakemake/template_config.yaml"
 readonly SNAKEFILE="${SCRIPT_DIR}/snakemake/Snakefile"
 
-# Load modules
-# NOTE: internal modules are loaded in main() after the UTILS_DIR is specified. Current modules:
-# - generate_run_templates.sh: function 'make_run_templates' is called
-
 #######################################
 # Run snakemake
 # Globals: (none)
@@ -107,7 +103,8 @@ function perform_setup() {
     printf "   -x genome_extension: extension for predicted protein files of subject genomes [default: faa]\n"
     printf "   -@ threads: maximum threads to use for any process [default: 1]\n\n"
     printf "Advanced parameters (use with care):\n"
-    printf "   -T template_config: Path to the template config file used in setup [default: ${TEMPLATE_CONFIG}]\n\n"
+    printf "   -T template_config: Path to the template config file used in setup [default: ${TEMPLATE_CONFIG}]\n"
+    printf "   -U utils_dir: Path to the BackBLAST utility script directory [default: ${UTILS_DIR}]\n\n"
     printf "Note: Currently does NOT support whitespaces in any input variables.\n\n"
 
     # Exit
@@ -131,10 +128,12 @@ function perform_setup() {
   genome_extension="faa"
   local template_config
   template_config=${TEMPLATE_CONFIG}
+  local utils_dir
+  utils_dir=${UTILS_DIR}
 
   # Set options (help from https://wiki.bash-hackers.org/howto/getopts_tutorial; accessed March 8th, 2019)
   OPTIND=1 # reset the OPTIND counter just in case
-  while getopts ":@:t:b:r:e:p:x:T:" opt; do
+  while getopts ":@:t:b:r:e:p:x:T:U:" opt; do
     case ${opt} in
       \@)
         threads=${OPTARG}
@@ -159,6 +158,9 @@ function perform_setup() {
         ;;
       T)
         template_config=${OPTARG}
+        ;;
+      U)
+        utils_dir=${OPTARG}
         ;;
       \?)
         echo "[ $(date -u) ]: ERROR: Invalid option: '-${OPTARG}'. Exiting..." >&2
@@ -188,8 +190,19 @@ function perform_setup() {
   echo "[ $(date -u) ]: Command run: ${SCRIPT_NAME} setup ${original_arguments}" >&2
 
   # Make the template files for the run
-  make_run_templates ${template_config} ${query_filepath} ${query_genome_filepath} ${subject_genome_directory} \
-    ${genome_extension} ${output_directory} ${threads} ${phylogenetic_tree_newick} ${bootstrap_cutoff} ${root_name} ${evalue} ${pident}
+  ${utils_dir}/generate_run_templates.sh \
+    -T ${template_config} \
+    -t ${phylogenetic_tree_newick} \
+    -b ${bootstrap_cutoff} \
+    -r ${root_name} \
+    -e ${evalue} \
+    -p ${pident} \
+    -x ${genome_extension} \
+    -@ ${threads} \
+    ${query_filepath} \
+    ${query_genome_filepath} \
+    ${subject_genome_directory} \
+    ${output_directory}
 
   echo "[ $(date -u) ]: Setup complete. After modifying the config.yaml file to your liking, run ${SCRIPT_NAME} using 'run' mode." >&2
   echo "[ $(date -u) ]: BackBLAST finished." >&2
@@ -492,7 +505,8 @@ function main() {
     printf "   combine_tables: combines a set of input BLAST tables\n"
     printf "   generate_heatmap: generates a heatmap from input BLAST and phylogeny data\n\n"
     printf "Advanced parameters (use with care):\n"
-    printf "   -U utils_dir: Path to the BackBLAST utility script directory [default: ${UTILS_DIR}]\n\n"
+    printf "   -U utils_dir: Path to the BackBLAST utility script directory for running specific workflow steps\n"
+    printf "                 [default: ${UTILS_DIR}]\n\n"
 
     # Exit
     exit 0
@@ -526,10 +540,6 @@ function main() {
   shift $((OPTIND - 1)) # shift to avoid flags when assigning positional arguments
   local run_mode
   run_mode=$1
-
-  # Load internal modules
-  # TODO: redesign the code so that this can be done at the top of the script, or run via CLI instead of loading as a module
-  source "${utils_dir}/generate_run_templates.sh" # the 'make_run_templates' function is called
 
   # Determine the run mode based on user input
   # Different variables are needed for the different run modes
