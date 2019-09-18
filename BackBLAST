@@ -8,7 +8,7 @@ set -euo pipefail
 readonly VERSION="0.8.0"
 readonly SCRIPT_NAME="${0##*/}"
 readonly SCRIPT_DIR="$(realpath ${0%/*})"
-readonly UTILS_DIR="${SCRIPT_DIR}/BackBLAST_utils"
+readonly UTILS_DIR="${SCRIPT_DIR}/scripts"
 readonly TEMPLATE_CONFIG="${SCRIPT_DIR}/snakemake/template_config.yaml"
 readonly SNAKEFILE="${SCRIPT_DIR}/snakemake/Snakefile"
 
