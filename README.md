@@ -40,6 +40,7 @@ conda env create --name backblast --file="envs/conda_requirements.yaml"
 
 # Add the repo scripts to your PATH temporarily in the current Bash session
 PATH=${PATH}:${PWD}:${PWD}/scripts
+# Advanced users: Or add these folders to the PATH in your Bash environment file (e.g., .bashrc) to work across all Bash sessions
 ```
 Now you should be good to go! Run `BackBLAST -h` to get started.
 
