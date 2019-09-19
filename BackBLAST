@@ -5,7 +5,7 @@ set -euo pipefail
 # The entry script for running BackBLAST via command line
 
 # GLOBAL variables
-readonly VERSION="0.8.0"
+readonly VERSION="2.0.0-alpha"
 readonly SCRIPT_NAME="${0##*/}"
 readonly SCRIPT_DIR="$(realpath ${0%/*})"
 readonly TEMPLATE_CONFIG="${SCRIPT_DIR}/snakemake/template_config.yaml"
