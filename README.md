@@ -1,6 +1,6 @@
 BackBLAST_Reciprocal_BLAST
 ==========================
-![DOI: 10.5281](https://zenodo.org/badge/DOI/10.5281/zenodo.3465955.svg "BackBlast DOI")
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3465955.svg)](https://doi.org/10.5281/zenodo.3465955)
 
 Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2019
 
