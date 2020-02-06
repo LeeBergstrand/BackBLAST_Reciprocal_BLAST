@@ -32,7 +32,7 @@ rule run_reciprocal_blast:
         eval = config.get("e_value_cutoff"),
         pident = config.get("minimum_percent_identity")
     shell:
-        "BackBLAST_core.py --gene_cluster {params.query_genes} --query_proteome {params.query_genome_orfs} --subject_proteome {input} "
+        "backblast search --gene_cluster {params.query_genes} --query_proteome {params.query_genome_orfs} --subject_proteome {input} "
             "--e_value {params.eval} --min_ident {params.pident} --output_file {output} > {log} 2>&1"
 
 # Remove duplicate BLAST hits for each BLAST table
@@ -47,7 +47,7 @@ rule remove_duplicates:
         "logging/benchmarks/{subject}.remove_duplicates.benchmark.txt"
     threads: 1
     shell:
-        "BackBLAST_remove_duplicates.sh {input} > {output} 2> {log}"
+        "backblast remove_duplicates {input} > {output} 2> {log}"
 
 # If BLAST CSV is empty, create a blank BLAST table
 rule create_blank_results:
@@ -62,7 +62,7 @@ rule create_blank_results:
     params:
         query_genes=config.get("query_genes")
     shell:
-        "BackBLAST_create_blank_results.py -i {input} -q {params.query_genes} -o {output} > {log} 2>&1"
+        "backblast create_blank_results -i {input} -q {params.query_genes} -o {output} > {log} 2>&1"
 
 # Combine the BLAST tables into a single table, and add a column for sample ID
 rule combine_blast_tables:
@@ -75,7 +75,7 @@ rule combine_blast_tables:
     benchmark:
         "logging/benchmarks/combine_blast_tables.benchmark.txt"
     shell:
-        "BackBLAST_combine_BLAST_tables.R {input} {output} > {log} 2>&1"
+        "backblast combine_tables {input} {output} > {log} 2>&1"
 
 # Create a symlink of the combined BLAST table to make it easier for the user to find
 rule symlink_combined_blast_table:
@@ -166,7 +166,7 @@ rule generate_heatmap:
         plot_width = config.get("plot_width_mm", 400),
         plot_height = config.get("plot_height_mm", 200)
     shell:
-        "BackBLAST_generate_heatmap.R -m {params.genome_metadata} -g {params.gene_metadata} "
+        "backblast generate_heatmap -m {params.genome_metadata} -g {params.gene_metadata} "
             "-b {params.bootstrap_cutoff} -r {params.root_name} -w {params.plot_width} -z {params.plot_height} "
             "{input.tree_file} {input.blast_table} {output} 2>&1 | tee {log} && "
         "if [[ -f Rplots.pdf ]]; then rm Rplots.pdf; fi"

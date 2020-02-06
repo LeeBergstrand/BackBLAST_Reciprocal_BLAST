@@ -30,12 +30,12 @@ gtotree_minimum_hit_fraction: 0.5
 ## Plot settings
 # Optional: Tab-separated file containing the 'subject_name' of each plotted genome, plus the 'plotting_name' that you desire to appear
   # on the final plot.
-  # See ExampleData/Example_configs/genome_naming.tsv
+  # See testing/inputs/genome_metadata.tsv
 genome_metadata_tsv: NA
 # Optional: Tab-separated file containing the accession of each query gene and its corresponding gene name.
   # Should have two columns: 'qseqid' with the accession and 'gene_name' with the corresponding gene name.
   # Genes will be plotted in the order specified in this TSV file.
-  # See ExampleData/Example_configs/gene_naming.tsv
+  # See testing/inputs/gene_metadata.tsv
 gene_metadata_tsv: NA
 plot_width_mm: 400
 plot_height_mm: 200

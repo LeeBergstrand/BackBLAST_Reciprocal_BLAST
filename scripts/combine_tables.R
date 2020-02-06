@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 
-# BackBLAST_combine_BLAST_tables.R
+# combine_tables.R
 # Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2019
 # Combines BLAST output (CSV) tables into a single output table with headers
 # Part of the BackBLAST pipeline
@@ -19,11 +19,11 @@ HEADER_NAMES <- c("qseqid", "sseqid", "pident", "evalue", "qcovhsp", "bitscore")
 parse_command_line_input <- function(commandArgs) {
   
   if (length(commandArgs) < 2) {
-    cat("BackBLAST_combine_BLAST_tables.R: Combines BLAST tables and makes new column for sample ID based on the filenames.\n")
+    cat("combine_tables.R: Combines BLAST tables and makes new column for sample ID based on the filenames.\n")
     cat("Copyright Lee Bergstrand and Jackson M. Tsuji, 2019\n")
     cat("Part of the BackBLAST pipeline.\n\n")
     
-    cat("Usage: BackBLAST_combine_BLAST_tables.R subject1.csv subject2.csv ... subjectN.csv combined_blast_tables.csv\n\n")
+    cat("Usage: combine_tables.R subject1.csv subject2.csv ... subjectN.csv combined_blast_tables.csv\n\n")
     
     cat("Details:\n",
         "subject1.csv, etc.: CSV BLAST tables for all individual samples (subjects for BLAST). Name should be the subject name [Required]\n",
@@ -71,7 +71,7 @@ main <- function() {
   params <- parse_command_line_input(commandArgs(trailingOnly = TRUE))
   
   # Startup messages
-  flog.info("Running BackBLAST_combine_BLAST_tables.R")
+  flog.info("Running combine_tables.R")
   flog.info(paste("Input tables: ", length(params$input_filenames), " total", sep = ""))
   flog.info(paste("Output table: '", params$output_filename, "'", sep = ""))
   
@@ -85,7 +85,7 @@ main <- function() {
   flog.info("Writing combining BLAST table to file (**with headers**)")
   write.table(output_table, file = params$output_filename, sep = ",", row.names = FALSE, col.names = TRUE)
   
-  flog.info("BackBLAST_combine_BLAST_tables.R: Done.")
+  flog.info("combine_tables.R: Done.")
 }
 
 main()
