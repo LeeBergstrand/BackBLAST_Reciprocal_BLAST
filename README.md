@@ -70,26 +70,27 @@ Rough notes on develop version for now.
 ## Recommended workflow
 ```bash
 # Set up the run
-BackBLAST setup query.faa query_genome.faa subject_dir output_dir
+backblast setup query.faa query_genome.faa subject_dir output_dir
 # Then edit output_dir/config.yaml
 # You can also edit output_dir/gene_metadata.tsv and output_dir/genome_metadata.tsv to make the plot look better
 
 # Start the run
-BackBLAST run output_dir/config.yaml output_dir
+backblast run output_dir/config.yaml output_dir
 # All done! You can iteratively refine the plot from here as you'd like.
 ```
 
 ## Speedy workflow
 Gets the job done without any custom settings
 ```bash
-BackBLAST auto query.faa query_genome.faa subject_dir output_dir
+backblast auto query.faa query_genome.faa subject_dir output_dir
 ```
 
 ## Test data
 Try a test run from inside the repo with:
 ```bash
 mkdir -p testing/outputs
-./BackBLAST run testing/inputs/config.yaml testing/outputs --notemp
+# Make sure backblast is added to your PATH before running the test
+backblast run testing/inputs/config.yaml testing/outputs --notemp
 
 # See if the output file looks as expected
 cmp testing/outputs/blast/combine_blast_tables/blast_tables_combined.csv \
