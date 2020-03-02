@@ -66,30 +66,27 @@ convert_to_constant_NA <- function(entry) {
 #' @return ggtree-format tree, rooted
 #' @export
 reroot_ggtree <- function(phylo_tree, root_name) {
-  
-  # Extract the data from the tree in tabular format
-  tree_data <- ggtree::ggtree(phylo_tree)$data
-  
-  # Check that the root_name exists
-  if ( !(root_name %in% tree_data$label) ) {
-    futile.logger::flog.error(glue::glue("Could not find the root_name '", root_name, 
-                          "' in the provided tree. Cannot re-root. Exiting..."))
-    quit(save = "no", status = 1)
+
+  # Midpoint root the tree if requested; otherwise root to a name
+  if (root_name == "midpoint") {
+    futile.logger::flog.info("Midpoint rooting the tree")
+    tree_rooted <- phytools::midpoint.root(phylo_tree)
+  } else {
+    futile.logger::flog.info(glue::glue("Re-rooting tree to '", root_name, "'"))
+    # Extract the data from the tree in tabular format
+    tree_data <- ggtree::ggtree(phylo_tree)$data
+
+    # Check that the root_name exists
+    if ( !(root_name %in% tree_data$label) ) {
+      futile.logger::flog.error(glue::glue("Could not find the root_name '", root_name,
+                            "' in the provided tree. Cannot re-root. Exiting..."))
+      quit(save = "no", status = 1)
+    }
+
+    # Re-root
+    tree_rooted <- treeio::root(phylo_tree, outgroup = root_name)
   }
-  
-  # Get the ggtree ID # of the to-be root
-  tip_label_index <- match(x = root_name, table = phylo_tree$tip.label)
-  
-  # Check that only one matching parent node exists
-  if (length(tip_label_index) != 1) {
-    futile.logger::flog.error(glue::glue("The provided root_name '", root_name, 
-                          "' appears to have more than one associated node. Cannot re-root. Exiting..."))
-    quit(save = "no", status = 1)
-  }
-  
-  # Re-root
-  tree_rooted <- treeio::root(phylo_tree, outgroup = root_name)
-  
+
   return(tree_rooted)
 }
 
@@ -174,7 +171,6 @@ load_and_plot_phylogenetic_tree <- function(input_phylogenetic_tree_filepath, ro
   
   # Optionally re-root tree
   if ( !is.na(root_name) ) {
-    futile.logger::flog.info(glue::glue("Re-rooting tree to '", root_name, "'"))
     phylo_tree <- reroot_ggtree(phylo_tree, root_name)
   }
   
@@ -562,7 +558,7 @@ if ( !interactive() ) {
                                     help = "Bootstrap cutoff value",
                                     type = "numeric", default = NA)
   parser <- argparser::add_argument(parser = parser, arg = "--root_name", short = "-r",
-                                    help = "Root name",
+                                    help = "Root name ('midpoint' to midpoint root or NA to keep the existing root; default NA)",
                                     type = "character", default = NA)
   parser <- argparser::add_argument(parser = parser, arg = "--plot_width", short = "-w",
                                     help = "Plot width (mm)",

@@ -92,9 +92,11 @@ mkdir -p testing/outputs
 # Make sure backblast is added to your PATH before running the test
 backblast run testing/inputs/config.yaml testing/outputs --notemp
 
-# See if the output file looks as expected
+# See if the output files looks as expected
 cmp testing/outputs/blast/combine_blast_tables/blast_tables_combined.csv \
   testing/outputs_expected/blast/combine_blast_tables/blast_tables_combined.csv
+cmp testing/outputs/heatmap/BackBLAST_heatmap.tsv \
+  testing/outputs_expected/heatmap/BackBLAST_heatmap.tsv
 
 # Clean up test if everything looks good
 rm -r testing/outputs
