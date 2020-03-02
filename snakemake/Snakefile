@@ -167,7 +167,7 @@ rule generate_heatmap:
         plot_height = config.get("plot_height_mm", 200)
     shell:
         "backblast generate_heatmap -m {params.genome_metadata} -g {params.gene_metadata} "
-            "-b {params.bootstrap_cutoff} -r {params.root_name} -w {params.plot_width} -z {params.plot_height} "
+            "-b {params.bootstrap_cutoff} -r {params.root_name} -w {params.plot_width} -z {params.plot_height} -d "
             "{input.tree_file} {input.blast_table} {output} 2>&1 | tee {log} && "
         "if [[ -f Rplots.pdf ]]; then rm Rplots.pdf; fi"
 

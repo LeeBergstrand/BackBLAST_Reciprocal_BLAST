@@ -1,0 +1,36 @@
+subject_name	qseqid	sseqid	pident	evalue	qcovhsp	bitscore
+Chl. ferrooxidans KoFox	bacterioferritin	WP_006365810.1	100	5.58e-115	100	313
+Chl. ferrooxidans KoFox	cysI	WP_006367305.1	100	0	100	602
+Chl. ferrooxidans KoFox	cysH	WP_006367307.1	100	0	100	493
+Chl. ferrooxidans KoFox	cysD	WP_006367308.1	100	0	100	611
+Chl. ferrooxidans KoFox	cysN	WP_006367309.1	100	0	100	1232
+Chl. ferrooxidans KoFox	cysG	WP_006367310.1	100	1.25e-114	100	312
+Chl. ferrooxidans KoFox	cysA	WP_006367320.1	100	0	100	732
+Chl. ferrooxidans KoFox	cysW	WP_006367321.1	100	0	100	572
+Chl. ferrooxidans KoFox	cysT	WP_006367322.1	100	0	100	555
+Chl. ferrooxidans KoFox	cysP	WP_006367323.1	100	0	100	690
+Chl. ferrooxidans KoFox	cyc2	WP_006367388.1	100	0	100	839
+Chl. luteolum DSM273	bacterioferritin	WP_011356871.1	71.429	4.53e-83	99	233
+Chl. luteolum DSM273	cysI	WP_011358288.1	53.004	3.83e-113	96	321
+Chl. luteolum DSM273	cysH	WP_011358287.1	67.257	1.85e-116	95	324
+Chl. luteolum DSM273	cysD	WP_011358286.1	79.522	0	100	505
+Chl. luteolum DSM273	cysN	WP_011358285.1	71.953	0	100	887
+Chl. luteolum DSM273	cysG	WP_041463880.1	53.147	8.67e-59	95	171
+Chl. luteolum DSM273	cysA	WP_011358284.1	75.35	0	100	560
+Chl. luteolum DSM273	cysW	WP_011358283.1	71.831	5.83e-144	98	398
+Chl. luteolum DSM273	cysT	WP_011358282.1	77.256	3.78e-157	100	430
+Chl. luteolum DSM273	cysP	WP_011358281.1	76.347	0	98	528
+Chl. luteolum DSM273	cyc2	WP_011358173.1	53.364	2.54e-149	100	421
+Chl. phaeoferrooxidans KB01	bacterioferritin	WP_076790319.1	98.71	6.57e-114	100	311
+Chl. phaeoferrooxidans KB01	cysI	WP_076789648.1	93.151	0	100	571
+Chl. phaeoferrooxidans KB01	cysH	WP_076790657.1	95.359	3.02e-175	100	473
+Chl. phaeoferrooxidans KB01	cysD	WP_076790659.1	97.952	0	100	603
+Chl. phaeoferrooxidans KB01	cysN	WP_076790661.1	97.496	0	100	1201
+Chl. phaeoferrooxidans KB01	cysG	WP_076790662.1	82.667	6.27e-95	100	263
+Chl. phaeoferrooxidans KB01	cysA	WP_076790666.1	96.078	0	100	704
+Chl. phaeoferrooxidans KB01	cysW	WP_076790668.1	93.426	0	100	543
+Chl. phaeoferrooxidans KB01	cysT	WP_076790669.1	98.917	0	100	552
+Chl. phaeoferrooxidans KB01	cysP	WP_076790671.1	97.345	0	100	674
+Chl. phaeoferrooxidans KB01	cyc2	WP_076792910.1	89.538	0	100	744
+Chl. sp. N1	cyc2	WP_131354685.1	57.178	5.41e-158	98	442
+Ignavibacterium album JCM16511 (outgroup)	cysA	WP_014560057.1	44.558	2.72e-82	79	246

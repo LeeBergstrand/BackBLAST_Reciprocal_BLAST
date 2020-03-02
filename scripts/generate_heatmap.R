@@ -12,6 +12,7 @@
   # can be used.
 library(argparser)
 library(futile.logger)
+library(tools)
 library(glue, warn.conflicts = FALSE)
 library(plyr, warn.conflicts = FALSE)
 library(dplyr, warn.conflicts = FALSE)
@@ -23,6 +24,7 @@ library(ape, warn.conflicts = FALSE)
 library(maps, warn.conflicts = FALSE)
 library(phytools, warn.conflicts = FALSE)
 library(tidytree, warn.conflicts = FALSE)
+library(treeio, warn.conflicts = FALSE)
 suppressPackageStartupMessages(library(ggtree))
 library(gridExtra, warn.conflicts = FALSE)
 library(egg, warn.conflicts = FALSE)
@@ -39,31 +41,6 @@ read_tibble <- function(file, sep = "\t", header = TRUE, stringsAsFactors = FALS
   data_table <- read.table(file, sep = sep, header = header, stringsAsFactors = stringsAsFactors) %>%
     tibble::as_tibble()
   return(data_table)
-}
-
-#' Chooses a nice discrete colour scale of the desired length
-#' 
-#' @param length Numeric; length of the desired colour scale vector
-#' @return Character vector of HTML colour codes
-#' @export
-choose_discrete_colour_scale <- function(length) {
-  
-  # Choose the best colour scale based on the number of entries to be plotted
-  if (length == 2) {
-    colour_palette <- RColorBrewer::brewer.pal(n = 3, name = "Dark2")[c(1, 2)]
-  } else if (length <= 8) {
-    colour_palette <- RColorBrewer::brewer.pal(n = length, name = "Dark2")
-  } else if (length <= 12) {
-    colour_palette <- RColorBrewer::brewer.pal(n = length, name = "Set3")
-  } else if (length > 12) {
-    colour_palette <- scales::hue_pal(h = c(20, 290))(length)
-  } else {
-    futile.logger::flog.error(glue::glue("Something is wrong with the provided length ('", length, 
-                          "'). Is it non-numeric? Exiting..."))
-    quit(save = "no", status = 1)
-  }
-  
-  return(colour_palette)
 }
 
 #' Convert character "NA" (from command line) into constant NA
@@ -111,7 +88,7 @@ reroot_ggtree <- function(phylo_tree, root_name) {
   }
   
   # Re-root
-  tree_rooted <- ggtree::reroot(phylo_tree, node = tip_label_index)
+  tree_rooted <- treeio::root(phylo_tree, outgroup = root_name)
   
   return(tree_rooted)
 }
@@ -497,6 +474,7 @@ main <- function(params) {
                                       params$gene_metadata_filepath))
   futile.logger::flog.info(glue::glue("Plot width (mm): ", params$plot_width))
   futile.logger::flog.info(glue::glue("Plot height (mm): ", params$plot_height))
+  futile.logger::flog.info(glue::glue("Write data table: ", params$write_data))
   futile.logger::flog.info("############################")
   
   # Convert character "NA" (from command line) into true NA
@@ -521,7 +499,15 @@ main <- function(params) {
   blast_results_list <- load_and_plot_blast_results(params$input_blast_table_filepath, 
                                                 tip_order, params$gene_metadata_filepath,
                                                 params$genome_metadata_filepath)
-  
+
+  # Save the heatmap data
+  if (params$write_data == TRUE) {
+    futile.logger::flog.info("Saving raw heatmap data to file")
+    output_table_filepath = paste(tools::file_path_sans_ext(params$output_pdf_filepath), ".tsv", sep = "")
+    write.table(blast_results_list[[1]], file = output_table_filepath, sep = "\t",
+              col.names = TRUE, row.names = FALSE, quote = FALSE)
+  }
+
   # Save the plot
   if (!is.na(params$input_phylogenetic_tree_filepath)) {
     # Combine the tree and heatmap
@@ -584,6 +570,9 @@ if ( !interactive() ) {
   parser <- argparser::add_argument(parser = parser, arg = "--plot_height", short = "-z",
                                     help = "Plot height (mm)",
                                     type = "numeric", default = 200)
+  parser <- argparser::add_argument(parser = parser, arg = "--write_data", short = "-d",
+                                    help = "Write raw plotting data to disk (same basepath as the PDF, but as a .tsv file)",
+                                    flag = TRUE)
   
   params <- argparser::parse_args(parser)
   

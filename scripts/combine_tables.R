@@ -83,7 +83,8 @@ main <- function() {
   output_table <- dplyr::bind_rows(blast_tables)
   
   flog.info("Writing combining BLAST table to file (**with headers**)")
-  write.table(output_table, file = params$output_filename, sep = ",", row.names = FALSE, col.names = TRUE)
+  write.table(output_table, file = params$output_filename, sep = ",", row.names = FALSE,
+              col.names = TRUE, quote = FALSE)
   
   flog.info("combine_tables.R: Done.")
 }
