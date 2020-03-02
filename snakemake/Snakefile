@@ -31,9 +31,10 @@ rule run_reciprocal_blast:
         query_genome_orfs = config.get("query_genome_orfs"),
         eval = config.get("e_value_cutoff"),
         pident = config.get("minimum_percent_identity")
+        qcovhsp = config.get("minimum_query_coverage")
     shell:
         "backblast search --gene_cluster {params.query_genes} --query_proteome {params.query_genome_orfs} --subject_proteome {input} "
-            "--e_value {params.eval} --min_ident {params.pident} --output_file {output} > {log} 2>&1"
+            "--e_value {params.eval} --min_ident {params.pident} --min_query_cov {params.qcovhsp} --output_file {output} > {log} 2>&1"
 
 # Remove duplicate BLAST hits for each BLAST table
 rule remove_duplicates:
