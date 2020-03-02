@@ -100,6 +100,7 @@ function perform_setup() {
     printf "   -r root_name: Exact name of the tree tip label at the desired root of the tree [default: NA; will skip rooting]\n"
     printf "   -e evalue: e-value cutoff for reciprocal BLASTP [default: 1e-40]\n"
     printf "   -p pident: percent identity cutoff for reciprocal BLASTP [default: 25]\n"
+    printf "   -c qcov: percent query coverage cutoff for reciprocal BLASTP [default: 50]\n"
     printf "   -x genome_extension: extension for predicted protein files of subject genomes [default: faa]\n"
     printf "   -@ threads: maximum threads to use for any process [default: 1]\n\n"
     printf "Advanced parameters (use with care):\n"
@@ -124,6 +125,8 @@ function perform_setup() {
   evalue=1e-40
   local pident
   pident=25
+  local qcov
+  qcov=50
   local genome_extension
   genome_extension="faa"
   local template_config
@@ -133,7 +136,7 @@ function perform_setup() {
 
   # Set options (help from https://wiki.bash-hackers.org/howto/getopts_tutorial; accessed March 8th, 2019)
   OPTIND=1 # reset the OPTIND counter just in case
-  while getopts ":@:t:b:r:e:p:x:T:U:" opt; do
+  while getopts ":@:t:b:r:e:p:c:x:T:U:" opt; do
     case ${opt} in
       \@)
         threads=${OPTARG}
@@ -152,6 +155,9 @@ function perform_setup() {
         ;;
       p)
         pident=${OPTARG}
+        ;;
+      c)
+        qcov=${OPTARG}
         ;;
       x)
         genome_extension=${OPTARG}
@@ -197,6 +203,7 @@ function perform_setup() {
     -r ${root_name} \
     -e ${evalue} \
     -p ${pident} \
+    -c ${qcov} \
     -x ${genome_extension} \
     -@ ${threads} \
     ${query_filepath} \
@@ -349,6 +356,7 @@ function perform_auto() {
     printf "   -r root_name: Exact name of the tree tip label at the desired root of the tree [default: NA; will skip rooting]\n"
     printf "   -e evalue: e-value cutoff for reciprocal BLASTP [default: 1e-40]\n"
     printf "   -p pident: percent identity cutoff for reciprocal BLASTP [default: 25]\n"
+    printf "   -c qcov: percent query coverage cutoff for reciprocal BLASTP [default: 50]\n"
     printf "   -x genome_extension: extension for predicted protein files of subject genomes [default: faa]\n"
     printf "   -P conda_prefix: path to where the conda envs should be stored [default: '.snakemake/conda' in the run_directory]"
     printf "   -@ threads: maximum threads to use for any process [default: 1]\n"
@@ -386,6 +394,8 @@ function perform_auto() {
   evalue=1e-40
   local pident
   pident=25
+  local qcov
+  pident=50
   local genome_extension
   genome_extension="faa"
   local template_config
@@ -397,7 +407,7 @@ function perform_auto() {
 
   # Set options (help from https://wiki.bash-hackers.org/howto/getopts_tutorial; accessed March 8th, 2019)
   OPTIND=1 # reset the OPTIND counter just in case
-  while getopts ":j:@:P:t:b:r:e:p:x:T:S:C:" opt; do
+  while getopts ":j:@:P:t:b:r:e:p:c:x:T:S:C:" opt; do
     case ${opt} in
       j)
         jobs=${OPTARG}
@@ -422,6 +432,9 @@ function perform_auto() {
         ;;
       p)
         pident=${OPTARG}
+        ;;
+      c)
+        qcov=${OPTARG}
         ;;
       x)
         genome_extension=${OPTARG}
@@ -467,8 +480,20 @@ function perform_auto() {
   echo "[ $(date -u) ]: Command run: ${SCRIPT_NAME} setup ${original_arguments}" >&2
 
   # Make the template files for the run
-  make_run_templates ${template_config} ${query_filepath} ${query_genome_filepath} ${subject_genome_directory} \
-    ${genome_extension} ${output_directory} ${threads} ${phylogenetic_tree_newick} ${bootstrap_cutoff} ${root_name} ${evalue} ${pident}
+  ${utils_dir}/generate_run_templates.sh \
+    -T ${template_config} \
+    -t ${phylogenetic_tree_newick} \
+    -b ${bootstrap_cutoff} \
+    -r ${root_name} \
+    -e ${evalue} \
+    -p ${pident} \
+    -c ${qcov} \
+    -x ${genome_extension} \
+    -@ ${threads} \
+    ${query_filepath} \
+    ${query_genome_filepath} \
+    ${subject_genome_directory} \
+    ${output_directory}
 
   # Change metadata files to NA for default run
   local output_config_filepath
@@ -478,7 +503,8 @@ function perform_auto() {
 
   # Start the run
   echo "[ $(date -u) ]: Default setup finished; starting pipeline" >&2
-  run_snakemake ${snakefile} ${output_config_filepath} ${output_directory} ${conda_prefix} ${jobs} ${use_conda} ${snakemake_arguments}
+  run_snakemake ${snakefile} ${output_config_filepath} ${output_directory} ${conda_prefix} ${jobs} ${use_conda} \
+    ${snakemake_arguments}
 
   echo "[ $(date -u) ]: BackBLAST finished." >&2
 }
