@@ -98,5 +98,5 @@ rm -r testing/outputs
 ```
 
 # Going deeper
-More details will be coming on the [**wiki**] (https://github.com/LeeBergstrand/BackBLAST-Gene-Cluster-Finder/wiki), or run `backblast -h` after installing the tool for specific documentation. Enjoy!
+More details will be coming on the [**wiki**](https://github.com/LeeBergstrand/BackBLAST-Gene-Cluster-Finder/wiki), or run `backblast -h` after installing the tool for specific documentation. Enjoy!
 
