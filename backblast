@@ -5,7 +5,7 @@ set -euo pipefail
 # The entry script for running BackBLAST via command line
 
 # GLOBAL variables
-readonly VERSION="2.0.0-alpha"
+readonly VERSION="2.0.0-alpha4"
 readonly SCRIPT_NAME="${0##*/}"
 readonly SCRIPT_DIR="$(realpath ${0%/*})"
 readonly UTILS_DIR="${SCRIPT_DIR}/scripts"
@@ -395,7 +395,7 @@ function perform_auto() {
   local pident
   pident=25
   local qcov
-  pident=50
+  qcov=50
   local genome_extension
   genome_extension="faa"
   local template_config

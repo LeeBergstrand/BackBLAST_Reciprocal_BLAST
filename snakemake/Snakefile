@@ -126,7 +126,7 @@ if config.get("phylogenetic_tree_newick") == "subjects":
         output:
             "phylogeny/iqtree_out.treefile"
         conda:
-            "envs/gtotree.yaml"
+            "../envs/gtotree.yaml"
         log:
             "logging/logs/phylogeny/gtotree.log"
         benchmark:
@@ -139,7 +139,7 @@ if config.get("phylogenetic_tree_newick") == "subjects":
         shell:
             "GToTree -A {input} -H {params.phylogenetic_model} -o phylogeny/gtotree -T IQ-TREE "
                 "-c {params.sequence_length_threshold} -G {params.minimum_hit_fraction} "
-                "-n {threads} -j {threads} > {log} 2>&1 && "
+                "-n {threads} -j {threads} 2>&1 | tee {log} && "
             "ln phylogeny/gtotree/iqtree_out/iqtree_out.treefile phylogeny/iqtree_out.treefile"
 
 # Create a fake temp file to allow plotter to run if 'NA' is selected
