@@ -1,33 +1,29 @@
 #!/usr/bin/env Rscript
 # generate_heatmap.R
-# Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2019
+# Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2021
 # Plots a newick treefile and BLAST table together as a phylogenetic tree and heatmap
 # Part of the BackBLAST pipeline
 
 # Load libraries
-# Note: warn.conflicts: Normally, when a library is loaded that has a function with identical 
-  # name to another function (e.g., setdiff() in dplyr), a warning is given during package 
-  # load. The warnings are disabled here to prevent excessive messages when the script is run.
-  # Long-term, once possible to switch to R 3.6.0, options(conflicts.policy(list(warn = FALSE)))
-  # can be used.
+library(conflicted)
 library(argparser)
 library(futile.logger)
 library(tools)
-library(glue, warn.conflicts = FALSE)
-library(plyr, warn.conflicts = FALSE)
-library(dplyr, warn.conflicts = FALSE)
-library(tibble, warn.conflicts = FALSE)
-library(reshape2, warn.conflicts = FALSE)
-library(RColorBrewer, warn.conflicts = FALSE)
-library(ggplot2, warn.conflicts = FALSE)
-library(ape, warn.conflicts = FALSE)
-library(maps, warn.conflicts = FALSE)
-library(phytools, warn.conflicts = FALSE)
-library(tidytree, warn.conflicts = FALSE)
-library(treeio, warn.conflicts = FALSE)
+library(glue)
+library(plyr)
+library(dplyr)
+library(tibble)
+library(reshape2)
+library(RColorBrewer)
+library(ggplot2)
+library(ape)
+library(maps)
+library(phytools)
+library(tidytree)
+suppressPackageStartupMessages(library(treeio))
 suppressPackageStartupMessages(library(ggtree))
-library(gridExtra, warn.conflicts = FALSE)
-library(egg, warn.conflicts = FALSE)
+library(gridExtra)
+library(egg)
 
 #' Reads a data table as a tibble with several default parameters. All parameters below are the same as read.table()
 #' 
