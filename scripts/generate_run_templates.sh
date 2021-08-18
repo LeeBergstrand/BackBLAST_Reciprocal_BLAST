@@ -119,6 +119,7 @@ function generate_metadata_templates() {
 #   root_name: string; the exact label of the phylogenetic tree tip corresponding to the root (or 'NA' to skip)
 #   evalue: numeric/scientific; e-value cutoff for reciprocal BLASTP
 #   pident: numeric; percent identity cutoff for reciprocal BLASTP
+#   qcov: numeric; percent query coverage cutoff for reciprocal BLASTP
 # Returns:
 #   writes three template files to the output_directory: 'config.yaml', 'genome_metadata.tsv', and 'gene_metadata.tsv'
 #######################################
@@ -149,6 +150,8 @@ function make_run_templates() {
   evalue=${11}
   local pident
   pident=${12}
+  local qcov
+  qcov=${13}
 
   # Check if output directory exists
   if [[ ! -d ${output_directory} ]]; then
@@ -176,7 +179,8 @@ function make_run_templates() {
   fi
 
   # Generate the metadata templates
-  generate_metadata_templates ${genome_metadata_tsv} ${gene_metadata_tsv} ${subject_genome_directory} ${genome_extension} ${query_filepath}
+  generate_metadata_templates ${genome_metadata_tsv} ${gene_metadata_tsv} ${subject_genome_directory} \
+    ${genome_extension} ${query_filepath}
 
   ### Generate config file and add variables
   echo "[ $(date -u) ]: Writing config info to '${output_config_filepath}'" >&2
@@ -203,6 +207,7 @@ function make_run_templates() {
   sed -i "s|^root_name: .*|root_name: '${root_name}'|" ${output_config_filepath}
   sed -i "s|^e_value_cutoff: .*|e_value_cutoff: ${evalue}|" ${output_config_filepath}
   sed -i "s|^minimum_percent_identity: .*|minimum_percent_identity: ${pident}|" ${output_config_filepath}
+  sed -i "s|^minimum_query_coverage: .*|minimum_query_coverage: ${qcov}|" ${output_config_filepath}
 }
 
 function main() {
@@ -229,6 +234,7 @@ function main() {
     printf "   -r root_name: Exact name of the tree tip label at the desired root of the tree [default: NA; will skip rooting]\n"
     printf "   -e evalue: e-value cutoff for reciprocal BLASTP [default: 1e-40]\n"
     printf "   -p pident: percent identity cutoff for reciprocal BLASTP [default: 25]\n"
+    printf "   -c qcov: percent query coverage cutoff for reciprocal BLASTP [default: 50]\n"
     printf "   -x genome_extension: extension for predicted protein files of subject genomes [default: faa]\n"
     printf "   -@ threads: maximum threads to use for any process [default: 1]\n\n"
     printf "Advanced parameters (use with care):\n"
@@ -252,6 +258,8 @@ function main() {
   evalue=1e-40
   local pident
   pident=25
+  local qcov
+  qcov=50
   local genome_extension
   genome_extension="faa"
   local template_config
@@ -259,7 +267,7 @@ function main() {
 
   # Set options (help from https://wiki.bash-hackers.org/howto/getopts_tutorial; accessed March 8th, 2019)
   OPTIND=1 # reset the OPTIND counter just in case
-  while getopts ":@:t:b:r:e:p:x:T:" opt; do
+  while getopts ":@:t:b:r:e:p:c:x:T:" opt; do
     case ${opt} in
       \@)
         threads=${OPTARG}
@@ -278,6 +286,9 @@ function main() {
         ;;
       p)
         pident=${OPTARG}
+        ;;
+      c)
+        qcov=${OPTARG}
         ;;
       x)
         genome_extension=${OPTARG}
@@ -313,7 +324,8 @@ function main() {
   echo "[ $(date -u) ]: Command run: ${SCRIPT_NAME} ${original_arguments}" >&2
 
   make_run_templates ${template_config} ${query_filepath} ${query_genome_filepath} ${subject_genome_directory} \
-    ${genome_extension} ${output_directory} ${threads} ${phylogenetic_tree_newick} ${bootstrap_cutoff} ${root_name} ${evalue} ${pident}
+    ${genome_extension} ${output_directory} ${threads} ${phylogenetic_tree_newick} ${bootstrap_cutoff} ${root_name} \
+    ${evalue} ${pident} ${qcov}
 
   echo "[ $(date -u) ]: BackBLAST template generation finished." >&2
 }
