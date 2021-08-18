@@ -163,7 +163,7 @@ plot_ggtree <- function(phylo_tree, bootstrap_label_data) {
 load_and_plot_phylogenetic_tree <- function(input_phylogenetic_tree_filepath, root_name, bootstrap_cutoff) {
   # Read tree
   futile.logger::flog.info("Reading input phylogenetic tree")
-  phylo_tree <- ape::read.tree(input_phylogenetic_tree_filepath)
+  phylo_tree <- treeio::read.tree(input_phylogenetic_tree_filepath)
   
   # Optionally re-root tree
   if ( !is.na(root_name) ) {

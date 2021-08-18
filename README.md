@@ -2,7 +2,7 @@ BackBLAST_Reciprocal_BLAST
 ==========================
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3465955.svg)](https://doi.org/10.5281/zenodo.3465955)
 
-Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2019
+Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2021
 
 This repository contains a reciprocal BLAST program for filtering down BLAST results to best bidirectional hits. It also contains a toolkit for finding and visualizing BLAST hits for gene clusters within multiple bacterial genomes.
 
