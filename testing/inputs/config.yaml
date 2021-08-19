@@ -46,6 +46,8 @@ plot_height_mm: 70
 e_value_cutoff: 1e-40
 # Only hits with percent amino acid identity above this number will be kept
 minimum_percent_identity: 25
+# Only hits with percent query coverage above this number will be kept
+minimum_query_coverage: 50
 
 
 ## BLAST input files

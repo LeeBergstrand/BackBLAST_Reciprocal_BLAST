@@ -4,36 +4,34 @@ BackBLAST_Reciprocal_BLAST
 
 Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2021
 
-This repository contains a reciprocal BLAST program for filtering down BLAST results to best bidirectional hits. It also contains a toolkit for finding and visualizing BLAST hits for gene clusters within multiple bacterial genomes.
-
-# Repo contents
+# Software overview
 (To be updated once BackBLAST2 is complete)
 
-- **BackBLAST_core.py** - A script that uses NCBI BLAST to search for gene clusters within a within a bacterial genome genome. Non-orthalagous genes are filtred out by identifying and extracting only Bidirectional BLAST Hits using a graph-based algorithm. The algorithm is illustrated below:
+`backblast` automates the use of NCBI BLASTP to search for gene clusters within a multiple bacterial genomes. 
+Non-orthologous genes are filtered out by identifying and extracting only bidirectional best BLASTP hits using a graph-based algorithm. The algorithm is illustrated below:
 
 ![BackBLAST Algorithm](https://raw.githubusercontent.com/LeeBergstrand/BackBLAST-Gene-Cluster-Finder/master/Media/BackBLAST-Algorithm.gif)
 
-- **Visualization** - This repository also includes tools for visualizing the results from **BackBLAST_core.py** in the form of a R heatmap. Here is an example:
+Furthermore, `backblast` allows users to visualize the results from bidirectional BLASTP in the form of a heatmap. Here is an example:
 
-![Example Results](https://raw.githubusercontent.com/LeeBergstrand/BackBLAST-Gene-Cluster-Finder/master/Media/ExampleResults.jpeg)
-
+![Example Results](https://media.springernature.com/full/springer-static/image/art%3A10.1038%2Fs41396-020-0650-2/MediaObjects/41396_2020_650_Fig7_HTML.png)
+(Example from Spasov, Tsuji, _et al._, 2020, [doi:10.1038/s41396-020-0650-2](https://doi.org/10.1038/s41396-020-0650-2))
 
 # Installation
-Temporary instructions while BackBLAST2 is still under development, to install the development version  
+Temporary instructions while BackBLAST2 is still under development 
 
 ## Dependencies
 - Linux operating system (e.g., Ubuntu)
-- miniconda (2 or 3) or Anaconda
+- miniconda (2 or 3)
 - Workflow is pretty light on RAM, CPU, and storage space, so most machines should be able to handle BackBLAST without issue. The only exception is if you create genome trees within the pipeline, in which case you'll need a fair amount of CPU and time to calculate large trees.
 
 ## Instructions
 Takes a few steps -- to be revised once we make a conda install.
 ```bash
 # Download the repo
-cd /tmp
 git clone https://github.com/LeeBergstrand/BackBLAST_Reciprocal_BLAST.git
 cd BackBLAST_Reciprocal_BLAST
-git checkout develop # optionally go to a specific branch
+git checkout develop # optionally go to a specific branch or version tag
 
 # Create the conda env based on the YAML file in the repo
 # It is recommended that you run this command using mamba instead of conda - conda might fail during install.
@@ -41,8 +39,8 @@ mamba env create -n backblast --file=envs/conda_requirements.yaml
 
 # Copy the key repo contents into a conda share folder
 conda activate backblast
-mkdir -p ${CONDA_PREFIX}/share/BackBLAST
-cp -r * ${CONDA_PREFIX}/share/BackBLAST
+mkdir -p ${CONDA_PREFIX}/share/backblast
+cp -r * ${CONDA_PREFIX}/share/backblast
 
 # Remove the original repo
 cd ..
@@ -54,7 +52,7 @@ mkdir -p ${CONDA_PREFIX}/etc/conda/activate.d
 if [[ ! -f ${CONDA_PREFIX}/etc/conda/activate.d/env_vars.sh ]]; then
   echo '#!/bin/sh' > ${CONDA_PREFIX}/etc/conda/activate.d/env_vars.sh
 fi
-echo "export PATH=\${PATH}:${CONDA_PREFIX}/share/BackBLAST:${CONDA_PREFIX}/share/BackBLAST/scripts" \
+echo "export PATH=\${PATH}:${CONDA_PREFIX}/share/backblast:${CONDA_PREFIX}/share/backblast/scripts" \
   >> ${CONDA_PREFIX}/etc/conda/activate.d/env_vars.sh
 chmod 755 ${CONDA_PREFIX}/etc/conda/activate.d/env_vars.sh
 
@@ -62,11 +60,10 @@ chmod 755 ${CONDA_PREFIX}/etc/conda/activate.d/env_vars.sh
 conda deactivate
 conda activate backblast
 ```
-Now you should be good to go! Run `BackBLAST -h` to get started.
-
+Now you should be good to go! Run `backblast -h` to get started.
 
 # Usage
-Rough notes on develop version for now.
+Rough notes on develop version for now. More specific documentation can be found by installing the tool and running `backblast -h`.
 
 ## Recommended workflow
 ```bash
@@ -83,7 +80,7 @@ backblast run output_dir/config.yaml output_dir
 ## Speedy workflow
 Gets the job done without any custom settings
 ```bash
-backblast auto query.faa query_genome.faa subject_dir output_dir
+backblast auto [OPTIONS] query.faa query_genome.faa subject_dir output_dir
 ```
 
 ## Test data
@@ -104,5 +101,5 @@ rm -r testing/outputs
 ```
 
 # Going deeper
-For more thorough descriptions and information on usage please check the [**wiki**] (https://github.com/LeeBergstrand/BackBLAST-Gene-Cluster-Finder/wiki) or look at the help information within `BackBLAST`. Enjoy!
+More details will be coming on the [**wiki**](https://github.com/LeeBergstrand/BackBLAST-Gene-Cluster-Finder/wiki), or run `backblast -h` after installing the tool for specific documentation. Enjoy!
 
