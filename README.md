@@ -36,7 +36,7 @@ cd BackBLAST_Reciprocal_BLAST
 git checkout develop # optionally go to a specific branch
 
 # Create the conda env based on the YAML file in the repo
-# It is recommended that you run this command using mamba instead of conda to save time - but conda should also work.
+# It is recommended that you run this command using mamba instead of conda - conda might fail during install.
 mamba env create -n backblast --file=envs/conda_requirements.yaml
 
 # Copy the key repo contents into a conda share folder
