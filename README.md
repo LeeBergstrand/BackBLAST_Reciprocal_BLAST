@@ -2,7 +2,7 @@ BackBLAST_Reciprocal_BLAST
 ==========================
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3465955.svg)](https://doi.org/10.5281/zenodo.3465955)
 
-Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2020
+Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2021
 
 # Software overview
 (To be updated once BackBLAST2 is complete)
@@ -34,7 +34,8 @@ cd BackBLAST_Reciprocal_BLAST
 git checkout develop # optionally go to a specific branch or version tag
 
 # Create the conda env based on the YAML file in the repo
-conda env create -n backblast --file=envs/conda_requirements.yaml
+# It is recommended that you run this command using mamba instead of conda - conda might fail during install.
+mamba env create -n backblast --file=envs/conda_requirements.yaml
 
 # Copy the key repo contents into a conda share folder
 conda activate backblast
@@ -89,9 +90,11 @@ mkdir -p testing/outputs
 # Make sure backblast is added to your PATH before running the test
 backblast run testing/inputs/config.yaml testing/outputs --notemp
 
-# See if the output file looks as expected
+# See if the output files looks as expected
 cmp testing/outputs/blast/combine_blast_tables/blast_tables_combined.csv \
   testing/outputs_expected/blast/combine_blast_tables/blast_tables_combined.csv
+cmp testing/outputs/heatmap/BackBLAST_heatmap.tsv \
+  testing/outputs_expected/heatmap/BackBLAST_heatmap.tsv
 
 # Clean up test if everything looks good
 rm -r testing/outputs

@@ -13,7 +13,8 @@ threads: 1
 phylogenetic_tree_newick: NA
 # Optional: set the cutoff for displayed bootstrap values. Anything greater than to equal to the cutoff will be shown.
 bootstrap_cutoff: 80
-# Optional: if you want to re-root your tree, then give the exact name of the tip you want to re-root by. Otherwise, 'NA'.
+# Optional: if you want to re-root your tree, then give the exact name of the tip you want to re-root by.
+  # 'midpoint' will midpoint root the tree. 'NA' will keep the current tree topology.
 root_name: NA
 
 

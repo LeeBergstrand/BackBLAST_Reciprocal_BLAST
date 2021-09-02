@@ -1,31 +1,29 @@
 #!/usr/bin/env Rscript
 # generate_heatmap.R
-# Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2019
+# Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2021
 # Plots a newick treefile and BLAST table together as a phylogenetic tree and heatmap
 # Part of the BackBLAST pipeline
 
 # Load libraries
-# Note: warn.conflicts: Normally, when a library is loaded that has a function with identical 
-  # name to another function (e.g., setdiff() in dplyr), a warning is given during package 
-  # load. The warnings are disabled here to prevent excessive messages when the script is run.
-  # Long-term, once possible to switch to R 3.6.0, options(conflicts.policy(list(warn = FALSE)))
-  # can be used.
+library(conflicted)
 library(argparser)
 library(futile.logger)
-library(glue, warn.conflicts = FALSE)
-library(plyr, warn.conflicts = FALSE)
-library(dplyr, warn.conflicts = FALSE)
-library(tibble, warn.conflicts = FALSE)
-library(reshape2, warn.conflicts = FALSE)
-library(RColorBrewer, warn.conflicts = FALSE)
-library(ggplot2, warn.conflicts = FALSE)
-library(ape, warn.conflicts = FALSE)
-library(maps, warn.conflicts = FALSE)
-library(phytools, warn.conflicts = FALSE)
-library(tidytree, warn.conflicts = FALSE)
+library(tools)
+library(glue)
+library(plyr)
+library(dplyr)
+library(tibble)
+library(reshape2)
+library(RColorBrewer)
+library(ggplot2)
+library(ape)
+library(maps)
+library(phytools)
+library(tidytree)
+suppressPackageStartupMessages(library(treeio))
 suppressPackageStartupMessages(library(ggtree))
-library(gridExtra, warn.conflicts = FALSE)
-library(egg, warn.conflicts = FALSE)
+library(gridExtra)
+library(egg)
 
 #' Reads a data table as a tibble with several default parameters. All parameters below are the same as read.table()
 #' 
@@ -39,31 +37,6 @@ read_tibble <- function(file, sep = "\t", header = TRUE, stringsAsFactors = FALS
   data_table <- read.table(file, sep = sep, header = header, stringsAsFactors = stringsAsFactors) %>%
     tibble::as_tibble()
   return(data_table)
-}
-
-#' Chooses a nice discrete colour scale of the desired length
-#' 
-#' @param length Numeric; length of the desired colour scale vector
-#' @return Character vector of HTML colour codes
-#' @export
-choose_discrete_colour_scale <- function(length) {
-  
-  # Choose the best colour scale based on the number of entries to be plotted
-  if (length == 2) {
-    colour_palette <- RColorBrewer::brewer.pal(n = 3, name = "Dark2")[c(1, 2)]
-  } else if (length <= 8) {
-    colour_palette <- RColorBrewer::brewer.pal(n = length, name = "Dark2")
-  } else if (length <= 12) {
-    colour_palette <- RColorBrewer::brewer.pal(n = length, name = "Set3")
-  } else if (length > 12) {
-    colour_palette <- scales::hue_pal(h = c(20, 290))(length)
-  } else {
-    futile.logger::flog.error(glue::glue("Something is wrong with the provided length ('", length, 
-                          "'). Is it non-numeric? Exiting..."))
-    quit(save = "no", status = 1)
-  }
-  
-  return(colour_palette)
 }
 
 #' Convert character "NA" (from command line) into constant NA
@@ -89,30 +62,27 @@ convert_to_constant_NA <- function(entry) {
 #' @return ggtree-format tree, rooted
 #' @export
 reroot_ggtree <- function(phylo_tree, root_name) {
-  
-  # Extract the data from the tree in tabular format
-  tree_data <- ggtree::ggtree(phylo_tree)$data
-  
-  # Check that the root_name exists
-  if ( !(root_name %in% tree_data$label) ) {
-    futile.logger::flog.error(glue::glue("Could not find the root_name '", root_name, 
-                          "' in the provided tree. Cannot re-root. Exiting..."))
-    quit(save = "no", status = 1)
+
+  # Midpoint root the tree if requested; otherwise root to a name
+  if (root_name == "midpoint") {
+    futile.logger::flog.info("Midpoint rooting the tree")
+    tree_rooted <- phytools::midpoint.root(phylo_tree)
+  } else {
+    futile.logger::flog.info(glue::glue("Re-rooting tree to '", root_name, "'"))
+    # Extract the data from the tree in tabular format
+    tree_data <- ggtree::ggtree(phylo_tree)$data
+
+    # Check that the root_name exists
+    if ( !(root_name %in% tree_data$label) ) {
+      futile.logger::flog.error(glue::glue("Could not find the root_name '", root_name,
+                            "' in the provided tree. Cannot re-root. Exiting..."))
+      quit(save = "no", status = 1)
+    }
+
+    # Re-root
+    tree_rooted <- treeio::root(phylo_tree, outgroup = root_name)
   }
-  
-  # Get the ggtree ID # of the to-be root
-  tip_label_index <- match(x = root_name, table = phylo_tree$tip.label)
-  
-  # Check that only one matching parent node exists
-  if (length(tip_label_index) != 1) {
-    futile.logger::flog.error(glue::glue("The provided root_name '", root_name, 
-                          "' appears to have more than one associated node. Cannot re-root. Exiting..."))
-    quit(save = "no", status = 1)
-  }
-  
-  # Re-root
-  tree_rooted <- ggtree::reroot(phylo_tree, node = tip_label_index)
-  
+
   return(tree_rooted)
 }
 
@@ -193,11 +163,10 @@ plot_ggtree <- function(phylo_tree, bootstrap_label_data) {
 load_and_plot_phylogenetic_tree <- function(input_phylogenetic_tree_filepath, root_name, bootstrap_cutoff) {
   # Read tree
   futile.logger::flog.info("Reading input phylogenetic tree")
-  phylo_tree <- ape::read.tree(input_phylogenetic_tree_filepath)
+  phylo_tree <- treeio::read.tree(input_phylogenetic_tree_filepath)
   
   # Optionally re-root tree
   if ( !is.na(root_name) ) {
-    futile.logger::flog.info(glue::glue("Re-rooting tree to '", root_name, "'"))
     phylo_tree <- reroot_ggtree(phylo_tree, root_name)
   }
   
@@ -497,6 +466,7 @@ main <- function(params) {
                                       params$gene_metadata_filepath))
   futile.logger::flog.info(glue::glue("Plot width (mm): ", params$plot_width))
   futile.logger::flog.info(glue::glue("Plot height (mm): ", params$plot_height))
+  futile.logger::flog.info(glue::glue("Write data table: ", params$write_data))
   futile.logger::flog.info("############################")
   
   # Convert character "NA" (from command line) into true NA
@@ -521,7 +491,15 @@ main <- function(params) {
   blast_results_list <- load_and_plot_blast_results(params$input_blast_table_filepath, 
                                                 tip_order, params$gene_metadata_filepath,
                                                 params$genome_metadata_filepath)
-  
+
+  # Save the heatmap data
+  if (params$write_data == TRUE) {
+    futile.logger::flog.info("Saving raw heatmap data to file")
+    output_table_filepath = paste(tools::file_path_sans_ext(params$output_pdf_filepath), ".tsv", sep = "")
+    write.table(blast_results_list[[1]], file = output_table_filepath, sep = "\t",
+              col.names = TRUE, row.names = FALSE, quote = FALSE)
+  }
+
   # Save the plot
   if (!is.na(params$input_phylogenetic_tree_filepath)) {
     # Combine the tree and heatmap
@@ -576,7 +554,7 @@ if ( !interactive() ) {
                                     help = "Bootstrap cutoff value",
                                     type = "numeric", default = NA)
   parser <- argparser::add_argument(parser = parser, arg = "--root_name", short = "-r",
-                                    help = "Root name",
+                                    help = "Root name ('midpoint' to midpoint root or NA to keep the existing root; default NA)",
                                     type = "character", default = NA)
   parser <- argparser::add_argument(parser = parser, arg = "--plot_width", short = "-w",
                                     help = "Plot width (mm)",
@@ -584,6 +562,9 @@ if ( !interactive() ) {
   parser <- argparser::add_argument(parser = parser, arg = "--plot_height", short = "-z",
                                     help = "Plot height (mm)",
                                     type = "numeric", default = 200)
+  parser <- argparser::add_argument(parser = parser, arg = "--write_data", short = "-d",
+                                    help = "Write raw plotting data to disk (same basepath as the PDF, but as a .tsv file)",
+                                    flag = TRUE)
   
   params <- argparser::parse_args(parser)
   
