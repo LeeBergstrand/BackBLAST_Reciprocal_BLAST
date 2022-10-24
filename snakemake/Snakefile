@@ -1,11 +1,11 @@
 # Snakemake rules for the BackBLAST pipeline
-# Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2019
+# Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2022
 
 import os
 from snakemake.utils import logger, min_version, update_config
 
 # Specify the minimum snakemake version allowable
-min_version("5.0")
+min_version("6.0")
 # Specify shell parameters
 shell.executable("/bin/bash")
 shell.prefix("set -o pipefail; ")

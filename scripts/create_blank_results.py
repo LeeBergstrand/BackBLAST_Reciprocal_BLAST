@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # -----------------------------------------------------------------------------------------------------------
-# Copyright: Lee H. Bergstrand and Jackson M. Tsuji (2019)
+# Copyright: Lee H. Bergstrand and Jackson M. Tsuji (2022)
 # Description: A simple program that takes a FASTA file query and makes a csv of blank BLAST results. Part of the BackBLAST pipeline.
 #
 # Requirements: - This script requires the Biopython module: http://biopython.org/wiki/Download
