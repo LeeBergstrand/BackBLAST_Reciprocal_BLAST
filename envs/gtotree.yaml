@@ -4,4 +4,4 @@ channels:
   - astrobiomike
   - defaults
 dependencies:
-  - gtotree=1.6
+  - gtotree=1.7

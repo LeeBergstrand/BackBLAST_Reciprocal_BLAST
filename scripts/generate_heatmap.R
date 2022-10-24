@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 # generate_heatmap.R
-# Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2021
+# Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2022
 # Plots a newick treefile and BLAST table together as a phylogenetic tree and heatmap
 # Part of the BackBLAST pipeline
 
