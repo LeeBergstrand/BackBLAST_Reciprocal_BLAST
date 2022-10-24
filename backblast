@@ -6,6 +6,7 @@ set -euo pipefail
 
 # GLOBAL variables
 readonly VERSION="2.0.0-alpha6"
+readonly COPYRIGHT_YEAR="2022"
 readonly SCRIPT_NAME="${0##*/}"
 readonly SCRIPT_DIR="$(realpath ${0%/*})"
 readonly UTILS_DIR="${SCRIPT_DIR}/scripts"
@@ -518,7 +519,7 @@ function main() {
 
     # Help statement
     printf "${SCRIPT_NAME}: pipeline to search for and visualize gene homologs across multiple genomes.\n"
-    printf "Copyright Lee H. Bergstrand and Jackson M. Tsuji, Neufeld Research Group, 2019\n"
+    printf "Copyright Lee H. Bergstrand and Jackson M. Tsuji, Neufeld Research Group, ${COPYRIGHT_YEAR}\n"
     printf "Version: ${VERSION}\n\n"
     printf "Please specify a run mode for the main workflow for further usage instructions:\n"
     printf "   1. setup: for setting up pre-run configuration files\n"
