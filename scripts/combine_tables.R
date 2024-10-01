@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 # combine_tables.R
-# Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2022
+# Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2024
 # Combines BLAST output (CSV) tables into a single output table with headers
 # Part of the BackBLAST pipeline
 

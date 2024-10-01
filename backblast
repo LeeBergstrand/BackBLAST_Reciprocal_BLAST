@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 # BackBLAST
-# Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2022
+# Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2024
 # The entry script for running BackBLAST via command line
 
 # GLOBAL variables
-readonly VERSION="2.0.0-alpha6"
-readonly COPYRIGHT_YEAR="2022"
+readonly VERSION="2.0.0-alpha7"
+readonly COPYRIGHT_YEAR="2024"
 readonly SCRIPT_NAME="${0##*/}"
 readonly SCRIPT_DIR="$(realpath ${0%/*})"
 readonly UTILS_DIR="${SCRIPT_DIR}/scripts"
