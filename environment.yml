@@ -2,7 +2,7 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - python=3.9
+  - python=3.12
   - snakemake=7
   - biopython>=1.76,<=1.84
   - blast>=2.9,<=2.16
