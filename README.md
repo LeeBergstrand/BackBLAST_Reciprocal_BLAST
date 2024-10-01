@@ -21,8 +21,8 @@ Furthermore, `backblast` allows users to visualize the results from bidirectiona
 Temporary instructions while BackBLAST2 is still under development 
 
 ## Dependencies
-- Linux operating system (e.g., Ubuntu)
-- miniconda (2 or 3)
+- Linux operating system (e.g., Ubuntu) or MacOS (tested on Sonoma 14)
+- miniconda or miniforge
 - Workflow is pretty light on RAM, CPU, and storage space, so most machines should be able to handle BackBLAST without issue. The only exception is if you create genome trees within the pipeline, in which case you'll need a fair amount of CPU and time to calculate large trees.
 
 ## Instructions
@@ -33,9 +33,8 @@ git clone https://github.com/LeeBergstrand/BackBLAST_Reciprocal_BLAST.git
 cd BackBLAST_Reciprocal_BLAST
 git checkout develop # optionally go to a specific branch or version tag
 
-# Create the conda env based on the YAML file in the repo
-# It is recommended that you run this command using mamba instead of conda - conda might fail during install.
-mamba env create -n backblast --file=envs/conda_requirements.yaml
+# Create the conda env
+conda env create -n backblast --file=environment.yml
 
 # Copy the key repo contents into a conda share folder
 conda activate backblast
