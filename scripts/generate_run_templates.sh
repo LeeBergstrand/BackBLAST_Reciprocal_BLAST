@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 # generate_run_templates.sh
-# Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2022
+# Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2024
 # Script for generating and manipulating BackBLAST config templates
 # Part of the BackBLAST pipeline
 

@@ -1,13 +1,11 @@
 channels:
   - conda-forge
   - bioconda
-  - r
-  - defaults
 dependencies:
-  - python=3.9
+  - python=3.12
   - snakemake=7
-  - biopython>=1.76,<=1.79
-  - blast>=2.9,<=2.13
+  - biopython>=1.76,<=1.84
+  - blast>=2.9,<=2.16
   - r-base=4
   - r-codetools
   - r-conflicted
@@ -16,16 +14,16 @@ dependencies:
   - r-futile.logger=1.4
   - r-glue=1
   - r-plyr=1.8
-  - r-dplyr=1.0
-  - r-tibble=3.1
+  - r-dplyr=1.1
+  - r-tibble=3.2
   - r-reshape2=1.4
-  - r-rcolorbrewer=1.1_2
-  - r-ggplot2=3
-  - r-ape=5.6
-  - r-maps=3.3
-  - r-phytools>=0.6_99,<=0.7_80
+  - r-rcolorbrewer=1.1_3
+  - r-ggplot2=3.5
+  - r-ape=5.8
+  - r-maps=3.4
+  - r-phytools=2
   - r-tidytree=0.4
-  - bioconductor-treeio=1.18
-  - bioconductor-ggtree=3.2
+  - bioconductor-treeio=1.26
+  - bioconductor-ggtree=3.10
   - r-gridextra=2.3
   - r-egg=0.4

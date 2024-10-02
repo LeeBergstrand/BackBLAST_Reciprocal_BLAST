@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # ----------------------------------------------------------------------------------------
-# Copyright: Lee H. Bergstrand (2022)
+# Copyright: Lee H. Bergstrand (2024)
 # Description: A Biopython program that takes a list of query proteins and uses local BLASTP to search
 #              for highly similar proteins within a local blast database (usually a local db of a target
 #              proteome). The program then BLASTPs backwards from the found subject proteins to the query
