@@ -22,7 +22,8 @@ Example gene heatmap visualization:
 - OS: runs on linux (e.g., Ubuntu) and MacOS (tested on Sonoma 14)
 - Hardware: most modern computers (e.g., with basic CPU, >=4 GB RAM, and >=4 GB of free storage) should be able to run BackBLAST without issue.
   The only exception is if you create a genome tree within the pipeline, in which case you'll need a fair amount of CPU and time to calculate large trees.
-- Software: miniconda or miniforge needs to be installed (must be set to the `osx-64` channel for MacOS)
+- Software: miniconda or miniforge needs to be installed (must be set to the `osx-64` channel for MacOS).
+  (Because conda is used during the run to install additional tools for the workflow, you will need an internet connection the first time you run BackBLAST.)
 
 # Installation
 Installation is currently semi-manual. We hope to make an automated conda install in the future.
@@ -62,8 +63,21 @@ conda activate backblast
 ```
 Now you should be good to go! Run `backblast -h` to get started.
 
-# Usage (quick start)
-Quick start instructions are provided below. See the full manual + settings for BackBLAST at the bottom of this README.
+# Usage: quick start
+```bash
+# Set up the run
+backblast setup query.faa query_genome.faa subject_dir output_dir
+# Then edit output_dir/config.yaml
+# You can also edit output_dir/gene_metadata.tsv and output_dir/genome_metadata.tsv to make the plot look better
+
+# Start the run
+backblast run output_dir/config.yaml output_dir
+# All done! You can iteratively refine the plot from here as you'd like.
+```
+See more detailed instructions below.
+
+# Usage: step-by-step instructions
+Get beautiful heatmaps using BackBLAST by following the step-by-step instructions below.
 
 ## 1. Prepare your input files
 Prepare the following files and folders as input for BackBLAST:
@@ -81,14 +95,15 @@ You are then ready to run BackBLAST, using either method 2a or 2b below.
 ## 2a. Recommended workflow
 Gives you the ability to customize the parameters of your run.
 
-First, set up the run:
+### 2a-i. Set up the run
 ```bash
 backblast setup query.faa query_genome.faa subject_dir output_dir
 ```
 This makes several configuration files in the `output_dir`.
 
+### 2a-ii. Configure the run settings and metadata
 Open and edit `output_dir/config.yaml` (e.g., in a text editor) to customize the settings for your run. Some key settings include:
-- Thresholds for bidirectional BLASTP: you can set the e-value, percent identity, and query coverage cutoffs for the BLASTP search
+- Thresholds for bidirectional BLASTP: you can set the e-value, percent identity, and query coverage cutoffs for the BLASTP search.
 - Phylogenetic tree: you can also set whether you want to auto-generate a genome-based phylogenetic tree during your run (takes time)
   or if you want to supply a custom pre-generated phylogenetic tree.
   - If you provide your own phylogenetic tree, the genome IDs in the tree need to match the file names of the genomes in the `subject_dir`.
@@ -96,30 +111,34 @@ Open and edit `output_dir/config.yaml` (e.g., in a text editor) to customize the
     genomes are in the `subject_dir` but are missing in the tree, then BackBLAST will still proceed but will drop those genomes from the
     analysis.)
   - Alternatively, you can also choose to not add a phylogenetic tree to the heatmap.
-- Tree rooting: one other helpful setting is related to tree rooting. You can choose to either root the tree automatically by midpoint or
-  provide the name of one of the genomes that you want to serve as the root of the tree.
+- Tree rooting: one other helpful setting is related to tree rooting. You can choose to root the tree automatically by midpoint or provide
+  the name of one of the genomes that you want to serve as the root of the tree. Alternatively, you can choose to use the current tree
+  topology as-is.
 - Plot width and height: you can adjust the final width and height of the heatmap as well. It might take a few rounds of running BackBLAST
-  to find the "perfect" width and height for your heatmap.
+  to find the "perfect" width and height for your heatmap (see below).
 - Take a look at the full config file to see other advanced settings.
 
 You also have the opportunity (optionally) to edit the tab-separeted tables `output_dir/gene_metadata.tsv` and `output_dir/genome_metadata.tsv`
 to improve data visualization. You can open these in a text editor or a table editor (like Excel).
 - In `gene_metadata.tsv`, you can provide human-readable names for the query genes you want to search for. You can also customize the order
-  that the genes will be shown in the heatmap by changing how they are sorted in this file. Also, you can delete rows if you want them to be
-  removed from the heatmap.
-- In `genome_metadata.tsv`, you can provide human-readable names for the genomes in the run. The sort order of the genomes in this file does
-  only impacts the order that the genomes are plotted in if you choose to not use a phylogenetic tree (in the config file above). Otherwise,
-  the sort order is determined using the phylogenetic tree.
+  that the genes will be shown in the heatmap by changing how they are sorted in this file. If you delete rows, then those genes will be removed
+  removed from the heatmap during the run.
+- In `genome_metadata.tsv`, you can provide human-readable names for the genomes in the run. The sort order of the genomes in this file only
+  impacts the order that the genomes are plotted in if you choose to not use a phylogenetic tree (in the config file above). Otherwise, the
+  sort order is determined using the phylogenetic tree.
 
-Then, start the run:
+### 2a-iii. Start the run
 ```bash
 backblast run output_dir/config.yaml output_dir
 ```
+This should generate a series of blast and heatmap-related files in the output folder.
+
+### 2a-iv. Check and iteratively improve the run results
 Then, take a look at the key output files `heatmap/BackBLAST_heatmap.tsv` and `heatmap/BackBLAST_heatmap.pdf`.
 The first of these files shows the final bidirectional BLASTP results as a tab-separated table. The second is the final heatmap.
 
 If you aren't satisfied with the results, you can selectively delete run files from the output folder, tweak the settings files above, and
-then re-run BackBLAST to re-generate the desired files with the new run settings.
+then re-run BackBLAST (via step 2a-iii) to re-generate the desired files with the new run settings.
 
 Three common things to change are:
 - If your BLASTP results are too stringent or not stringent enough: delete the `blast` folder, tweak the key BLASTP settings (in the config file),
@@ -127,9 +146,10 @@ Three common things to change are:
 - If your visualization doesn't look right (e.g., the height and width aren't optimal, the genome/gene names aren't ideal, or the genes aren't sorted
   as you'd like), then delete the `heatmap` folder, tweak the config and metadata files (mentioned above), and re-run `backblast run`.
   BackBLAST will then use the old `blast` results and just generate a new heatmap.
-- If your phylogeny has issues, then delete the old phylogeny or point to a new one, then re-run `backblast run`. This will use the
-  old `blast` results but will overwrite the old heatmap with a new one.
+- If you want to use a different phylogenetic tree, then point to a new phylogenetic tree file in the config file, then re-run `backblast run`.
+  BackBLAST will use the old `blast` results but should overwrite the old heatmap files with new ones using the updated tree.
 
+### 2a-v. Final tweaks to the heatmap
 The PDF heatmap will not be perfect (e.g., the dashed lines between the genome names and tree tips won't be perfectly aligned), but
 you can open the heatmap in a PDF editor like Inkscape and clean it up or customize it as desired.
 
@@ -141,7 +161,29 @@ backblast auto [OPTIONS] query.faa query_genome.faa subject_dir output_dir
 # See the different OPTIONS for customizing your run in the full settings at the bottom of this README.
 ```
 
-You can then edit the PDF heatmap as described above.
+The level of fine-tuning possible using this method is much less than in Method 2a, but it is a nice way to quickly see some initial
+bidirectional BLASTP results.
+
+In addition, you can iteratively tweak the run results and re-run using `backblast run` just like described in step 2a-iv above.
+
+Once done, you can then edit the PDF heatmap as described in step 2a-v above.
+
+# Caveats
+One disadvantage of BackBLAST is that it has trouble handling paralogous genes (e.g., gene duplicates).
+- If the __query genome__ contains paralogs of your query gene, this can sometimes cause BackBLAST to miss real functional gene hits
+  for your query gene in some subject genomes. If the gene in the subject genome happens to be a closer match to one of the paralogs
+  in the query genome than to your query, then even if the gene in the subject genome is a valid functional gene for the process you are
+  interested in, it will be screened out by the BackBLAST algorithm and not reported. This can lead to an under-estimation of the true
+  functional gene content of subject genomes.
+  - As a partial workaround, we recommend to check for paralogs of your query genes in your query genome before running BackBLAST so
+    you are aware if there could be issues. One easy way to check for paralogs is to run BLASTP for each of your query genes against
+    the query genome and look for high-scoring hits. You can then watch for unexpected results when running BackBLAST. If you are not hitting
+    real fucntional genes that you want to detect in the subject genomes due to having paralogs in the query genome, then you can mask out
+    (i.e., delete) the paralogs of your query gene in the query genome file and re-run BackBLAST. Make sure you know what you are doing if
+    you do this, though... in some use cases, you really want the paralogs to be there to filter out non-true hits to your query.
+- If the __subject genomes__ contain paralogs (or multiple copies) of the query, then BackBLAST will not report this information. It will just
+  show the best hit to your query gene and ignore the other hits. This is non-ideal if you want to know how many paralogs are in the subject genomes.
+  - There is no built-in workaround for this in BackBLAST at the moment.
 
 # Test data
 Try a test run from inside the repo with:
@@ -167,8 +209,9 @@ which describes the initial version of BackBLAST:
 > Bergstrand LH, Cardenas E, Holert J, Van Hamme JD, Mohn WW. Delineation of steroid-degrading microorganisms through
 > comparative genomic analysis. __mBio__ 7:[10.1128/mbio.00166-16](https://doi.org/10.1128/mbio.00166-16).
 
-# Full usage instructions
-Help messages (e.g., from running `backblast -h`) are pasted below.
+# Appendix: full usage instructions
+Help messages (e.g., from running `backblast -h`) are pasted below. These show some of the advanced options possible in
+the command line (e.g., for `backblast auto`).
 
 `backblast`
 ```
