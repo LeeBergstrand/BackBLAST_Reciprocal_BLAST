@@ -176,9 +176,9 @@ One disadvantage of BackBLAST is that it has trouble handling paralogous genes (
   interested in, it will be screened out by the BackBLAST algorithm and not reported. This can lead to an under-estimation of the true
   functional gene content of subject genomes.
   - As a partial workaround, we recommend to check for paralogs of your query genes in your query genome before running BackBLAST so
-    you are aware if there could be issues. One easy way to check for paralogs is to run BLASTP for each of your query genes against
+    you are aware if there could be paralog-related issues. One easy way to check for paralogs is to run BLASTP for each of your query genes against
     the query genome and look for high-scoring hits. You can then watch for unexpected results when running BackBLAST. If you are not hitting
-    real fucntional genes that you want to detect in the subject genomes due to having paralogs in the query genome, then you can mask out
+    real functional genes that you want to detect in the subject genomes due to having paralogs in the query genome, then you can mask out
     (i.e., delete) the paralogs of your query gene in the query genome file and re-run BackBLAST. Make sure you know what you are doing if
     you do this, though... in some use cases, you really want the paralogs to be there to filter out non-true hits to your query.
 - If the __subject genomes__ contain paralogs (or multiple copies) of the query, then BackBLAST will not report this information. It will just
