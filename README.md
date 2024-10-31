@@ -11,7 +11,7 @@ Furthermore, `backblast` allows users to visualize the results from bidirectiona
 
 The bidirectional BLASTP-based filtering algorithm is illustrated below:
 
-![BackBLAST Algorithm](https://raw.githubusercontent.com/LeeBergstrand/BackBLAST-Gene-Cluster-Finder/master/Media/BackBLAST-Algorithm.gif)
+![BackBLAST Algorithm](https://private-user-images.githubusercontent.com/18713012/381830418-2b8690db-ffd5-4fe5-adc3-661c6a7515c2.gif)
 
 Here is an example heatmap visualization of the results:
 
