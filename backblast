@@ -5,7 +5,7 @@ set -euo pipefail
 # The entry script for running BackBLAST via command line
 
 # GLOBAL variables
-readonly VERSION="2.0.0-alpha7"
+readonly VERSION="2.0.0-beta1"
 readonly COPYRIGHT_YEAR="2024"
 readonly SCRIPT_NAME="${0##*/}"
 readonly SCRIPT_DIR="$(realpath ${0%/*})"
@@ -85,7 +85,7 @@ function perform_setup() {
 
     # Print help statement
     printf "${SCRIPT_NAME} setup: module for setting up a BackBLAST run.\n"
-    printf "Copyright Lee H. Bergstrand and Jackson M. Tsuji, Neufeld Research Group, 2019\n"
+    printf "Copyright Lee H. Bergstrand and Jackson M. Tsuji, Neufeld Research Group, 2024\n"
     printf "Version: ${VERSION}\n\n"
     printf "Usage: ${SCRIPT_NAME} setup [OPTIONS] query_filepath query_genome_filepath subject_genome_directory output_directory\n\n"
     printf "Positional arguments (required):\n"
@@ -236,7 +236,7 @@ function perform_run() {
 
     # Print help statement
     printf "${SCRIPT_NAME} run: module for initializing a BackBLAST run.\n"
-    printf "Copyright Lee H. Bergstrand and Jackson M. Tsuji, Neufeld Research Group, 2019\n"
+    printf "Copyright Lee H. Bergstrand and Jackson M. Tsuji, Neufeld Research Group, 2024\n"
     printf "Version: ${VERSION}\n\n"
     printf "Usage: ${SCRIPT_NAME} run [OPTIONS] config_filepath run_directory [SNAKEMAKE_ARGUMENTS]\n\n"
     printf "Positional arguments (required):\n"
@@ -341,7 +341,7 @@ function perform_auto() {
 
     # Print help statement
     printf "${SCRIPT_NAME} auto: module for setting up a BackBLAST run AND starting with some defaults.\n"
-    printf "Copyright Lee H. Bergstrand and Jackson M. Tsuji, Neufeld Research Group, 2019\n"
+    printf "Copyright Lee H. Bergstrand and Jackson M. Tsuji, Neufeld Research Group, 2024\n"
     printf "Version: ${VERSION}\n\n"
     printf "Usage: ${SCRIPT_NAME} auto [OPTIONS] query_filepath query_genome_filepath subject_genome_directory output_directory [SNAKEMAKE_ARGUMENTS]\n\n"
     printf "Positional arguments (required):\n"
