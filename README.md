@@ -1,12 +1,10 @@
 BackBLAST_Reciprocal_BLAST
 ==========================
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3465955.svg)](https://doi.org/10.5281/zenodo.3465955)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3465954.svg)](https://doi.org/10.5281/zenodo.3465954)
 
 Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2024
 
 # Software overview
-(To be updated once BackBLAST2 is complete)
-
 `backblast` automates the use of NCBI BLASTP to search for gene clusters within a multiple bacterial genomes. 
 Non-orthologous genes are filtered out by identifying and extracting only bidirectional best BLASTP hits using a graph-based algorithm. The algorithm is illustrated below:
 
