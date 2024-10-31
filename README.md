@@ -5,24 +5,24 @@ BackBLAST reciprocal BLAST workflow
 Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2024
 
 # Software overview
-`backblast` automates the use of NCBI BLASTP to search for genes or gene clusters within a multiple bacterial genomes. 
+`backblast` automates the use of NCBI BLASTP to search for genes or gene clusters within bacterial genomes. 
 Non-orthologous genes are filtered out by identifying and extracting only bidirectional best BLASTP hits using a graph-based algorithm.
-Furthermore, `backblast` allows users to visualize the results from bidirectional BLASTP in the form of a heatmap.
+`backblast` then visualizes the results of bidirectional BLASTP in a convenient gene heatmap coupled to a genome phylogeny.
 
 The bidirectional BLASTP-based filtering algorithm is illustrated below:
 
 ![BackBLAST Algorithm](https://private-user-images.githubusercontent.com/18713012/381830418-2b8690db-ffd5-4fe5-adc3-661c6a7515c2.gif?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MzAzNTE2MDYsIm5iZiI6MTczMDM1MTMwNiwicGF0aCI6Ii8xODcxMzAxMi8zODE4MzA0MTgtMmI4NjkwZGItZmZkNS00ZmU1LWFkYzMtNjYxYzZhNzUxNWMyLmdpZj9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNDEwMzElMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjQxMDMxVDA1MDgyNlomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTVlOGJkODI1ZjIxYmE1ZTQyMTAzMzdmMjBiYjY4YzYxZGQ2ZWJlOWQ2MDkxMDY1YTE4M2U0ZWM2ODYyZmNiNmQmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.mywfr_T158k973yrDKpOsR-uHRDg_s155-a4bm2n6Hs)
 
-Here is an example heatmap visualization of the results:
+Example gene heatmap visualization:
 
 ![Example Results](https://media.springernature.com/full/springer-static/image/art%3A10.1038%2Fs41396-020-0650-2/MediaObjects/41396_2020_650_Fig7_HTML.png)
-(Example from Spasov, Tsuji, _et al._, 2020, [doi:10.1038/s41396-020-0650-2](https://doi.org/10.1038/s41396-020-0650-2))
+(From Spasov, Tsuji, _et al._, 2020, [doi:10.1038/s41396-020-0650-2](https://doi.org/10.1038/s41396-020-0650-2))
 
-# Dependencies
-- OS: Linux operating system (e.g., Ubuntu) or MacOS (tested on Sonoma 14)
-- Software: miniconda or miniforge needs to be installed (must be set to the `osx-64` channel for MacOS)
-- Hardware: Workflow is pretty light on RAM, CPU, and storage space, so most modern computers should be able to handle BackBLAST without issue.
+# Requirements and dependencies
+- OS: runs on linux (e.g., Ubuntu) and MacOS (tested on Sonoma 14)
+- Hardware: most modern computers (e.g., with basic CPU, >=4 GB RAM, and >=4 GB of free storage) should be able to run BackBLAST without issue.
   The only exception is if you create a genome tree within the pipeline, in which case you'll need a fair amount of CPU and time to calculate large trees.
+- Software: miniconda or miniforge needs to be installed (must be set to the `osx-64` channel for MacOS)
 
 # Installation
 Installation is currently semi-manual. We hope to make an automated conda install in the future.
@@ -63,25 +63,85 @@ conda activate backblast
 Now you should be good to go! Run `backblast -h` to get started.
 
 # Usage (quick start)
-See the full manual + settings for BackBLAST at the bottom of this README. Quick start instructions are below.
+Quick start instructions are provided below. See the full manual + settings for BackBLAST at the bottom of this README.
 
-## Recommended workflow
+## 1. Prepare your input files
+Prepare the following files and folders as input for BackBLAST:
+- `query.faa`: multi-fasta file containing the query proteins that you want to search for. 
+               These should be copied and pasted from the `query_genome.faa` file below (the FastA headers for each protein need to be the same as in that file).
+- `query_genome.faa`: multi-fasta file containing all proteins encoded by the query bacterial genome.
+- `subject_dir`: a folder containing the subjects for the search.
+                 Each subject should be the protein-coding genes (as amino acids) for a bacterial genome.
+                 Save each subject as multi-fasta file (like `query_genome.faa` above).
+                 By default, the extension of each file needs to be `.faa`, but this can be changed in the tool settings if desired.
+- `output_dir`: an empty folder for saving the output of BackBLAST.
+
+You are then ready to run BackBLAST, using either method 2a or 2b below.
+
+## 2a. Recommended workflow
+Gives you the ability to customize the parameters of your run.
+
+First, set up the run:
 ```bash
-# Set up the run
 backblast setup query.faa query_genome.faa subject_dir output_dir
-# Then edit output_dir/config.yaml
-# You can also edit output_dir/gene_metadata.tsv and output_dir/genome_metadata.tsv to make the plot look better
-
-# Start the run
-backblast run output_dir/config.yaml output_dir
-# All done! You can iteratively refine the plot from here as you'd like.
 ```
+This makes several configuration files in the `output_dir`.
 
-## Speedy workflow
-Gets the job done without any custom settings
+Open and edit `output_dir/config.yaml` (e.g., in a text editor) to customize the settings for your run. Some key settings include:
+- Thresholds for bidirectional BLASTP: you can set the e-value, percent identity, and query coverage cutoffs for the BLASTP search
+- Phylogenetic tree: you can also set whether you want to auto-generate a genome-based phylogenetic tree during your run (takes time)
+  or if you want to supply a custom pre-generated phylogenetic tree.
+  - If you provide your own phylogenetic tree, the genome IDs in the tree need to match the file names of the genomes in the `subject_dir`.
+    In addition, all genomes in the phylogenetic tree need to be present in the `subject_dir`, or else BackBLAST will fail. If some
+    genomes are in the `subject_dir` but are missing in the tree, then BackBLAST will still proceed but will drop those genomes from the
+    analysis.)
+  - Alternatively, you can also choose to not add a phylogenetic tree to the heatmap.
+- Tree rooting: one other helpful setting is related to tree rooting. You can choose to either root the tree automatically by midpoint or
+  provide the name of one of the genomes that you want to serve as the root of the tree.
+- Plot width and height: you can adjust the final width and height of the heatmap as well. It might take a few rounds of running BackBLAST
+  to find the "perfect" width and height for your heatmap.
+- Take a look at the full config file to see other advanced settings.
+
+You also have the opportunity (optionally) to edit the tab-separeted tables `output_dir/gene_metadata.tsv` and `output_dir/genome_metadata.tsv`
+to improve data visualization. You can open these in a text editor or a table editor (like Excel).
+- In `gene_metadata.tsv`, you can provide human-readable names for the query genes you want to search for. You can also customize the order
+  that the genes will be shown in the heatmap by changing how they are sorted in this file. Also, you can delete rows if you want them to be
+  removed from the heatmap.
+- In `genome_metadata.tsv`, you can provide human-readable names for the genomes in the run. The sort order of the genomes in this file does
+  only impacts the order that the genomes are plotted in if you choose to not use a phylogenetic tree (in the config file above). Otherwise,
+  the sort order is determined using the phylogenetic tree.
+
+Then, start the run:
+```bash
+backblast run output_dir/config.yaml output_dir
+```
+Then, take a look at the key output files `heatmap/BackBLAST_heatmap.tsv` and `heatmap/BackBLAST_heatmap.pdf`.
+The first of these files shows the final bidirectional BLASTP results as a tab-separated table. The second is the final heatmap.
+
+If you aren't satisfied with the results, you can selectively delete run files from the output folder, tweak the settings files above, and
+then re-run BackBLAST to re-generate the desired files with the new run settings.
+
+Three common things to change are:
+- If your BLASTP results are too stringent or not stringent enough: delete the `blast` folder, tweak the key BLASTP settings (in the config file),
+  and then re-run `backblast run`. This will redo everything from the `blast` step and will overwrite the old heatmap files.
+- If your visualization doesn't look right (e.g., the height and width aren't optimal, the genome/gene names aren't ideal, or the genes aren't sorted
+  as you'd like), then delete the `heatmap` folder, tweak the config and metadata files (mentioned above), and re-run `backblast run`.
+  BackBLAST will then use the old `blast` results and just generate a new heatmap.
+- If your phylogeny has issues, then delete the old phylogeny or point to a new one, then re-run `backblast run`. This will use the
+  old `blast` results but will overwrite the old heatmap with a new one.
+
+The PDF heatmap will not be perfect (e.g., the dashed lines between the genome names and tree tips won't be perfectly aligned), but
+you can open the heatmap in a PDF editor like Inkscape and clean it up or customize it as desired.
+
+## 2b. Alternative, speedy workflow
+Gets the job done without any custom settings.
+This command skips the setup setup (above) and just runs the pipeline. You can set some of the key config settings via optional flags. 
 ```bash
 backblast auto [OPTIONS] query.faa query_genome.faa subject_dir output_dir
+# See the different OPTIONS for customizing your run in the full settings at the bottom of this README.
 ```
+
+You can then edit the PDF heatmap as described above.
 
 # Test data
 Try a test run from inside the repo with:
@@ -101,9 +161,11 @@ rm -r testing/outputs
 ```
 
 # Citation
-We hope that BackBLAST is helpful for you! If you use BackBLAST in your research, please cite the following paper, which describes the initial version of BackBLAST:
+We hope that BackBLAST is helpful for you! If you use BackBLAST in your research, please cite the following paper,
+which describes the initial version of BackBLAST:
 
-> Bergstrand LH, Cardenas E, Holert J, Van Hamme JD, Mohn WW. Delineation of Steroid-Degrading Microorganisms through Comparative Genomic Analysis. __mBio__ 7:[10.1128/mbio.00166-16](https://doi.org/10.1128/mbio.00166-16).
+> Bergstrand LH, Cardenas E, Holert J, Van Hamme JD, Mohn WW. Delineation of steroid-degrading microorganisms through
+> comparative genomic analysis. __mBio__ 7:[10.1128/mbio.00166-16](https://doi.org/10.1128/mbio.00166-16).
 
 # Full usage instructions
 Help messages (e.g., from running `backblast -h`) are pasted below.
