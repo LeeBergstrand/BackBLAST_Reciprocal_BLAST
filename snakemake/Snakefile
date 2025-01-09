@@ -133,7 +133,7 @@ if config.get("phylogenetic_tree_newick") == "subjects":
             "logging/benchmarks/gtotree.benchmark.txt"
         threads: config.get("threads", 1)
         params:
-            phylogenetic_model = config.get("gtotree_phylogenetic_model", "Universal_Hug_et_al.hmm"),
+            phylogenetic_model = config.get("gtotree_phylogenetic_model", "Universal-Hug-et-al"),
             sequence_length_threshold = config.get("gtotree_sequence_length_threshold", "0.2"),
             minimum_hit_fraction = config.get("gtotree_minimum_hit_fraction", "0.5")
         shell:
