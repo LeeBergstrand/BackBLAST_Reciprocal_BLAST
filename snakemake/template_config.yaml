@@ -21,7 +21,7 @@ root_name: NA
 ## Options for GToTree, if you want to generate the phylogenetic tree within the BackBLAST pipeline
 ## For these options to be used, set 'phylogenetic_tree_newick' above to 'subjects'
 # Gene marker set to use for making the tree
-gtotree_phylogenetic_model: "Universal_Hug_et_al.hmm"
+gtotree_phylogenetic_model: "Universal-Hug-et-al"
 # Keeps gene hits within this proportional threshold of the median sequence length
 gtotree_sequence_length_threshold: 0.2
 # Keeps genomes with this proportion of hits from the gene marker set
