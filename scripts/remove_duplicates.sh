@@ -13,7 +13,7 @@ if [[ $# -ne 1 ]]; then
   exit 1
 elif [[ $1 = "-h" ]] || [[ $1 = "--help" ]]; then
   printf "${SCRIPT_NAME}: A simple script that removes multiple hits from BackBLAST results.\n"
-  printf "Copyright Lee H. Bergstrand and Jackson M. Tsuji, Neufeld Research Group, 2019\n\n"
+  printf "Copyright Lee H. Bergstrand and Jackson M. Tsuji, Neufeld Research Group, 2024\n\n"
   printf "Usage: ${SCRIPT_NAME} input.csv > output.csv\n\n"
   printf "Note: log information is printed to STDERR.\n\n"
   exit 0
