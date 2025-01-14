@@ -377,7 +377,7 @@ overlay_gene_naming <- function(blast_results, gene_metadata_filepath) {
 #' @export
 plot_blast_heatmap <- function(blast_results) {
 
-  # Only keep the top percent identity value for a query if there are multiple hits (e.g., including possible paralogs)
+  # Just to be safe, only keep the top percent identity value for a query if there are multiple hits
   blast_results_drop_duplicates <- dplyr::top_n(blast_results, 1, pident)
 
   # Add NA values for missing grid values so that grid lines will appear in the final plot
