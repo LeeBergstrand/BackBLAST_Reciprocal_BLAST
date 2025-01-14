@@ -131,7 +131,6 @@ def filter_forward_pairs_by_reverse_pairs(forward_blast_high_scoring_pairs, reve
     filterable_forward_blast_results = list(forward_blast_high_scoring_pairs)
     print(">> Checking if forward hit subjects have better reciprocal hits than query.")
     for hit in forward_blast_high_scoring_pairs:
-        print(hit)
         subject_protein = blast_graph[hit[1]]
 
         # Find the top score of the best reciprocal BLAST hit
