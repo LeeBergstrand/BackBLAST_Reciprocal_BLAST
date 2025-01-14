@@ -22,12 +22,12 @@ import uuid
 import os
 
 from Bio import SeqIO
-
-from Graph import Graph
+import networkx as nx
 
 DEFAULT_E_VALUE_CUTOFF = 1e-25
 DEFAULT_MINIMUM_IDENTITY_CUTOFF = 25
 DEFAULT_MINIMUM_QUERY_COVERAGE = 50
+
 
 def get_blast_hight_scoring_pairs(query_gene_cluster_path, subject_proteome_file, e_value_cutoff, minimum_identity,
                                   minimum_query_coverage):
@@ -53,7 +53,7 @@ def run_blastp(query_file_path, subject_file_path, e_value_cutoff):
     """
     Runs BLASTP on the given query and subject FASTA files.
 
-    :param query_file_path: The path to the query FASTA file..
+    :param query_file_path: The path to the query FASTA file.
     :param subject_file_path: The path to the subject FASTA file.
     :param e_value_cutoff: The e-value cutoff for BLASTP.
     :return:    A csv formatted BLASTP output (query_sequence_id, subject_sequence_id, percent_identity, e-value,
@@ -83,7 +83,7 @@ def filter_blast_csv(raw_blast_output, minimum_identity, minimum_query_coverage)
     # Rather than making a new one
     for high_scoring_pair in blast_results:
         if float(high_scoring_pair[2]) >= minimum_identity:  # Filter by minimum identity
-            if float(high_scoring_pair[4]) >= minimum_query_coverage: # Filter by minimum query coverage
+            if float(high_scoring_pair[4]) >= minimum_query_coverage:  # Filter by minimum query coverage
                 # Converts each high_scoring_pair parameter that should be a number to a number
                 high_scoring_pair[2] = float(high_scoring_pair[2])
                 high_scoring_pair[3] = float(high_scoring_pair[3])
@@ -131,23 +131,23 @@ def filter_forward_pairs_by_reverse_pairs(forward_blast_high_scoring_pairs, reve
     filterable_forward_blast_results = list(forward_blast_high_scoring_pairs)
     print(">> Checking if forward hit subjects have better reciprocal hits than query.")
     for hit in forward_blast_high_scoring_pairs:
-        query_protein = blast_graph.getVertex(hit[0])
-        subject_protein = blast_graph.getVertex(hit[1])
+        print(hit)
+        subject_protein = blast_graph[hit[1]]
 
-        top_back_hit_score = 0
         # Find the top score of the best reciprocal BLAST hit
-        for backHit in subject_protein.getConnections():
-            back_hit_score = subject_protein.getWeight(
-                backHit)  # The edge weight between the subject and its reciprocal BLAST hit is the BLAST score
+        top_back_hit_score = 0
+        for back_hit_id in subject_protein:
+            back_hit_score = get_edge_attribute(subject_protein, back_hit_id,
+                                                'bitscore-rev', none_value=0)
             if back_hit_score >= top_back_hit_score:
                 top_back_hit_score = back_hit_score
 
         # Check if the query is the best reciprocal BLAST hit for the subject
         delete_hit = False
-        if query_protein in subject_protein.getConnections():
+        if hit[0] in subject_protein:
             # The edge weight between the subject and the query is the reciprocal BLAST score
-            back_hit_to_query_score = subject_protein.getWeight(query_protein)
-
+            back_hit_to_query_score = get_edge_attribute(subject_protein, hit[0],
+                                                         'bitscore-rev', none_value=0)
             if back_hit_to_query_score < top_back_hit_score:
                 # If the query is not the best reciprocal BLAST hit simply delete
                 # it from the filterable_forward_blast_results
@@ -160,7 +160,7 @@ def filter_forward_pairs_by_reverse_pairs(forward_blast_high_scoring_pairs, reve
             # Delete the forward BLAST hit from filterable_forward_blast_results
             del filterable_forward_blast_results[filterable_forward_blast_results.index(hit)]
 
-            # Attempts to write reciprocal BLAST output to file
+    # Return reciprocal BLAST output
     return filterable_forward_blast_results
 
 
@@ -172,15 +172,39 @@ def create_blast_graph(forward_blast_high_scoring_pairs, reverse_blast_high_scor
     :param reverse_blast_high_scoring_pairs: The reverse blast high scoring pairs.
     :return: A graph representation of forward and reverse HSPs.
     """
-    blast_graph = Graph()  # Creates graph to map BLAST hits
+    blast_graph = nx.Graph()  # Creates graph to map BLAST hits
     print(">> Creating Graph...")
+    # hit[0] = query ID; hit[1] = subject ID; hit[5] = bitscore
 
     for hit in forward_blast_high_scoring_pairs:
-        blast_graph.addEdge(hit[0], hit[1], hit[5])
+        blast_graph.add_edge(hit[0], hit[1])
+        blast_graph[hit[0]][hit[1]]['bitscore-fwd'] = hit[5]
+
     for hit in reverse_blast_high_scoring_pairs:
-        blast_graph.addEdge(hit[0], hit[1], hit[5])
+        blast_graph.add_edge(hit[1], hit[0])
+        blast_graph[hit[1]][hit[0]]['bitscore-rev'] = hit[5]
 
     return blast_graph
+
+
+def get_edge_attribute(vertex, neighbour_id, attribute_name, none_value=None):
+    """
+    Get attribute of the edge of a nx.Graph()
+
+    :param vertex: AtlasView of a graph centered on the vertex of interest (e.g., graph[vertex]).
+    :param neighbour_id: The ID of the neighbouring vertex to form the edge.
+    :param attribute_name: Name of the edge attribute.
+    :param none_value: What to return of the attribute does not exist for the edge.
+    :return: The value of the attribute for the desired edge.
+    """
+    edge_attributes = vertex[neighbour_id]
+
+    if attribute_name in edge_attributes:
+        attribute_value = edge_attributes[attribute_name]
+    else:
+        attribute_value = none_value
+
+    return attribute_value
 
 
 def main(args):
@@ -207,14 +231,13 @@ def main(args):
     if not subject_proteome_file.endswith(".faa"):
         print("[Warning] " + subject_proteome_file + " may not be a amino acid FASTA file!")
 
-
     print(">> Forward Blasting to subject proteome...")
     # Forward BLAST from query proteins to subject proteome and filter BLAST results by percent identity and query cov
     forward_blast_high_scoring_pairs = get_blast_hight_scoring_pairs(query_gene_cluster_path=query_gene_cluster_path,
-                                                                      subject_proteome_file=subject_proteome_file,
-                                                                      e_value_cutoff=input_e_value_cutoff,
-                                                                      minimum_identity=input_min_ident_cutoff,
-                                                                      minimum_query_coverage=input_min_query_cov_cutoff)
+                                                                     subject_proteome_file=subject_proteome_file,
+                                                                     e_value_cutoff=input_e_value_cutoff,
+                                                                     minimum_identity=input_min_ident_cutoff,
+                                                                     minimum_query_coverage=input_min_query_cov_cutoff)
 
     if len(forward_blast_high_scoring_pairs) == 0:
         print(">> No Forward hits in subject proteome were found.")
@@ -241,9 +264,9 @@ def main(args):
     complete_back_blast_query = "".join(back_blast_query_fastas)
 
     # Attempt to write a temporary FASTA file for the reverse BLAST to use
+    temp_filename = "temp_query_" + uuid.uuid4().hex + ".faa"
+    print(">> Writing backBLASTing query to temporary file " + temp_filename)
     try:
-        temp_filename = "temp_query_" + uuid.uuid4().hex + ".faa"
-        print(">> Writing backBLASTing query to temporary file " + temp_filename)
         write_file = open(temp_filename, "w")
         write_file.write(complete_back_blast_query)
         write_file.close()
@@ -254,10 +277,10 @@ def main(args):
     print(">> BLASTing backwards from subject genome to query genome.")
     # Run backwards BLAST towards query proteome and filters BLAST results by percent identity
     reverse_blast_high_scoring_pairs = get_blast_hight_scoring_pairs(query_gene_cluster_path=temp_filename,
-                                                                      subject_proteome_file=query_proteome_path,
-                                                                      e_value_cutoff=input_e_value_cutoff,
-                                                                      minimum_identity=input_min_ident_cutoff,
-                                                                      minimum_query_coverage=input_min_query_cov_cutoff)
+                                                                     subject_proteome_file=query_proteome_path,
+                                                                     e_value_cutoff=input_e_value_cutoff,
+                                                                     minimum_identity=input_min_ident_cutoff,
+                                                                     minimum_query_coverage=input_min_query_cov_cutoff)
 
     filterable_forward_blast_results = filter_forward_pairs_by_reverse_pairs(forward_blast_high_scoring_pairs,
                                                                              reverse_blast_high_scoring_pairs)

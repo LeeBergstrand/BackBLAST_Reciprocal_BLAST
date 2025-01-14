@@ -6,6 +6,7 @@ dependencies:
   - snakemake=7
   - biopython>=1.76,<=1.84
   - blast>=2.9,<=2.16
+  - networkx=3.4
   - r-base=4
   - r-codetools
   - r-conflicted
