@@ -382,12 +382,13 @@ plot_blast_heatmap <- function(blast_results) {
 
   # Add NA values for missing grid values so that grid lines will appear in the final plot
   # TODO - A bit hacky
-  blast_results_drop_duplicates <- reshape2::dcast(blast_results, subject_name ~ qseqid, value.var = "pident") %>%
+  blast_results_drop_duplicates <- reshape2::dcast(blast_results_drop_duplicates, subject_name ~ qseqid,
+                                                   value.var = "pident") %>%
     reshape2::melt(na.rm = FALSE, id.vars = c("subject_name"), variable.name = "qseqid",
                    value.name = "pident") %>%
     tibble::as_tibble()
   
-  blast_heatmap <- ggplot2::ggplot(blast_results, aes(y = subject_name, x = qseqid)) +
+  blast_heatmap <- ggplot2::ggplot(blast_results_drop_duplicates, aes(y = subject_name, x = qseqid)) +
     geom_tile(aes(fill = pident), colour = "black") +
     theme_bw() +
     theme(panel.grid = element_blank(), axis.title = element_text(size = 12),
