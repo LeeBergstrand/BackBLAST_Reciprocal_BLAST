@@ -2,7 +2,7 @@ BackBLAST reciprocal BLAST workflow
 ==========================
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3465954.svg)](https://doi.org/10.5281/zenodo.3465954)
 
-Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2024
+Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2025
 
 # Software overview
 `backblast` automates the use of NCBI BLASTP to search for genes or gene clusters within bacterial genomes. 
