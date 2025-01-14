@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # ----------------------------------------------------------------------------------------
-# Copyright: Lee H. Bergstrand (2024)
+# Copyright: Lee H. Bergstrand and Jackson M. Tsuji, 2025
 # Description: A Biopython program that takes a list of query proteins and uses local BLASTP to search
 #              for highly similar proteins within a local blast database (usually a local db of a target
 #              proteome). The program then BLASTPs backwards from the found subject proteins to the query
@@ -301,7 +301,8 @@ def main(args):
 if __name__ == '__main__':
     """Command Line Interface Options"""
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="Runs reciprocal BLASTP on a given set of query proteins. "
+                                                 "Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2025.")
     parser.add_argument('-q', '--gene_cluster', metavar='FASTA', required=True,
                         help='''The path to the protein FASTA file of the gene cluster to be used as a query.''')
 

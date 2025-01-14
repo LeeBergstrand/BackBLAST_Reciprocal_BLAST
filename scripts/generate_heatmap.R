@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 # generate_heatmap.R
-# Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2024
+# Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2025
 # Plots a newick treefile and BLAST table together as a phylogenetic tree and heatmap
 # Part of the BackBLAST pipeline
 
@@ -534,7 +534,7 @@ main <- function(params) {
 if ( !interactive() ) {
   parser <- argparser::arg_parser(
       description = glue::glue("generate_heatmap.R: Binds a phylogenetic tree to a BLAST table heatmap.
-                                Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2024."))
+                                Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2025."))
   
   # Add required args
   parser <- argparser::add_argument(parser = parser, arg = "input_phylogenetic_tree_filepath", 
