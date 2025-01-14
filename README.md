@@ -33,7 +33,8 @@ Run the following code in your command line (e.g., Terminal) to install BackBLAS
 # Download the repo
 git clone https://github.com/LeeBergstrand/BackBLAST_Reciprocal_BLAST.git
 cd BackBLAST_Reciprocal_BLAST
-git checkout develop # optionally go to a specific branch or version tag
+# git checkout develop # optionally go to a specific branch
+# git checkout v2.0.0-beta1 # optionally go to a specific release
 
 # Create the conda env
 conda env create -n backblast --file=environment.yml
