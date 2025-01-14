@@ -376,10 +376,13 @@ overlay_gene_naming <- function(blast_results, gene_metadata_filepath) {
 #' @return ggplot heatmap
 #' @export
 plot_blast_heatmap <- function(blast_results) {
-  
+
+  # Only keep the top percent identity value for a query if there are multiple hits (e.g., including possible paralogs)
+  blast_results_drop_duplicates <- dplyr::top_n(blast_results, 1, pident)
+
   # Add NA values for missing grid values so that grid lines will appear in the final plot
   # TODO - A bit hacky
-  blast_results <- reshape2::dcast(blast_results, subject_name ~ qseqid, value.var = "pident") %>%
+  blast_results_drop_duplicates <- reshape2::dcast(blast_results, subject_name ~ qseqid, value.var = "pident") %>%
     reshape2::melt(na.rm = FALSE, id.vars = c("subject_name"), variable.name = "qseqid",
                    value.name = "pident") %>%
     tibble::as_tibble()
