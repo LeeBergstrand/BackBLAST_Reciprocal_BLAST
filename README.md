@@ -19,7 +19,7 @@ Example gene heatmap visualization:
 (From Spasov, Tsuji, _et al._, 2020, [doi:10.1038/s41396-020-0650-2](https://doi.org/10.1038/s41396-020-0650-2))
 
 # Requirements and dependencies
-- OS: runs on linux (e.g., Ubuntu) and MacOS (tested on Sonoma 14)
+- OS: runs on linux (e.g., Ubuntu) and MacOS (tested on Sonoma 14 and Sequoia 15)
 - Hardware: most modern computers (e.g., with basic CPU, >=4 GB RAM, and >=4 GB of free storage) should be able to run BackBLAST without issue.
   The only exception is if you create a genome tree within the pipeline, in which case you'll need a fair amount of CPU and time to calculate large trees.
 - Software: miniconda or miniforge needs to be installed (must be set to the `osx-64` channel for MacOS).
