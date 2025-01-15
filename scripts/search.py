@@ -131,7 +131,9 @@ def filter_forward_pairs_by_reverse_pairs(forward_blast_high_scoring_pairs, reve
     filterable_forward_blast_results = list(forward_blast_high_scoring_pairs)
     print(">> Checking if forward hit subjects have better reciprocal hits than query.")
     for hit in forward_blast_high_scoring_pairs:
-        subject_protein = blast_graph[hit[1]]
+        query_protein_id = hit[0]
+        subject_protein_id = hit[1]
+        subject_protein = blast_graph[subject_protein_id]
 
         # Find the top score of the best reciprocal BLAST hit
         top_back_hit_score = 0
@@ -143,9 +145,9 @@ def filter_forward_pairs_by_reverse_pairs(forward_blast_high_scoring_pairs, reve
 
         # Check if the query is the best reciprocal BLAST hit for the subject
         delete_hit = False
-        if hit[0] in subject_protein:
+        if query_protein_id in subject_protein:
             # The edge weight between the subject and the query is the reciprocal BLAST score
-            back_hit_to_query_score = get_edge_attribute(subject_protein, hit[0],
+            back_hit_to_query_score = get_edge_attribute(subject_protein, query_protein_id,
                                                          'bitscore-rev', none_value=-1)
             if back_hit_to_query_score < top_back_hit_score:
                 # If the query is not the best reciprocal BLAST hit simply delete
