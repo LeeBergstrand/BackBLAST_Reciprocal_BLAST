@@ -138,6 +138,11 @@ def filter_forward_pairs_by_reverse_pairs(forward_blast_high_scoring_pairs, reve
         # Find the top score of the best reciprocal BLAST hit
         top_back_hit_score = 0
         for back_hit_id in subject_protein:
+            # If an edge in the graph has no reverse bitscore, it means that no BLASTP hit passed the search threshold
+            # for that subject -> query pair. Yet to do greater than/less than comparisons of bitscores, some kind of
+            # filler value is needed for these cases so that the script can still run. Using the none_value parameter
+            # here (and below), that filler value is set to -1 so that it is clear that it is not a real bitscore. This
+            # filler value will never pass the top_back_hit_score=0 threshold and so is safe to use.
             back_hit_score = get_edge_attribute(subject_protein, back_hit_id,
                                                 'bitscore-rev', none_value=-1)
             if back_hit_score >= top_back_hit_score:
