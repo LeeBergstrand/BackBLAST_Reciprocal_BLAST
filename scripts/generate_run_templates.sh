@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 # generate_run_templates.sh
-# Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2024
+# Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2025
 # Script for generating and manipulating BackBLAST config templates
 # Part of the BackBLAST pipeline
 
@@ -219,7 +219,7 @@ function main() {
 
     # Help statement
     printf "${SCRIPT_NAME}: generate template config files for a BackBLAST 'setup'. Part of the BackBLAST suite.\n"
-    printf "Copyright Lee H. Bergstrand and Jackson M. Tsuji, Neufeld Research Group, 2024\n\n"
+    printf "Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2025\n\n"
     printf "Usage: ${SCRIPT_NAME} [OPTIONS] query_filepath query_genome_filepath subject_genome_directory output_directory\n\n"
     printf "Positional arguments (required):\n"
     printf "   query_filepath: path to the query predicted protein sequences from the query genome, FastA format\n"
