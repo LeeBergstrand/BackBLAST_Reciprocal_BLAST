@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 # combine_tables.R
-# Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2024
+# Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2025
 # Combines BLAST output (CSV) tables into a single output table with headers
 # Part of the BackBLAST pipeline
 
@@ -20,7 +20,7 @@ parse_command_line_input <- function(commandArgs) {
   
   if (length(commandArgs) < 2) {
     cat("combine_tables.R: Combines BLAST tables and makes new column for sample ID based on the filenames.\n")
-    cat("Copyright Lee Bergstrand and Jackson M. Tsuji, 2024\n")
+    cat("Copyright Lee Bergstrand and Jackson M. Tsuji, 2025\n")
     cat("Part of the BackBLAST pipeline.\n\n")
     
     cat("Usage: combine_tables.R subject1.csv subject2.csv ... subjectN.csv combined_blast_tables.csv\n\n")

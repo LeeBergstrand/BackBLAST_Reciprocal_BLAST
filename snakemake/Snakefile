@@ -1,5 +1,5 @@
 # Snakemake rules for the BackBLAST pipeline
-# Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2022
+# Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2025
 
 import os
 from snakemake.utils import logger, min_version, update_config

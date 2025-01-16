@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 # generate_heatmap.R
-# Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2024
+# Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2025
 # Plots a newick treefile and BLAST table together as a phylogenetic tree and heatmap
 # Part of the BackBLAST pipeline
 
@@ -376,15 +376,19 @@ overlay_gene_naming <- function(blast_results, gene_metadata_filepath) {
 #' @return ggplot heatmap
 #' @export
 plot_blast_heatmap <- function(blast_results) {
-  
+
+  # Just to be safe, only keep the top percent identity value for a query if there are multiple hits
+  blast_results_drop_duplicates <- dplyr::top_n(blast_results, 1, pident)
+
   # Add NA values for missing grid values so that grid lines will appear in the final plot
   # TODO - A bit hacky
-  blast_results <- reshape2::dcast(blast_results, subject_name ~ qseqid, value.var = "pident") %>%
+  blast_results_drop_duplicates <- reshape2::dcast(blast_results_drop_duplicates, subject_name ~ qseqid,
+                                                   value.var = "pident") %>%
     reshape2::melt(na.rm = FALSE, id.vars = c("subject_name"), variable.name = "qseqid",
                    value.name = "pident") %>%
     tibble::as_tibble()
   
-  blast_heatmap <- ggplot2::ggplot(blast_results, aes(y = subject_name, x = qseqid)) +
+  blast_heatmap <- ggplot2::ggplot(blast_results_drop_duplicates, aes(y = subject_name, x = qseqid)) +
     geom_tile(aes(fill = pident), colour = "black") +
     theme_bw() +
     theme(panel.grid = element_blank(), axis.title = element_text(size = 12),
@@ -530,7 +534,7 @@ main <- function(params) {
 if ( !interactive() ) {
   parser <- argparser::arg_parser(
       description = glue::glue("generate_heatmap.R: Binds a phylogenetic tree to a BLAST table heatmap.
-                                Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2024."))
+                                Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2025."))
   
   # Add required args
   parser <- argparser::add_argument(parser = parser, arg = "input_phylogenetic_tree_filepath", 

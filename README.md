@@ -2,7 +2,7 @@ BackBLAST reciprocal BLAST workflow
 ==========================
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3465954.svg)](https://doi.org/10.5281/zenodo.3465954)
 
-Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2024
+Copyright Lee H. Bergstrand and Jackson M. Tsuji, 2025
 
 # Software overview
 `backblast` automates the use of NCBI BLASTP to search for genes or gene clusters within bacterial genomes. 
@@ -11,7 +11,7 @@ Non-orthologous genes are filtered out by identifying and extracting only bidire
 
 The bidirectional BLASTP-based filtering algorithm is illustrated below:
 
-![BackBLAST Algorithm](https://private-user-images.githubusercontent.com/18713012/381830418-2b8690db-ffd5-4fe5-adc3-661c6a7515c2.gif?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MzAzNTE2MDYsIm5iZiI6MTczMDM1MTMwNiwicGF0aCI6Ii8xODcxMzAxMi8zODE4MzA0MTgtMmI4NjkwZGItZmZkNS00ZmU1LWFkYzMtNjYxYzZhNzUxNWMyLmdpZj9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNDEwMzElMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjQxMDMxVDA1MDgyNlomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTVlOGJkODI1ZjIxYmE1ZTQyMTAzMzdmMjBiYjY4YzYxZGQ2ZWJlOWQ2MDkxMDY1YTE4M2U0ZWM2ODYyZmNiNmQmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.mywfr_T158k973yrDKpOsR-uHRDg_s155-a4bm2n6Hs)
+![BackBLAST Algorithm](https://private-user-images.githubusercontent.com/18713012/381830418-2b8690db-ffd5-4fe5-adc3-661c6a7515c2.gif?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MzY4MzM2MTUsIm5iZiI6MTczNjgzMzMxNSwicGF0aCI6Ii8xODcxMzAxMi8zODE4MzA0MTgtMmI4NjkwZGItZmZkNS00ZmU1LWFkYzMtNjYxYzZhNzUxNWMyLmdpZj9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTAxMTQlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUwMTE0VDA1NDE1NVomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTRmOWM2ODMyMjlmMjRjNDRiYzI0MzRkZGVjZDZmMTYzNmE2OWYwYjRjYjg2ZGZhMTdjYTA5ZjU4NjRjN2FkNzcmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0._Zn0HWRNK6News7h6oTw2r7_GnXWOjGk4wsuqBH6fS4)
 
 Example gene heatmap visualization:
 
@@ -19,7 +19,7 @@ Example gene heatmap visualization:
 (From Spasov, Tsuji, _et al._, 2020, [doi:10.1038/s41396-020-0650-2](https://doi.org/10.1038/s41396-020-0650-2))
 
 # Requirements and dependencies
-- OS: runs on linux (e.g., Ubuntu) and MacOS (tested on Sonoma 14)
+- OS: runs on linux (e.g., Ubuntu) and MacOS (tested on Sonoma 14 and Sequoia 15)
 - Hardware: most modern computers (e.g., with basic CPU, >=4 GB RAM, and >=4 GB of free storage) should be able to run BackBLAST without issue.
   The only exception is if you create a genome tree within the pipeline, in which case you'll need a fair amount of CPU and time to calculate large trees.
 - Software: miniconda or miniforge needs to be installed (must be set to the `osx-64` channel for MacOS).
@@ -33,7 +33,8 @@ Run the following code in your command line (e.g., Terminal) to install BackBLAS
 # Download the repo
 git clone https://github.com/LeeBergstrand/BackBLAST_Reciprocal_BLAST.git
 cd BackBLAST_Reciprocal_BLAST
-git checkout develop # optionally go to a specific branch or version tag
+# git checkout develop # optionally go to a specific branch
+# git checkout v2.0.0-beta1 # optionally go to a specific release
 
 # Create the conda env
 conda env create -n backblast --file=environment.yml
